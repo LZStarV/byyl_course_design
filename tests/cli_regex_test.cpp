@@ -67,6 +67,34 @@ private slots:
         QTextStream(stdout) << "【用例3Token数量】" << toks_all.size() << "，【ERR数量】" << err_all << "\n";
         QVERIFY(err_all == 0);
     }
+    void test_tiny_regex_pipeline(){
+        Engine eng;
+        auto text = readAllAny("tests/regex/tiny.regex");
+        if(text.isEmpty()){
+            text = QStringLiteral(
+                "letter = [A-Za-z]\n"
+                "digit = [0-9]\n"
+                "_identifier100 = letter(letter|digit)*\n"
+                "_number101 = digit+\n"
+                "_keywords200S = [Ii][Ff] | [Tt][Hh][Ee][Nn] | [Ee][Ll][Ss][Ee] | [Ee][Nn][Dd] | [Rr][Ee][Pp][Ee][Aa][Tt] | [Uu][Nn][Tt][Ii][Ll] | [Rr][Ee][Aa][Dd] | [Ww][Rr][Ii][Tt][Ee]\n"
+                "_operators220S = \\+ | - | \\* | / | % | ^ | < | <> | <= | >= | > | = | { | } | ; | :=\n"
+            );
+        }
+        auto rf = eng.lexFile(text);
+        auto pf = eng.parseFile(rf);
+        QVERIFY(pf.tokens.size() > 0);
+        QVector<int> codes; auto mdfas = eng.buildAllMinDFA(pf, codes);
+        QVERIFY(mdfas.size() == codes.size());
+        auto src = readAllAny("tests/sample/tiny/tiny1.tny");
+        if(src.isEmpty()) src = readAllAny("resources/sample.tny");
+        if(src.isEmpty()){
+            src = QStringLiteral("{ comment }\nREAD x;\nwrite 123\nif x < 10 then read y end\n");
+        }
+        auto out = eng.runMultiple(mdfas, codes, src);
+        auto toks = out.split(' ', Qt::SkipEmptyParts);
+        int err = 0; for(const auto& s : toks){ if(s == "ERR") err++; }
+        QVERIFY(err == 0);
+    }
 };
 QTEST_MAIN(CliRegexTest)
 #include "cli_regex_test.moc"
