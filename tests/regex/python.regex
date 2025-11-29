@@ -1,0 +1,6 @@
+letter = [A-Za-z_]
+digit = [0-9]
+_identifier100 = letter(letter|digit)*
+_number101 = digit+
+_keywords200S = if | else | def | return | class | import | from | as | for | while | break | continue | pass
+_operators220S = \+ | - | \* | / | % | == | != | < | <= | > | >= | = | \(| \) | \[ | \] | \{ | \} | , | :

@@ -1,0 +1,54 @@
+Start testing: Nov 30 02:09 CST
+----------------------------------------------------------
+1/2 Testing: GuiTest
+1/2 Test: GuiTest
+Command: "/Users/bytedance/project/byyl/build-macos/GuiTest"
+Directory: /Users/bytedance/project/byyl/build-macos
+"GuiTest" start time: Nov 30 02:09 CST
+Output:
+----------------------------------------------------------
+********* Start testing of TestGui *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+PASS   : TestGui::initTestCase()
+PASS   : TestGui::testConversionFlow()
+PASS   : TestGui::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 109ms
+********* Finished testing of TestGui *********
+<end of output>
+Test time =   0.26 sec
+----------------------------------------------------------
+Test Passed.
+"GuiTest" end time: Nov 30 02:09 CST
+"GuiTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: CliRegexTest
+2/2 Test: CliRegexTest
+Command: "/Users/bytedance/project/byyl/build-macos/CliRegexTest"
+Directory: /Users/bytedance/project/byyl/build-macos
+"CliRegexTest" start time: Nov 30 02:09 CST
+Output:
+----------------------------------------------------------
+********* Start testing of CliRegexTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+PASS   : CliRegexTest::initTestCase()
+TEXT_LEN=344
+TOKENS_LEX=4
+TOKENS_PARSE=4
+NFA cols=40
+DFA cols=39
+MinDFA cols=39
+OUT=ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR
+PASS   : CliRegexTest::test_js_regex_pipeline()
+PASS   : CliRegexTest::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 1ms
+********* Finished testing of CliRegexTest *********
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"CliRegexTest" end time: Nov 30 02:09 CST
+"CliRegexTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 30 02:09 CST

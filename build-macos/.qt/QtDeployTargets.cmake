@@ -1,0 +1,6 @@
+set(__QT_DEPLOY_TARGET_byyl_FILE /Users/bytedance/project/byyl/build-macos/byyl.app/Contents/MacOS/byyl)
+set(__QT_DEPLOY_TARGET_byyl_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_GuiTest_FILE /Users/bytedance/project/byyl/build-macos/GuiTest)
+set(__QT_DEPLOY_TARGET_GuiTest_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_CliRegexTest_FILE /Users/bytedance/project/byyl/build-macos/CliRegexTest)
+set(__QT_DEPLOY_TARGET_CliRegexTest_TYPE EXECUTABLE)

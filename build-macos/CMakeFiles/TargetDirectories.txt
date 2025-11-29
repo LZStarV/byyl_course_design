@@ -1,0 +1,12 @@
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/byyl.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/GuiTest.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/CliRegexTest.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/test.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/edit_cache.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/rebuild_cache.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/byyl_autogen_timestamp_deps.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/byyl_autogen.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/GuiTest_autogen_timestamp_deps.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/GuiTest_autogen.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/CliRegexTest_autogen_timestamp_deps.dir
+/Users/bytedance/project/byyl/build-macos/CMakeFiles/CliRegexTest_autogen.dir
