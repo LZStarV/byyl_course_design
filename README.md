@@ -47,6 +47,16 @@
 - 在“代码查看”页点击“生成代码”，会显示完整源码并保存到 `byyl.app/generated/lex/tiny_<yyyyMMdd_HHmmss>_<hash12>.cpp`
 - GUI 会将该源码编译到 `byyl.app/generated/lex/bin/` 并在“测试与验证”页通过“运行词法分析”执行；未更换正则时复用同一份生成代码与二进制
 
+## 配置
+- 工程侧配置文件：`config/lexer.json`
+  - `generated_output_dir`：生成代码保存目录，默认 `byyl.app/../../generated/lex`
+  - `weight_tiers`：权重阈值数组，按优先级从高到低，例如：
+    - `[{"min_code":220,"weight":3},{"min_code":200,"weight":4},{"min_code":100,"weight":1},{"min_code":0,"weight":0}]`
+- 环境变量覆盖：
+  - `BYYL_GEN_DIR`：覆盖生成代码保存目录
+  - `LEXER_WEIGHTS`：生成器可执行程序读取的权重配置，格式 `min:weight` 逗号分隔，例如：`220:3,200:4,100:1,0:0`
+- 默认回退：若未提供配置或环境变量，系统按当前内置阈值与目录工作，确保行为不变。
+
 ## 目录结构
  - `app/`：主窗口与 UI（`mainwindow.h/.cpp/.ui`，`main.cpp`）
  - `app/app.pro`：qmake 项目文件（可选）
@@ -57,6 +67,7 @@
   - `model/`：`Alphabet.h`，`Automata.h`
   - `Engine.*`：统一编排与运行器（构建所有规则的 MinDFA 并并行扫描）
 - `tests/`：`GuiTest`、`CliRegexTest`、`CodegenTest`
+- 新增测试：`ConfigWeightTest`（权重配置覆盖）、`GenDirConfigTest`（生成目录覆盖）
 - `tests/sample/`：示例源代码（`javascript/`、`python/`、`tiny/`）
 - `generated/lex/`：保存生成的合并扫描器源码（时间戳+哈希命名）
 - `generated/lex/bin/`：GUI 编译输出的可执行文件

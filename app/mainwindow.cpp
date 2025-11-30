@@ -21,6 +21,7 @@
 #include <QDateTime>
 #include <QCryptographicHash>
 #include "../src/Engine.h"
+#include "../src/config/Config.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -275,7 +276,7 @@ void MainWindow::fillAllMin(){
     fillTable(tblMinDFA, t);
 }
 QString MainWindow::computeRegexHash(const QString& text){ auto h = QCryptographicHash::hash(text.toUtf8(), QCryptographicHash::Sha256); return QString(h.toHex()); }
-QString MainWindow::ensureGenDir(){ QString base = QCoreApplication::applicationDirPath()+"/../../generated/lex"; QDir d(base); if(!d.exists()) d.mkpath("."); QDir b(base+"/bin"); if(!b.exists()) b.mkpath("."); return base; }
+QString MainWindow::ensureGenDir(){ QString base = Config::generatedOutputDir(); QDir d(base); if(!d.exists()) d.mkpath("."); QDir b(base+"/bin"); if(!b.exists()) b.mkpath("."); return base; }
 void MainWindow::onTabChanged(int idx){
     if(idx<0) return;
     auto w = tabs->widget(idx);

@@ -81,6 +81,7 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas, const QVec
     out += "#include <cctype>\n";
     out += "#include <string>\n";
     out += "#include <iostream>\n";
+    out += "#include <cstdlib>\n";
     out += "using namespace std;\n\n";
 
     out += "static inline int Judgechar(char ch)\n";
@@ -94,9 +95,25 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas, const QVec
 
     out += "static inline int codeWeight(int c)\n";
     out += "{\n";
-    out += "    if (c>=220) return 3;\n";
-    out += "    if (c>=200) return 4;\n";
-    out += "    if (c>=100) return 1;\n";
+    out += "    static bool inited=false;\n";
+    out += "    static int mins[16]; static int ws[16]; static int cnt=0;\n";
+    out += "    if(!inited){\n";
+    out += "        const char* env=getenv(\"LEXER_WEIGHTS\");\n";
+    out += "        if(env){\n";
+    out += "            // 格式: 220:3,200:4,100:1,0:0\n";
+    out += "            const char* p=env; while(*p){\n";
+    out += "                int a=0,b=0; while(*p && *p>='0' && *p<='9'){ a=a*10+(*p-'0'); p++; }\n";
+    out += "                if(*p==':'){ p++; while(*p && *p>='0' && *p<='9'){ b=b*10+(*p-'0'); p++; } }\n";
+    out += "                mins[cnt]=a; ws[cnt]=b; cnt++; if(*p==',') p++; else while(*p && *p!=',') p++;\n";
+    out += "            }\n";
+    out += "        }\n";
+    out += "        if(cnt>1){ // 按 minCode 降序排序\n";
+    out += "            for(int i=0;i<cnt;i++){ for(int j=i+1;j<cnt;j++){ if(mins[j]>mins[i]){ int tm=mins[i]; mins[i]=mins[j]; mins[j]=tm; int tw=ws[i]; ws[i]=ws[j]; ws[j]=tw; } } }\n";
+    out += "        }\n";
+    out += "        if(cnt==0){ mins[cnt]=220; ws[cnt++]=3; mins[cnt]=200; ws[cnt++]=4; mins[cnt]=100; ws[cnt++]=1; mins[cnt]=0; ws[cnt++]=0; }\n";
+    out += "        inited=true;\n";
+    out += "    }\n";
+    out += "    for(int i=0;i<cnt;i++){ if(c>=mins[i]) return ws[i]; }\n";
     out += "    return 0;\n";
     out += "}\n\n";
 

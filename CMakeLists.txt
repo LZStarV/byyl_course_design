@@ -30,6 +30,8 @@ set(APP_SOURCES
     src/generator/CodeGenerator.cpp
     src/Engine.h
     src/Engine.cpp
+    src/config/Config.h
+    src/config/Config.cpp
 )
 
 qt_add_executable(byyl
@@ -55,6 +57,7 @@ target_sources(GuiTest PRIVATE
     src/automata/Hopcroft.cpp
     src/generator/CodeGenerator.cpp
     src/Engine.cpp
+    src/config/Config.cpp
 )
 target_link_libraries(GuiTest PRIVATE Qt6::Widgets Qt6::Test)
 add_test(NAME 界面测试 COMMAND GuiTest)
@@ -68,6 +71,7 @@ target_sources(CliRegexTest PRIVATE
     src/automata/Hopcroft.cpp
     src/generator/CodeGenerator.cpp
     src/Engine.cpp
+    src/config/Config.cpp
 )
 target_link_libraries(CliRegexTest PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME 命令行正则测试 COMMAND CliRegexTest)
@@ -81,6 +85,28 @@ target_sources(CodegenTest PRIVATE
     src/automata/Hopcroft.cpp
     src/generator/CodeGenerator.cpp
     src/Engine.cpp
+    src/config/Config.cpp
 )
 target_link_libraries(CodegenTest PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME 代码生成器测试 COMMAND CodegenTest)
+
+add_executable(ConfigWeightTest tests/config_weight_test.cpp)
+target_sources(ConfigWeightTest PRIVATE
+    src/regex/RegexLexer.cpp
+    src/regex/RegexParser.cpp
+    src/automata/Thompson.cpp
+    src/automata/SubsetConstruction.cpp
+    src/automata/Hopcroft.cpp
+    src/generator/CodeGenerator.cpp
+    src/Engine.cpp
+    src/config/Config.cpp
+)
+target_link_libraries(ConfigWeightTest PRIVATE Qt6::Core Qt6::Test)
+add_test(NAME 权重配置测试 COMMAND ConfigWeightTest)
+
+add_executable(GenDirConfigTest tests/gen_dir_config_test.cpp)
+target_sources(GenDirConfigTest PRIVATE
+    src/config/Config.cpp
+)
+target_link_libraries(GenDirConfigTest PRIVATE Qt6::Core Qt6::Test)
+add_test(NAME 生成目录配置测试 COMMAND GenDirConfigTest)

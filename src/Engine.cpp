@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "config/Config.h"
 RegexFile Engine::lexFile(const QString& text){ return RegexLexer::lex(text); }
 ParsedFile Engine::parseFile(const RegexFile& f){ return RegexParser::parse(f); }
 NFA Engine::buildNFA(ASTNode* ast, const Alphabet& alpha){ return Thompson::build(ast,alpha); }
@@ -35,8 +36,7 @@ static int matchLen(const MinDFA& mdfa, const QString& src, int pos){ int state=
         if(!moved) break; i++; if(mdfa.states[state].accept) lastAcc=i; }
     return lastAcc==-1?0:(lastAcc-pos); }
 
-static auto codeWeight = [](int c){ if(c>=220) return 3; if(c>=200) return 4; if(c>=100) return 1; return 0; };
-QString Engine::runMultiple(const QVector<MinDFA>& mdfas, const QVector<int>& codes, const QString& source){ QString out; int pos=0; while(pos<source.size()){ QChar ch=source[pos]; if(ch==' '||ch=='\t'||ch=='\n'||ch=='\r'){ pos++; continue; } if(ch=='{'){ pos++; while(pos<source.size() && source[pos++]!='}'){} continue; } int bestLen=0; int bestIdx=-1; int bestW=-1; for(int i=0;i<mdfas.size();++i){ int len = matchLen(mdfas[i], source, pos); int w = codeWeight(codes[i]); if(len>bestLen || (len==bestLen && w>bestW)){ bestLen=len; bestIdx=i; bestW=w; } }
+QString Engine::runMultiple(const QVector<MinDFA>& mdfas, const QVector<int>& codes, const QString& source){ QString out; int pos=0; while(pos<source.size()){ QChar ch=source[pos]; if(ch==' '||ch=='\t'||ch=='\n'||ch=='\r'){ pos++; continue; } if(ch=='{'){ pos++; while(pos<source.size() && source[pos++]!='}'){} continue; } int bestLen=0; int bestIdx=-1; int bestW=-1; for(int i=0;i<mdfas.size();++i){ int len = matchLen(mdfas[i], source, pos); int w = Config::weightForCode(codes[i]); if(len>bestLen || (len==bestLen && w>bestW)){ bestLen=len; bestIdx=i; bestW=w; } }
         if(bestLen>0){ out += QString::number(codes[bestIdx])+" "; pos += bestLen; } else { out += "ERR "; pos++; }
     }
     return out.trimmed(); }
