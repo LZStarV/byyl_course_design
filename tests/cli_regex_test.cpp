@@ -1,7 +1,7 @@
 #include <QtTest>
 #include <QFile>
 #include <QTextStream>
-#include "../src/core/Engine.h"
+#include "../src/Engine.h"
 class CliRegexTest: public QObject {
     Q_OBJECT
 private:
@@ -86,7 +86,6 @@ private slots:
         QVector<int> codes; auto mdfas = eng.buildAllMinDFA(pf, codes);
         QVERIFY(mdfas.size() == codes.size());
         auto src = readAllAny("tests/sample/tiny/tiny1.tny");
-        if(src.isEmpty()) src = readAllAny("resources/sample.tny");
         if(src.isEmpty()){
             src = QStringLiteral("{ comment }\nREAD x;\nwrite 123\nif x < 10 then read y end\n");
         }

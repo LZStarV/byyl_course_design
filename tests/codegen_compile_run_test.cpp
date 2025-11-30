@@ -2,7 +2,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QProcess>
-#include "../src/core/Engine.h"
+#include "../src/Engine.h"
 class CodegenTest: public QObject {
     Q_OBJECT
 private:

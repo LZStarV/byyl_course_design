@@ -9,7 +9,8 @@
 - 正则解析：支持连接、`|`、`*`、`+`、`?`、`[]`、`()`、`\` 转义、命名宏 `name = expr`
 - 自动机转换：RE→NFA（Thompson）、NFA→DFA（子集构造）、DFA→MinDFA（Hopcroft）
 - 表格展示：动态列头（字母表与 `#` 表示 ε），首列标记（`-` 初态、`+` 终态）
-- 代码生成：从 MinDFA 生成 C/C++ 源码（方法二：Switch-Case），字符串已格式化并带换行
+- 代码生成：从 MinDFA 生成 C/C++ 源码（方法二：Switch-Case）
+- 生成代码持久化与复用：完整合并扫描器源码按时间戳+正则哈希保存至 `byyl.app/generated/lex`，并编译到 `byyl.app/generated/lex/bin`；在未更换正则表达式时，GUI 与测试复用当前生成文件
 - 测试与验证：并行扫描所有 Token 规则，最长匹配 + 权重策略，跳过空白与 `{...}` 注释
 
 ## 界面使用
@@ -21,8 +22,10 @@
 - 操作步骤：
   - 在“正则编辑”页点击“从文件加载”，选择正则文件（示例：`tests/regex/javascript.regex`）
   - 点击“转换”查看三阶段状态表
-  - 切到“测试与验证”，左侧输入源文本（JS/TINY 片段），点击“运行词法分析”查看右侧编码输出
-  - 若左侧为空，系统会尝试加载 `resources/sample.tny`；仍为空则注入示例文本并提示状态栏
+  - 切到“代码查看”，点击“生成代码”：显示完整合并扫描器源码，并保存到 `generated/lex/tiny_<yyyyMMdd_HHmmss>_<hash12>.cpp`
+  - 切到“测试与验证”，左侧输入源文本（JS/TINY 片段），点击“运行词法分析”：若当前未有生成文件或正则更换，会先编译当前源码到 `generated/lex/bin/` 并执行；右侧展示 Token 编码输出
+  - 若左侧为空，系统会尝试加载 `tests/sample/tiny/tiny1.tny`；仍为空则注入示例文本并提示状态栏
+  - 也可点击“选择样例文件”从 `tests/sample/` 目录选择 JS（`javascript/`）、Python（`python/`）或 TINY（`tiny/`）的示例文件
   - 若输出包含 `ERR`，状态栏会提示“存在未识别的词法单元(ERR)，请检查正则与输入”
 
 ## 命令行测试
@@ -40,19 +43,23 @@
 
 ## 代码生成
 - 生成方法：Switch-Case 状态机（方法二）
-- 生成内容包含：`Judgechar`、`AcceptState`、`Step` 等函数，格式化换行与缩进
-- 在“代码查看”页点击“生成代码”可查看生成字符串；也可复制到本地进行独立编译
+- 生成内容包含：`Judgechar`、`AcceptState`、`Step` 等函数，完整合并扫描器源码
+- 在“代码查看”页点击“生成代码”，会显示完整源码并保存到 `byyl.app/generated/lex/tiny_<yyyyMMdd_HHmmss>_<hash12>.cpp`
+- GUI 会将该源码编译到 `byyl.app/generated/lex/bin/` 并在“测试与验证”页通过“运行词法分析”执行；未更换正则时复用同一份生成代码与二进制
 
 ## 目录结构
-- `byyl_course_design_1/`：主窗口与 UI（`mainwindow.h/.cpp/.ui`，`main.cpp`）
-- `src/core/`：核心逻辑（与 GUI 解耦）
+ - `app/`：主窗口与 UI（`mainwindow.h/.cpp/.ui`，`main.cpp`）
+ - `app/app.pro`：qmake 项目文件（可选）
+ - `src/`：核心逻辑（与 GUI 解耦）
   - `regex/`：`RegexLexer.*`，`RegexParser.*`
   - `automata/`：`Thompson.*`，`SubsetConstruction.*`，`Hopcroft.*`
   - `generator/`：`CodeGenerator.*`
   - `model/`：`Alphabet.h`，`Automata.h`
   - `Engine.*`：统一编排与运行器（构建所有规则的 MinDFA 并并行扫描）
 - `tests/`：`GuiTest`、`CliRegexTest`、`CodegenTest`
-- `resources/`：示例 `tiny.regex` 与 `sample.tny`
+- `tests/sample/`：示例源代码（`javascript/`、`python/`、`tiny/`）
+- `generated/lex/`：保存生成的合并扫描器源码（时间戳+哈希命名）
+- `generated/lex/bin/`：GUI 编译输出的可执行文件
 - `CMakeLists.txt`：应用与测试目标定义
 
 ## 构建与运行
@@ -65,6 +72,7 @@
 - 找不到 Qt：优先使用 `qt-cmake`，或为 `cmake` 添加 `-DCMAKE_PREFIX_PATH=$(brew --prefix qt)`
 - 表格无内容：检查是否加载了有效的正则（至少包含一条以 `_` 开头的 Token 规则）
 - 输出包含 `ERR`：检查关键字大小写、操作符转义（如 `\+`、`\*`、`\(`、`\)`），以及输入文本是否符合正则
+- 关键字大小写：TINY 关键字大小写不敏感（无需写成 `[Ii][Ff]`），JS 关键字大小写敏感。
 
 ## 开发规范
 - 日志：建议启用 `export QT_LOGGING_RULES="*.debug=true"`，在关键路径输出结构化日志

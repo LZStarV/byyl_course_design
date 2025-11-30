@@ -3,7 +3,7 @@
 #include <QPushButton>
 #include <QTableWidget>
 #include <QPlainTextEdit>
-#include "../byyl_course_design_1/mainwindow.h"
+#include "../app/mainwindow.h"
 class TestGui: public QObject {
     Q_OBJECT
 private slots:

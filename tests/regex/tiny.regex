@@ -2,5 +2,5 @@ letter = [A-Za-z]
 digit = [0-9]
 _identifier100 = letter(letter|digit)*
 _number101 = digit+
-_keywords200S = [Ii][Ff] | [Tt][Hh][Ee][Nn] | [Ee][Ll][Ss][Ee] | [Ee][Nn][Dd] | [Rr][Ee][Pp][Ee][Aa][Tt] | [Uu][Nn][Tt][Ii][Ll] | [Rr][Ee][Aa][Dd] | [Ww][Rr][Ii][Tt][Ee]
+_keywords200S = if | then | else | end | repeat | until | read | write
 _operators220S = \+ | - | \* | / | % | ^ | < | <> | <= | >= | > | = | { | } | ; | :=

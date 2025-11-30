@@ -20,7 +20,7 @@
 #include <QComboBox>
 #include <QDateTime>
 #include <QCryptographicHash>
-#include "../src/core/Engine.h"
+#include "../src/Engine.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -150,13 +150,13 @@ void MainWindow::onRunLexerClicked(bool){
         currentRegexHash = hashNow; currentCodePath = savePath; currentBinPath = base+"/bin/"+QFileInfo(savePath).completeBaseName();
     }
     QProcess proc; proc.start("clang++", QStringList()<<"-std=c++17"<<currentCodePath<<"-o"<<currentBinPath); proc.waitForFinished(); if(proc.exitStatus()!=QProcess::NormalExit || proc.exitCode()!=0){ txtLexResult->setPlainText(QString::fromUtf8(proc.readAllStandardError())); statusBar()->showMessage("编译失败"); return; }
-    // 准备输入：优先选中的样例文件，其次文本框内容，再次 resources
+    // 准备输入：优先选中的样例文件，其次文本框内容，最后使用内置示例
     QString src = txtSourceTiny->toPlainText();
     if(src.trimmed().isEmpty()){
-        QString p1 = QCoreApplication::applicationDirPath()+"/../../resources/sample.tny";
+        QString p1 = QCoreApplication::applicationDirPath()+"/../../tests/sample/tiny/tiny1.tny";
         QFile f1(p1);
         if(f1.open(QIODevice::ReadOnly|QIODevice::Text)){ QTextStream in(&f1); src = in.readAll(); f1.close(); }
-        else { QString p2 = QCoreApplication::applicationDirPath()+"/resources/sample.tny"; QFile f2(p2); if(f2.open(QIODevice::ReadOnly|QIODevice::Text)){ QTextStream in(&f2); src = in.readAll(); f2.close(); } }
+        else { QString p2 = QCoreApplication::applicationDirPath()+"/tests/sample/tiny/tiny1.tny"; QFile f2(p2); if(f2.open(QIODevice::ReadOnly|QIODevice::Text)){ QTextStream in(&f2); src = in.readAll(); f2.close(); } }
         if(src.trimmed().isEmpty()){ src = QStringLiteral("read x;\n"); }
         txtSourceTiny->setPlainText(src);
     }
