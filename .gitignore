@@ -56,3 +56,6 @@ CMakeLists.txt.user*
 .cache/
 generated/lex/
 generated/lex/bin/
+
+# Trae IDE artifacts (internal tooling)
+/.trae/

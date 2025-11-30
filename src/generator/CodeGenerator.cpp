@@ -1,36 +1,83 @@
 #include "CodeGenerator.h"
 #include <QStringBuilder>
-static QString genJudge(const MinDFA& m){ QString s; s += "int Judgechar(char ch){"; if(m.alpha.hasLetter){ s += " if(isalpha((unsigned char)ch)) return 1;"; } if(m.alpha.hasDigit){ s += " if(isdigit((unsigned char)ch)) return 0;"; } s += " return -1; }"; return s; }
-static QString genNext(){ return "char GetNext(){ extern std::string buffer; extern size_t pos; if(pos<buffer.size()) return buffer[pos++]; return '\\0'; }"; }
-QString CodeGenerator::generate(const MinDFA& mdfa, const QMap<QString,int>& tokenCodes){
+static QString genJudge(const MinDFA& m)
+{
+    QString s;
+    s += "int Judgechar(char ch){";
+    if (m.alpha.hasLetter)
+    {
+        s += " if(isalpha((unsigned char)ch)) return 1;";
+    }
+    if (m.alpha.hasDigit)
+    {
+        s += " if(isdigit((unsigned char)ch)) return 0;";
+    }
+    s += " return -1; }";
+    return s;
+}
+static QString genNext()
+{
+    return "char GetNext(){ extern std::string buffer; extern size_t pos; if(pos<buffer.size()) "
+           "return buffer[pos++]; return '\\0'; }";
+}
+QString CodeGenerator::generate(const MinDFA& mdfa, const QMap<QString, int>& tokenCodes)
+{
     QString code;
     code += "#include <cctype>\n";
     code += "#include <string>\n";
     code += "using namespace std;\n\n";
 
     code += "int Judgechar(char ch) {\n";
-    if (mdfa.alpha.hasLetter) { code += "    if (isalpha((unsigned char)ch)) return 1;\n"; }
-    if (mdfa.alpha.hasDigit) { code += "    if (isdigit((unsigned char)ch)) return 0;\n"; }
+    if (mdfa.alpha.hasLetter)
+    {
+        code += "    if (isalpha((unsigned char)ch)) return 1;\n";
+    }
+    if (mdfa.alpha.hasDigit)
+    {
+        code += "    if (isdigit((unsigned char)ch)) return 0;\n";
+    }
     code += "    return -1;\n";
     code += "}\n\n";
 
     code += "bool AcceptState(int s) {\n";
     code += "    switch (s) {\n";
-    for(auto it=mdfa.states.begin(); it!=mdfa.states.end(); ++it){ if(it->accept){ code += "        case "+QString::number(it->id)+": return true;\n"; } }
+    for (auto it = mdfa.states.begin(); it != mdfa.states.end(); ++it)
+    {
+        if (it->accept)
+        {
+            code += "        case " + QString::number(it->id) + ": return true;\n";
+        }
+    }
     code += "        default: return false;\n";
     code += "    }\n";
     code += "}\n\n";
 
     code += "int Step(int state, char ch) {\n";
     code += "    switch (state) {\n";
-    for(auto it=mdfa.states.begin(); it!=mdfa.states.end(); ++it){
-        code += "        case "+QString::number(it->id)+":\n";
-        for(auto a: mdfa.alpha.ordered()){
-            int t=it->trans.value(a,-1);
-            if(t!=-1){
-                if(a.compare("letter",Qt::CaseInsensitive)==0){ code += "            if (isalpha((unsigned char)ch) || ch=='_' || ch=='$') return "+QString::number(t)+";\n"; }
-                else if(a.compare("digit",Qt::CaseInsensitive)==0){ code += "            if (isdigit((unsigned char)ch)) return "+QString::number(t)+";\n"; }
-                else { code += "            if (ch=='"+a+"') return "+QString::number(t)+";\n"; }
+    for (auto it = mdfa.states.begin(); it != mdfa.states.end(); ++it)
+    {
+        code += "        case " + QString::number(it->id) + ":\n";
+        for (auto a : mdfa.alpha.ordered())
+        {
+            int t = it->trans.value(a, -1);
+            if (t != -1)
+            {
+                if (a.compare("letter", Qt::CaseInsensitive) == 0)
+                {
+                    code +=
+                        "            if (isalpha((unsigned char)ch) || ch=='_' || ch=='$') "
+                        "return " +
+                        QString::number(t) + ";\n";
+                }
+                else if (a.compare("digit", Qt::CaseInsensitive) == 0)
+                {
+                    code += "            if (isdigit((unsigned char)ch)) return " +
+                            QString::number(t) + ";\n";
+                }
+                else
+                {
+                    code += "            if (ch=='" + a + "') return " + QString::number(t) + ";\n";
+                }
             }
         }
         code += "            return -1;\n";
@@ -41,32 +88,56 @@ QString CodeGenerator::generate(const MinDFA& mdfa, const QMap<QString,int>& tok
     return code;
 }
 
-static QString genAcceptStateI(const MinDFA& mdfa, int idx){
+static QString genAcceptStateI(const MinDFA& mdfa, int idx)
+{
     QString s;
-    s += "bool AcceptState_"+QString::number(idx)+"(int s)\n";
+    s += "bool AcceptState_" + QString::number(idx) + "(int s)\n";
     s += "{\n";
     s += "    switch (s)\n";
     s += "    {\n";
-    for(auto it=mdfa.states.begin(); it!=mdfa.states.end(); ++it){ if(it->accept){ s += "        case "+QString::number(it->id)+": return true;\n"; } }
+    for (auto it = mdfa.states.begin(); it != mdfa.states.end(); ++it)
+    {
+        if (it->accept)
+        {
+            s += "        case " + QString::number(it->id) + ": return true;\n";
+        }
+    }
     s += "        default: return false;\n";
     s += "    }\n";
     s += "}\n\n";
     return s;
 }
-static QString genStepI(const MinDFA& mdfa, int idx){
+static QString genStepI(const MinDFA& mdfa, int idx)
+{
     QString code;
-    code += "int Step_"+QString::number(idx)+"(int state, char ch)\n";
+    code += "int Step_" + QString::number(idx) + "(int state, char ch)\n";
     code += "{\n";
     code += "    switch (state)\n";
     code += "    {\n";
-    for(auto it=mdfa.states.begin(); it!=mdfa.states.end(); ++it){
-        code += "        case "+QString::number(it->id)+":\n";
-        for(auto a: mdfa.alpha.ordered()){
-            int t=it->trans.value(a,-1);
-            if(t!=-1){
-                if(a.compare("letter",Qt::CaseInsensitive)==0){ code += "            if (isalpha((unsigned char)ch) || ch=='_' || ch=='$') return "+QString::number(t)+";\n"; }
-                else if(a.compare("digit",Qt::CaseInsensitive)==0){ code += "            if (isdigit((unsigned char)ch)) return "+QString::number(t)+";\n"; }
-                else { code += "            if (ch=='"+a+"') return "+QString::number(t)+";\n"; }
+    for (auto it = mdfa.states.begin(); it != mdfa.states.end(); ++it)
+    {
+        code += "        case " + QString::number(it->id) + ":\n";
+        for (auto a : mdfa.alpha.ordered())
+        {
+            int t = it->trans.value(a, -1);
+            if (t != -1)
+            {
+                if (a.compare("letter", Qt::CaseInsensitive) == 0)
+                {
+                    code +=
+                        "            if (isalpha((unsigned char)ch) || ch=='_' || ch=='$') "
+                        "return " +
+                        QString::number(t) + ";\n";
+                }
+                else if (a.compare("digit", Qt::CaseInsensitive) == 0)
+                {
+                    code += "            if (isdigit((unsigned char)ch)) return " +
+                            QString::number(t) + ";\n";
+                }
+                else
+                {
+                    code += "            if (ch=='" + a + "') return " + QString::number(t) + ";\n";
+                }
             }
         }
         code += "            return -1;\n";
@@ -76,7 +147,10 @@ static QString genStepI(const MinDFA& mdfa, int idx){
     code += "}\n\n";
     return code;
 }
-QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas, const QVector<int>& codes, const Alphabet& alpha){
+QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas,
+                                        const QVector<int>&    codes,
+                                        const Alphabet&        alpha)
+{
     QString out;
     out += "#include <cctype>\n";
     out += "#include <string>\n";
@@ -89,24 +163,49 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas, const QVec
     out += "// 按字母表配置将字符划分为 letter/digit 类别\n";
     out += "static inline int Judgechar(char ch)\n";
     out += "{\n";
-    if(alpha.hasLetter){ out += "    if (isalpha((unsigned char)ch)) return 1;\n"; }
-    if(alpha.hasDigit){ out += "    if (isdigit((unsigned char)ch)) return 0;\n"; }
+    if (alpha.hasLetter)
+    {
+        out += "    if (isalpha((unsigned char)ch)) return 1;\n";
+    }
+    if (alpha.hasDigit)
+    {
+        out += "    if (isdigit((unsigned char)ch)) return 0;\n";
+    }
     out += "    return -1;\n";
     out += "}\n\n";
 
-    for(int i=0;i<mdfas.size();++i){ out += genAcceptStateI(mdfas[i], i); out += genStepI(mdfas[i], i); }
+    for (int i = 0; i < mdfas.size(); ++i)
+    {
+        out += genAcceptStateI(mdfas[i], i);
+        out += genStepI(mdfas[i], i);
+    }
 
     out += "// 每个 Token 的 DFA 函数分发表\n";
     out += "typedef int (*StepFn)(int,char);\n";
     out += "typedef bool (*AcceptFn)(int);\n";
-    out += "static StepFn STEPS["+QString::number(mdfas.size())+"]={";
-    for(int i=0;i<mdfas.size();++i){ out += "Step_"+QString::number(i); if(i+1<mdfas.size()) out += ","; }
+    out += "static StepFn STEPS[" + QString::number(mdfas.size()) + "]={";
+    for (int i = 0; i < mdfas.size(); ++i)
+    {
+        out += "Step_" + QString::number(i);
+        if (i + 1 < mdfas.size())
+            out += ",";
+    }
     out += "};\n";
-    out += "static AcceptFn ACCEPTS["+QString::number(mdfas.size())+"]={";
-    for(int i=0;i<mdfas.size();++i){ out += "AcceptState_"+QString::number(i); if(i+1<mdfas.size()) out += ","; }
+    out += "static AcceptFn ACCEPTS[" + QString::number(mdfas.size()) + "]={";
+    for (int i = 0; i < mdfas.size(); ++i)
+    {
+        out += "AcceptState_" + QString::number(i);
+        if (i + 1 < mdfas.size())
+            out += ",";
+    }
     out += "};\n";
-    out += "static int STARTS["+QString::number(mdfas.size())+"]={";
-    for(int i=0;i<mdfas.size();++i){ out += QString::number(mdfas[i].start); if(i+1<mdfas.size()) out += ","; }
+    out += "static int STARTS[" + QString::number(mdfas.size()) + "]={";
+    for (int i = 0; i < mdfas.size(); ++i)
+    {
+        out += QString::number(mdfas[i].start);
+        if (i + 1 < mdfas.size())
+            out += ",";
+    }
     out += "};\n\n";
 
     out += "// 权重函数：用于在匹配长度相同的情况下进行优先级决策\n";
@@ -119,15 +218,24 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas, const QVec
     out += "        if(env){\n";
     out += "            // 格式: 220:3,200:4,100:1,0:0\n";
     out += "            const char* p=env; while(*p){\n";
-    out += "                int a=0,b=0; while(*p && *p>='0' && *p<='9'){ a=a*10+(*p-'0'); p++; }\n";
-    out += "                if(*p==':'){ p++; while(*p && *p>='0' && *p<='9'){ b=b*10+(*p-'0'); p++; } }\n";
-    out += "                mins[cnt]=a; ws[cnt]=b; cnt++; if(*p==',') p++; else while(*p && *p!=',') p++;\n";
+    out +=
+        "                int a=0,b=0; while(*p && *p>='0' && *p<='9'){ a=a*10+(*p-'0'); p++; }\n";
+    out +=
+        "                if(*p==':'){ p++; while(*p && *p>='0' && *p<='9'){ b=b*10+(*p-'0'); p++; "
+        "} }\n";
+    out +=
+        "                mins[cnt]=a; ws[cnt]=b; cnt++; if(*p==',') p++; else while(*p && *p!=',') "
+        "p++;\n";
     out += "            }\n";
     out += "        }\n";
     out += "        if(cnt>1){ // 按 minCode 降序排序\n";
-    out += "            for(int i=0;i<cnt;i++){ for(int j=i+1;j<cnt;j++){ if(mins[j]>mins[i]){ int tm=mins[i]; mins[i]=mins[j]; mins[j]=tm; int tw=ws[i]; ws[i]=ws[j]; ws[j]=tw; } } }\n";
+    out +=
+        "            for(int i=0;i<cnt;i++){ for(int j=i+1;j<cnt;j++){ if(mins[j]>mins[i]){ int "
+        "tm=mins[i]; mins[i]=mins[j]; mins[j]=tm; int tw=ws[i]; ws[i]=ws[j]; ws[j]=tw; } } }\n";
     out += "        }\n";
-    out += "        if(cnt==0){ mins[cnt]=220; ws[cnt++]=3; mins[cnt]=200; ws[cnt++]=4; mins[cnt]=100; ws[cnt++]=1; mins[cnt]=0; ws[cnt++]=0; }\n";
+    out +=
+        "        if(cnt==0){ mins[cnt]=220; ws[cnt++]=3; mins[cnt]=200; ws[cnt++]=4; "
+        "mins[cnt]=100; ws[cnt++]=1; mins[cnt]=0; ws[cnt++]=0; }\n";
     out += "        inited=true;\n";
     out += "    }\n";
     out += "    for(int i=0;i<cnt;i++){ if(c>=mins[i]) return ws[i]; }\n";
@@ -193,10 +301,19 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas, const QVec
     out += "            skipBlock = (v==\"1\" || v==\"true\" || v==\"yes\");\n";
     out += "        }\n";
     out += "        if (ch==' '||ch=='\\t'||ch=='\\n'||ch=='\\r'){ pos++; continue; }\n";
-    out += "        if (skipBrace && ch=='{'){ pos++; while(pos<src.size() && src[pos++]!='}'){} continue; }\n";
-    out += "        if (skipLine && ch=='/' && pos+1<src.size() && src[pos+1]=='/'){ pos+=2; while(pos<src.size() && src[pos++]!='\\n'){} continue; }\n";
-    out += "        if (skipHash && ch==35){ pos++; while(pos<src.size() && src[pos++]!='\\n'){} continue; }\n";
-    out += "        if (skipBlock && ch=='/' && pos+1<src.size() && src[pos+1]=='*'){ pos+=2; while(pos+1<src.size()){ if(src[pos]=='*' && src[pos+1]=='/'){ pos+=2; break; } pos++; } continue; }\n";
+    out +=
+        "        if (skipBrace && ch=='{'){ pos++; while(pos<src.size() && src[pos++]!='}'){} "
+        "continue; }\n";
+    out +=
+        "        if (skipLine && ch=='/' && pos+1<src.size() && src[pos+1]=='/'){ pos+=2; "
+        "while(pos<src.size() && src[pos++]!='\\n'){} continue; }\n";
+    out +=
+        "        if (skipHash && ch==35){ pos++; while(pos<src.size() && src[pos++]!='\\n'){} "
+        "continue; }\n";
+    out +=
+        "        if (skipBlock && ch=='/' && pos+1<src.size() && src[pos+1]=='*'){ pos+=2; "
+        "while(pos+1<src.size()){ if(src[pos]=='*' && src[pos+1]=='/'){ pos+=2; break; } pos++; } "
+        "continue; }\n";
     out += "        const char* envSq = getenv(\"LEXER_SKIP_SQ_STRING\");\n";
     out += "        bool skipSq = true;\n";
     out += "        if (envSq) {\n";
@@ -220,15 +337,33 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas, const QVec
     out += "            for (auto &c : v) c = tolower(c);\n";
     out += "            skipTpl = (v==\"1\" || v==\"true\" || v==\"yes\");\n";
     out += "        }\n";
-    out += "        if (skipSq && ch==39){ pos++; while(pos<src.size()){ char c=src[pos++]; if(c==92){ if(pos<src.size()) pos++; continue; } if(c==39) break; } continue; }\n";
-    out += "        if (skipDq && ch==34){ pos++; while(pos<src.size()){ char c=src[pos++]; if(c==92){ if(pos<src.size()) pos++; continue; } if(c==34) break; } continue; }\n";
-    out += "        if (skipTpl && ch==96){ pos++; while(pos<src.size()){ char c=src[pos++]; if(c==92){ if(pos<src.size()) pos++; continue; } if(c==96) break; if(c==36 && pos<src.size() && src[pos]==123){ pos++; int depth=1; while(pos<src.size() && depth>0){ char c2=src[pos++]; if(c2==92){ if(pos<src.size()) pos++; continue; } if(c2==123) depth++; else if(c2==125) depth--; } } } continue; }\n";
+    out +=
+        "        if (skipSq && ch==39){ pos++; while(pos<src.size()){ char c=src[pos++]; "
+        "if(c==92){ if(pos<src.size()) pos++; continue; } if(c==39) break; } continue; }\n";
+    out +=
+        "        if (skipDq && ch==34){ pos++; while(pos<src.size()){ char c=src[pos++]; "
+        "if(c==92){ if(pos<src.size()) pos++; continue; } if(c==34) break; } continue; }\n";
+    out +=
+        "        if (skipTpl && ch==96){ pos++; while(pos<src.size()){ char c=src[pos++]; "
+        "if(c==92){ if(pos<src.size()) pos++; continue; } if(c==96) break; if(c==36 && "
+        "pos<src.size() && src[pos]==123){ pos++; int depth=1; while(pos<src.size() && depth>0){ "
+        "char c2=src[pos++]; if(c2==92){ if(pos<src.size()) pos++; continue; } if(c2==123) "
+        "depth++; else if(c2==125) depth--; } } } continue; }\n";
     out += "        int bestLen=0; int bestIdx=-1; int bestW=-1;\n";
-    out += "        int codeList["+QString::number(codes.size())+"]={";
-    for(int i=0;i<codes.size();++i){ out += QString::number(codes[i]); if(i+1<codes.size()) out += ","; }
+    out += "        int codeList[" + QString::number(codes.size()) + "]={";
+    for (int i = 0; i < codes.size(); ++i)
+    {
+        out += QString::number(codes[i]);
+        if (i + 1 < codes.size())
+            out += ",";
+    }
     out += "};\n";
-    out += "        for(int i=0;i<"+QString::number(mdfas.size())+"; ++i){ int len=matchLen(i,src,pos); int w=codeWeight(codeList[i]); if(len>bestLen || (len==bestLen && w>bestW)){ bestLen=len; bestIdx=i; bestW=w; } }\n";
-    out += "        if (bestLen>0){ if(!out.empty()) out+=' '; out+=to_string(codeList[bestIdx]); pos+=bestLen; } else { if(!out.empty()) out+=' '; out+=string(\"ERR\"); pos++; }\n";
+    out += "        for(int i=0;i<" + QString::number(mdfas.size()) +
+           "; ++i){ int len=matchLen(i,src,pos); int w=codeWeight(codeList[i]); if(len>bestLen || "
+           "(len==bestLen && w>bestW)){ bestLen=len; bestIdx=i; bestW=w; } }\n";
+    out +=
+        "        if (bestLen>0){ if(!out.empty()) out+=' '; out+=to_string(codeList[bestIdx]); "
+        "pos+=bestLen; } else { if(!out.empty()) out+=' '; out+=string(\"ERR\"); pos++; }\n";
     out += "    }\n";
     out += "    return out;\n";
     out += "}\n\n";
@@ -239,7 +374,9 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas, const QVec
     out += "    if (argc>1)\n";
     out += "    {\n";
     out += "        FILE* f=fopen(argv[1],\"rb\");\n";
-    out += "        if (f){ char buf[4096]; size_t n; while((n=fread(buf,1,sizeof(buf),f))>0){ input.append(buf,n);} fclose(f);}\n";
+    out +=
+        "        if (f){ char buf[4096]; size_t n; while((n=fread(buf,1,sizeof(buf),f))>0){ "
+        "input.append(buf,n);} fclose(f);}\n";
     out += "    }\n";
     out += "    else\n";
     out += "    {\n";

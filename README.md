@@ -100,3 +100,24 @@
 - 日志：建议启用 `export QT_LOGGING_RULES="*.debug=true"`，在关键路径输出结构化日志
 - 跨平台：路径用 `QDir/QFileInfo`，文件用 `QTextStream`；兼容 `\n/\r`；布局使用 `QLayout`；源码 UTF-8
 - UI 自动化：关键控件均设置 `objectName`，`Qt Test` 通过 `findChild` 与 `QTest` 进行交互与断言
+
+## 代码风格与自动格式化
+- 风格配置文件：项目根目录 `/.clang-format`
+- 基础规范：Google C++ 风格，定制为：
+  - 缩进：4 个空格（`IndentWidth: 4`）
+  - 大括号：Allman 风格（`BreakBeforeBraces: Allman`）
+  - 控制语句与括号之间保留空格（`SpaceBeforeParens: ControlStatements`）
+  - 参数/模板不打包，按对齐换行（`BinPackArguments: false`，`BinPackParameters: false`）
+  - 列宽限制 100（尽量减少无谓换行，`ColumnLimit: 100`）
+  - 保持包含顺序（`SortIncludes: false`，`IncludeBlocks: Preserve`）
+  - 注释不重排（`ReflowComments: false`），使用 Doxygen 规范
+- 安装工具：
+  - `brew install clang-format`
+- 检查与格式化（排除构建产物与生成目录）：
+  - 生成清单（macOS）：
+    - ``find src app tests \( -type d -name "*_autogen" -o -type d -name "generated" -o -type d -name "byyl.app" \) -prune -o \( -type f \( -name "*.cpp" -o -name "*.h" \) -print \) > format_file_list.txt``
+  - 干跑检查：
+    - ``cat format_file_list.txt | xargs -I{} clang-format -n --Werror --style=file {}``
+  - 执行格式化：
+    - ``cat format_file_list.txt | xargs -I{} clang-format -i --style=file {}``
+  - 完成后可删除 `format_file_list.txt`（仅为一次性清单），`/.clang-format` 请保留。
