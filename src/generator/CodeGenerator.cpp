@@ -337,18 +337,69 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas,
     out += "            for (auto &c : v) c = tolower(c);\n";
     out += "            skipTpl = (v==\"1\" || v==\"true\" || v==\"yes\");\n";
     out += "        }\n";
-    out +=
-        "        if (skipSq && ch==39){ pos++; while(pos<src.size()){ char c=src[pos++]; "
-        "if(c==92){ if(pos<src.size()) pos++; continue; } if(c==39) break; } continue; }\n";
-    out +=
-        "        if (skipDq && ch==34){ pos++; while(pos<src.size()){ char c=src[pos++]; "
-        "if(c==92){ if(pos<src.size()) pos++; continue; } if(c==34) break; } continue; }\n";
-    out +=
-        "        if (skipTpl && ch==96){ pos++; while(pos<src.size()){ char c=src[pos++]; "
-        "if(c==92){ if(pos<src.size()) pos++; continue; } if(c==96) break; if(c==36 && "
-        "pos<src.size() && src[pos]==123){ pos++; int depth=1; while(pos<src.size() && depth>0){ "
-        "char c2=src[pos++]; if(c2==92){ if(pos<src.size()) pos++; continue; } if(c2==123) "
-        "depth++; else if(c2==125) depth--; } } } continue; }\n";
+    out += "        if (skipSq && ch==39)\n";
+    out += "        {\n";
+    out += "            pos++;\n";
+    out += "            while (pos < src.size())\n";
+    out += "            {\n";
+    out += "                char c = src[pos++];\n";
+    out += "                if (c == 92)\n";
+    out += "                {\n";
+    out += "                    if (pos < src.size()) pos++;\n";
+    out += "                    continue;\n";
+    out += "                }\n";
+    out += "                if (c == 39) break;\n";
+    out += "            }\n";
+    out += "            continue;\n";
+    out += "        }\n";
+
+    out += "        if (skipDq && ch==34)\n";
+    out += "        {\n";
+    out += "            pos++;\n";
+    out += "            while (pos < src.size())\n";
+    out += "            {\n";
+    out += "                char c = src[pos++];\n";
+    out += "                if (c == 92)\n";
+    out += "                {\n";
+    out += "                    if (pos < src.size()) pos++;\n";
+    out += "                    continue;\n";
+    out += "                }\n";
+    out += "                if (c == 34) break;\n";
+    out += "            }\n";
+    out += "            continue;\n";
+    out += "        }\n";
+
+    out += "        if (skipTpl && ch==96)\n";
+    out += "        {\n";
+    out += "            pos++;\n";
+    out += "            while (pos < src.size())\n";
+    out += "            {\n";
+    out += "                char c = src[pos++];\n";
+    out += "                if (c == 92)\n";
+    out += "                {\n";
+    out += "                    if (pos < src.size()) pos++;\n";
+    out += "                    continue;\n";
+    out += "                }\n";
+    out += "                if (c == 96) break;\n";
+    out += "                if (c == 36 && pos < src.size() && src[pos] == 123)\n";
+    out += "                {\n";
+    out += "                    pos++;\n";
+    out += "                    int depth = 1;\n";
+    out += "                    while (pos < src.size() && depth > 0)\n";
+    out += "                    {\n";
+    out += "                        char c2 = src[pos++];\n";
+    out += "                        if (c2 == 92)\n";
+    out += "                        {\n";
+    out += "                            if (pos < src.size()) pos++;\n";
+    out += "                            continue;\n";
+    out += "                        }\n";
+    out += "                        if (c2 == 123) depth++;\n";
+    out += "                        else if (c2 == 125) depth--;\n";
+    out += "                    }\n";
+    out += "                }\n";
+    out += "            }\n";
+    out += "            continue;\n";
+    out += "        }\n";
     out += "        int bestLen=0; int bestIdx=-1; int bestW=-1;\n";
     out += "        int codeList[" + QString::number(codes.size()) + "]={";
     for (int i = 0; i < codes.size(); ++i)
@@ -358,12 +409,29 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas,
             out += ",";
     }
     out += "};\n";
-    out += "        for(int i=0;i<" + QString::number(mdfas.size()) +
-           "; ++i){ int len=matchLen(i,src,pos); int w=codeWeight(codeList[i]); if(len>bestLen || "
-           "(len==bestLen && w>bestW)){ bestLen=len; bestIdx=i; bestW=w; } }\n";
-    out +=
-        "        if (bestLen>0){ if(!out.empty()) out+=' '; out+=to_string(codeList[bestIdx]); "
-        "pos+=bestLen; } else { if(!out.empty()) out+=' '; out+=string(\"ERR\"); pos++; }\n";
+    out += "        for (int i = 0; i < " + QString::number(mdfas.size()) + "; ++i)\n";
+    out += "        {\n";
+    out += "            int len = matchLen(i, src, pos);\n";
+    out += "            int w   = codeWeight(codeList[i]);\n";
+    out += "            if (len > bestLen || (len == bestLen && w > bestW))\n";
+    out += "            {\n";
+    out += "                bestLen = len;\n";
+    out += "                bestIdx = i;\n";
+    out += "                bestW   = w;\n";
+    out += "            }\n";
+    out += "        }\n";
+    out += "        if (bestLen > 0)\n";
+    out += "        {\n";
+    out += "            if (!out.empty()) out += ' ';\n";
+    out += "            out += to_string(codeList[bestIdx]);\n";
+    out += "            pos += bestLen;\n";
+    out += "        }\n";
+    out += "        else\n";
+    out += "        {\n";
+    out += "            if (!out.empty()) out += ' ';\n";
+    out += "            out += string(\"ERR\");\n";
+    out += "            pos++;\n";
+    out += "        }\n";
     out += "    }\n";
     out += "    return out;\n";
     out += "}\n\n";

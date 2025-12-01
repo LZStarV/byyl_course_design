@@ -5,7 +5,7 @@
 
 # Build outputs (CMake/Ninja)
 /build/
-/build-macos/
+/dist/
 /build-*/
 **/CMakeCache.txt
 **/CMakeFiles/

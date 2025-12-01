@@ -29,7 +29,8 @@ class Config
     static bool skipBraceComment();
     /** \brief 是否跳过行注释（//）*/
     static bool                                           skipLineComment();
-    /** \brief 是否跳过块注释（/* ... */）* / static bool skipBlockComment();
+    /** \brief 是否跳过块注释（slash-star … star-slash）*/
+    static bool skipBlockComment();
     /** \brief 是否跳过井号注释（#）*/
     static bool skipHashComment();
     /** \brief 是否跳过单引号字符串 */

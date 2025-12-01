@@ -1,0 +1,16 @@
+CompileFlags:
+  CompilationDatabase: compile_commands.json
+  Add:
+    - -std=gnu++17
+    - -DQT_CORE_LIB
+    - -DQT_GUI_LIB
+    - -DQT_WIDGETS_LIB
+    - -DQT_NO_DEBUG
+    - -isystem
+    - /opt/homebrew/lib/QtCore.framework/Headers
+    - -isystem
+    - /opt/homebrew/lib/QtGui.framework/Headers
+    - -isystem
+    - /opt/homebrew/lib/QtWidgets.framework/Headers
+    - -iframework
+    - /opt/homebrew/lib
