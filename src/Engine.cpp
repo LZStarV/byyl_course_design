@@ -368,7 +368,10 @@ static int matchLen(const MinDFA& mdfa, const QString& src, int pos)
                 continue;
             if (a.compare("letter", Qt::CaseInsensitive) == 0)
             {
-                if (ch.isLetter() || ch == '_' || ch == '$')
+                bool ok = ch.isLetter();
+                if (!ok && mdfa.alpha.allowUnderscoreInLetter && ch == '_') ok = true;
+                if (!ok && mdfa.alpha.allowDollarInLetter && ch == '$') ok = true;
+                if (ok)
                 {
                     state = t;
                     moved = true;

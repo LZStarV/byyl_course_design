@@ -230,5 +230,12 @@ ParsedFile RegexParser::parse(const RegexFile& file)
         if (a.hasDigit)
             out.alpha.hasDigit = true;
     }
+    // 根据宏定义推断 letter 允许的附加字符
+    if (out.macros.contains("letter"))
+    {
+        auto expr = out.macros.value("letter").expr;
+        if (expr.contains('_')) out.alpha.allowUnderscoreInLetter = true;
+        if (expr.contains('$')) out.alpha.allowDollarInLetter     = true;
+    }
     return out;
 }

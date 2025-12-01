@@ -64,10 +64,10 @@ QString CodeGenerator::generate(const MinDFA& mdfa, const QMap<QString, int>& to
             {
                 if (a.compare("letter", Qt::CaseInsensitive) == 0)
                 {
-                    code +=
-                        "            if (isalpha((unsigned char)ch) || ch=='_' || ch=='$') "
-                        "return " +
-                        QString::number(t) + ";\n";
+                    code += "            if (isalpha((unsigned char)ch)";
+                    code += mdfa.alpha.allowUnderscoreInLetter ? " || ch=='_'" : "";
+                    code += mdfa.alpha.allowDollarInLetter ? " || ch=='$'" : "";
+                    code += ") return " + QString::number(t) + ";\n";
                 }
                 else if (a.compare("digit", Qt::CaseInsensitive) == 0)
                 {
@@ -124,10 +124,10 @@ static QString genStepI(const MinDFA& mdfa, int idx)
             {
                 if (a.compare("letter", Qt::CaseInsensitive) == 0)
                 {
-                    code +=
-                        "            if (isalpha((unsigned char)ch) || ch=='_' || ch=='$') "
-                        "return " +
-                        QString::number(t) + ";\n";
+                    code += "            if (isalpha((unsigned char)ch)";
+                    code += mdfa.alpha.allowUnderscoreInLetter ? " || ch=='_'" : "";
+                    code += mdfa.alpha.allowDollarInLetter ? " || ch=='$'" : "";
+                    code += ") return " + QString::number(t) + ";\n";
                 }
                 else if (a.compare("digit", Qt::CaseInsensitive) == 0)
                 {
