@@ -202,6 +202,7 @@ class CliRegexTest : public QObject
         QVERIFY(mdfas.size() == codes.size());
         auto src = readAllAny("tests/test_data/sample/cpp/cpp1.cpp");
         if (src.isEmpty()) src = QStringLiteral("#include <iostream>\nint main(){int x=123; std::cout<<x<<std::endl; return 0;}");
+        qputenv("LEXER_SKIP_HASH_COMMENT", QByteArray("0"));
         auto out = eng.runMultiple(mdfas, codes, src);
         QTextStream(stdout) << "【rust 输出】" << out << "\n";
         auto toks = out.split(' ', Qt::SkipEmptyParts);

@@ -368,6 +368,12 @@ void MainWindow::onRunLexerClicked(bool)
     QStringList args;
     if (!selectedSamplePath.isEmpty())
         args << selectedSamplePath;
+    if (!selectedSamplePath.isEmpty() && (selectedSamplePath.endsWith(".cpp") || selectedSamplePath.endsWith(".c") || selectedSamplePath.endsWith(".hpp") || selectedSamplePath.endsWith(".h")))
+    {
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        env.insert("LEXER_SKIP_HASH_COMMENT", "0");
+        run.setProcessEnvironment(env);
+    }
     run.start(currentBinPath, args);
     if (args.isEmpty())
     {
@@ -493,6 +499,12 @@ void MainWindow::onCompileRunClicked(bool)
     if (!selectedSamplePath.isEmpty())
         args << selectedSamplePath;
     QProcess run;
+    if (!selectedSamplePath.isEmpty() && (selectedSamplePath.endsWith(".cpp") || selectedSamplePath.endsWith(".c") || selectedSamplePath.endsWith(".hpp") || selectedSamplePath.endsWith(".h")))
+    {
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        env.insert("LEXER_SKIP_HASH_COMMENT", "0");
+        run.setProcessEnvironment(env);
+    }
     run.start(bin, args);
     if (!selectedSamplePath.isEmpty())
     {

@@ -3,4 +3,4 @@ digit = [0-9]
 _identifier100 = letter(letter|digit)*
 _number101 = digit+
 _keywords200S = int | double | float | char | bool | class | struct | template | typename | if | else | for | while | do | switch | case | break | continue | return | namespace | using | new | delete | public | private | protected | virtual | override | const | constexpr | static | inline | friend | this | operator | try | catch | throw
-_operators220S = \+ | - | \* | / | % | == | != | < | <= | > | >= | = | \+\+ | -- | :: | \. | -> | \( | \) | \[ | \] | \{ | \} | , | ;
+_operators220S = \+ | - | \* | / | % | == | != | < | <= | > | >= | = | \+\+ | -- | :: | \. | -> | \( | \) | \[ | \] | \{ | \} | , | ; | #
