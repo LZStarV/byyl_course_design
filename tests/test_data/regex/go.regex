@@ -3,4 +3,4 @@ digit = [0-9]
 _identifier100 = letter(letter|digit)*
 _number101 = digit+
 _keywords200S = package | import | func | var | const | type | struct | interface | map | chan | go | select | if | else | for | range | switch | case | default | return | defer | fallthrough | break | continue
-_operators220S = \+ | - | \* | / | % | == | != | < | <= | > | >= | = | := | \+\+ | -- | && | \|\| | ! | & | \| | \^ | << | >> | &\^ | \( | \) | \[ | \] | \{ | \} | , | ; | \.
+_operators220S = \+ | - | \* | / | % | == | != | < | <= | > | >= | = | := | \+\+ | -- | && | \|\| | ! | & | \| | \^ | << | >> | &\^ | \( | \) | \[ | \] | \{ | \} | , | ; | \. | \"
