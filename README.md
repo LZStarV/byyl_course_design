@@ -6,24 +6,58 @@
 - 特性：在实验一（正则→自动机→词法代码生成）基础上，增量集成实验二：LL(1) 语法分析器（BNF 解析、First/Follow、预测分析表、表驱动分析、AST 可视化、语法代码生成）。
 
 ## 快速开始（CMake 统一构建）
+
+### macOS
 - 配置：`qt-cmake -S . -B dist -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
 - 编译：`cmake --build dist -j`
 - 运行：`open dist/byyl.app` 或 `dist/byyl.app/Contents/MacOS/byyl`
 - 测试：`ctest --test-dir dist -V`
+
+### Windows
+- 配置：`qt-cmake -S . -B dist -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+- 编译：`cmake --build dist -j`
+- 运行：`dist\\byyl.exe`
+- 测试：`ctest --test-dir dist -V`
+
 - 说明：完整细节见下文“构建指南（CMake Only）”。
 
 ## 构建指南（CMake Only）
-- 依赖准备：
-  - 安装 Qt/CMake/Ninja：`brew install qt cmake ninja`
-  - Graphviz 用于 DOT 预览：`brew install graphviz`
-- 配置（初次或变更后）：
-  - `qt-cmake -S . -B dist -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
-  - 可选：`ln -sf dist/compile_commands.json compile_commands.json`
-- 编译：`cmake --build dist -j`
-- 运行 GUI：`open dist/byyl.app` 或 `dist/byyl.app/Contents/MacOS/byyl`
-- 运行测试：`ctest --test-dir dist -V`
-- 清理/重建：`rm -rf dist && qt-cmake -S . -B dist -G Ninja && cmake --build dist -j`
-- 重要说明：本项目统一使用 CMake 构建（不使用 qmake）。
+
+### 依赖准备
+
+#### macOS
+- 安装 Qt/CMake/Ninja：`brew install qt cmake ninja`
+- Graphviz 用于 DOT 预览：`brew install graphviz`
+
+#### Windows
+- **Qt**：从 https://www.qt.io/download 下载并安装，选择最新的 LTS 版本，安装时确保勾选 CMake 和 Ninja
+- **CMake**：从 https://cmake.org/download 下载 Windows 安装程序，安装时选择 "Add CMake to the system PATH for all users"
+- **Ninja**：从 https://github.com/ninja-build/ninja/releases 下载 `ninja.exe`，将其复制到系统 PATH 中的目录（如 `C:\Windows\System32`）
+- **Graphviz（可选）**：从 https://graphviz.org/download/ 下载 Windows 安装程序，安装时选择 "Add Graphviz to the system PATH for all users"
+
+### 构建步骤
+
+#### 配置（初次或变更后）
+- `qt-cmake -S . -B dist -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+- 可选（macOS）：`ln -sf dist/compile_commands.json compile_commands.json`
+- 可选（Windows）：将 `dist\compile_commands.json` 复制到项目根目录，用于支持 clangd 等语言服务器
+
+#### 编译
+- `cmake --build dist -j`
+
+#### 运行 GUI
+- **macOS**：`open dist/byyl.app` 或 `dist/byyl.app/Contents/MacOS/byyl`
+- **Windows**：`dist\\byyl.exe` 或双击 `dist\byyl.exe`
+
+#### 运行测试
+- `ctest --test-dir dist -V`
+
+#### 清理/重建
+- **macOS**：`rm -rf dist && qt-cmake -S . -B dist -G Ninja && cmake --build dist -j`
+- **Windows**：删除 `dist` 目录，然后重新执行配置和编译命令
+
+### 重要说明
+- 本项目统一使用 CMake 构建（不使用 qmake）
 
 ### 修改代码后的重新构建
 - 常规代码改动（源文件/头文件）：`cmake --build dist -j`
@@ -31,7 +65,9 @@
 
 ### 编辑器诊断（推荐）
 - 生成编译数据库：`qt-cmake -S . -B dist -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
-- 建立链接：`ln -sf dist/compile_commands.json compile_commands.json`
+- 建立链接：
+  - **macOS/Linux**：`ln -sf dist/compile_commands.json compile_commands.json`
+  - **Windows**：`copy dist\compile_commands.json compile_commands.json /y`
 
 ## 功能概览
 - 正则解析与自动机：RE→NFA（Thompson）、NFA→DFA（子集构造）、DFA→MinDFA（Hopcroft）；表格展示与 DOT 导出、PNG 预览；合并扫描器源码生成与复用。
@@ -104,16 +140,39 @@
 - `generated/syntax/`：语法分析器源码与 `graphs/`
 
 ## 常见问题
-- 找不到 Qt：优先使用 `qt-cmake`，或为 `cmake` 添加 `-DCMAKE_PREFIX_PATH=$(brew --prefix qt)`
+
+### 通用问题
+- 找不到 Qt：优先使用 `qt-cmake`，或为 `cmake` 添加 Qt 安装路径：
+  - **macOS**：`-DCMAKE_PREFIX_PATH=$(brew --prefix qt)`
+  - **Windows**：`-DCMAKE_PREFIX_PATH="C:\Qt\<版本号>\msvc2019_64"`（根据实际安装路径调整）
 - 文法解析失败或提示左递归：检查产生式是否存在直接左递归（`A -> A α`）；将文法改写为适用 LL(1) 的形式。
 - 非 LL(1) 冲突：状态栏将提示冲突的非终结符与终结符，参考 First/Follow 修正文法。
 - 语法错误：在“测试与验证”页确保先运行词法分析，`txtLexResult` 中的 Token 序列用于语法分析；若失败，请检查起始符与预测表项是否覆盖该输入。
 - Graphviz 渲染失败：安装 `graphviz` 并确保 `dot` 在 PATH 中；降低 DPI 或导出 DOT 用外部工具查看。
 
+### Windows 特有问题
+- **找不到 qt-cmake 或 cmake**：确保 Qt 和 CMake 已正确安装，并已添加到系统 PATH 中。验证方法：在命令行中运行 `qt-cmake --version` 和 `cmake --version`。
+- **构建失败，提示缺少头文件或库**：确保 Qt 安装时选择了正确的编译器组件（如 MSVC 2022 64-bit）。建议重新安装 Qt，确保勾选了与您系统编译器匹配的组件。
+- **运行时缺少 DLL 文件**：
+  1. 使用 Qt 提供的 `windeployqt` 工具：`windeployqt --release dist/byyl.exe`
+  2. 或者将 Qt 安装目录下的 `bin` 文件夹添加到系统 PATH 中
+
 ## 开发规范
-- 日志：建议启用 `export QT_LOGGING_RULES="*.debug=true"`
+- 日志：
+  - **macOS/Linux**：`export QT_LOGGING_RULES="*.debug=true"`
+  - **Windows（CMD）**：`set QT_LOGGING_RULES=*.debug=true`
+  - **Windows（PowerShell）**：`$env:QT_LOGGING_RULES="*.debug=true"`
 - 跨平台：路径用 `QDir/QFileInfo`，文件用 `QTextStream`；布局使用 `QLayout`；源码 UTF-8
 - UI 自动化：关键控件均设置 `objectName`，`Qt Test` 通过 `findChild` 与 `QTest` 交互断言
+- 代码格式：使用 `.clang-format` 保持代码风格一致，建议安装 clang-format 插件到您的 IDE
+
+### 开发建议
+- **IDE 选择**：
+  - 推荐使用 Qt Creator，提供了良好的跨平台开发体验
+  - 也可使用 Visual Studio Code 配合 CMake 和 C++ 扩展
+- **调试**：在 Qt Creator 中打开项目，可直接进行跨平台调试
+- **测试**：定期运行测试套件，确保代码变更不会破坏现有功能
+- **路径处理**：始终使用 Qt 提供的跨平台路径 API（如 `QDir`、`QFileInfo`），避免直接使用平台特定的路径分隔符
 
 ## DOT 格式规范（开发者）
 - NFA：节点编号为状态 ID，接受态 `shape=doublecircle`；起始态通过隐含点 `__start -> <start>` 指示；ε 标签为 `ε`

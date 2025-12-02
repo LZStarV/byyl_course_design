@@ -435,7 +435,24 @@ void MainWindow::onRunLexerClicked(bool)
         currentBinPath   = base + "/bin/" + QFileInfo(savePath).completeBaseName();
     }
     QProcess proc;
-    proc.start("clang++",
+    // 检测可用的编译器
+    QString compiler = "clang++";
+    QProcess checkClang;
+    checkClang.start("clang++", QStringList() << "--version");
+    checkClang.waitForFinished(1000);
+    
+    if (checkClang.exitStatus() != QProcess::NormalExit || checkClang.exitCode() != 0) {
+        // 如果clang++不可用，尝试使用g++
+        QProcess checkGcc;
+        checkGcc.start("g++", QStringList() << "--version");
+        checkGcc.waitForFinished(1000);
+        
+        if (checkGcc.exitStatus() == QProcess::NormalExit && checkGcc.exitCode() == 0) {
+            compiler = "g++";
+        }
+    }
+    
+    proc.start(compiler,
                QStringList() << "-std=c++17" << currentCodePath << "-o" << currentBinPath);
     proc.waitForFinished();
     if (proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0)
@@ -627,7 +644,24 @@ void MainWindow::onCompileRunClicked(bool)
     currentBinPath  = base + "/bin/" + QFileInfo(outCpp).completeBaseName();
     QProcess proc;
     QString  bin = base + "/bin/" + QFileInfo(outCpp).completeBaseName();
-    proc.start("clang++", QStringList() << "-std=c++17" << outCpp << "-o" << bin);
+    // 检测可用的编译器
+    QString compiler = "clang++";
+    QProcess checkClang;
+    checkClang.start("clang++", QStringList() << "--version");
+    checkClang.waitForFinished(1000);
+    
+    if (checkClang.exitStatus() != QProcess::NormalExit || checkClang.exitCode() != 0) {
+        // 如果clang++不可用，尝试使用g++
+        QProcess checkGcc;
+        checkGcc.start("g++", QStringList() << "--version");
+        checkGcc.waitForFinished(1000);
+        
+        if (checkGcc.exitStatus() == QProcess::NormalExit && checkGcc.exitCode() == 0) {
+            compiler = "g++";
+        }
+    }
+    
+    proc.start(compiler, QStringList() << "-std=c++17" << outCpp << "-o" << bin);
     proc.waitForFinished();
     if (proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0)
     {

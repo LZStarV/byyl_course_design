@@ -83,9 +83,11 @@ qt_add_executable(byyl
 
 target_link_libraries(byyl PRIVATE Qt6::Widgets)
 
-set_target_properties(byyl PROPERTIES
-    MACOSX_BUNDLE TRUE
-)
+if(APPLE)
+    set_target_properties(byyl PROPERTIES
+        MACOSX_BUNDLE TRUE
+    )
+endif()
 
 enable_testing()
 add_executable(GuiTest tests/ui/auto_test_ui.cpp)
