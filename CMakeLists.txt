@@ -18,6 +18,8 @@ set(APP_SOURCES
     app/ui/ToastWidget.cpp
     app/ui/ToastManager.h
     app/ui/ToastManager.cpp
+    app/ui/SettingsDialog.h
+    app/ui/SettingsDialog.cpp
     src/model/Alphabet.h
     src/model/Automata.h
     src/regex/RegexLexer.h
@@ -56,6 +58,7 @@ target_sources(GuiTest PRIVATE
     app/mainwindow.ui
     app/ui/ToastWidget.cpp
     app/ui/ToastManager.cpp
+    app/ui/SettingsDialog.cpp
     src/regex/RegexLexer.cpp
     src/regex/RegexParser.cpp
     src/automata/Thompson.cpp
@@ -120,3 +123,11 @@ target_sources(GenDirConfigTest PRIVATE
 )
 target_link_libraries(GenDirConfigTest PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME 生成目录配置测试 COMMAND GenDirConfigTest)
+
+add_executable(ConfigGuiPersistTest tests/config/config_gui_persist_test.cpp)
+target_sources(ConfigGuiPersistTest PRIVATE
+    tests/config/config_gui_persist_test.h
+    src/config/Config.cpp
+)
+target_link_libraries(ConfigGuiPersistTest PRIVATE Qt6::Core Qt6::Test)
+add_test(NAME 配置持久化测试 COMMAND ConfigGuiPersistTest)

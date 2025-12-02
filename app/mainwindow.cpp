@@ -19,6 +19,7 @@
 #include <QDir>
 #include <QComboBox>
 #include "ui/ToastManager.h"
+#include "ui/SettingsDialog.h"
 #include <QDateTime>
 #include <QCryptographicHash>
 #include "../src/Engine.h"
@@ -59,6 +60,13 @@ void MainWindow::setupUiCustom()
     tabs   = new QTabWidget(ui->centralwidget);
     auto v = new QVBoxLayout;
     ui->centralwidget->setLayout(v);
+    auto mbar = menuBar();
+    auto mSettings = mbar->addMenu("设置");
+    auto actOpenSettings = mSettings->addAction("打开设置…");
+    connect(actOpenSettings, &QAction::triggered, [this]() {
+        SettingsDialog dlg(this);
+        dlg.exec();
+    });
     v->addWidget(tabs);
     auto w1       = new QWidget;
     auto l1       = new QVBoxLayout(w1);
@@ -377,10 +385,25 @@ void MainWindow::onRunLexerClicked(bool)
     QStringList args;
     if (!selectedSamplePath.isEmpty())
         args << selectedSamplePath;
-    if (!selectedSamplePath.isEmpty() && (selectedSamplePath.endsWith(".cpp") || selectedSamplePath.endsWith(".c") || selectedSamplePath.endsWith(".hpp") || selectedSamplePath.endsWith(".h")))
     {
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        env.insert("LEXER_SKIP_HASH_COMMENT", "0");
+        auto tiers = Config::weightTiers();
+        QString wstr;
+        for (int i = 0; i < tiers.size(); ++i) {
+            if (i) wstr += ",";
+            wstr += QString::number(tiers[i].minCode);
+            wstr += ":";
+            wstr += QString::number(tiers[i].weight);
+        }
+        env.insert("LEXER_WEIGHTS", wstr);
+        env.insert("LEXER_SKIP_BRACE_COMMENT", Config::skipBraceComment() ? "1" : "0");
+        env.insert("LEXER_SKIP_LINE_COMMENT", Config::skipLineComment() ? "1" : "0");
+        env.insert("LEXER_SKIP_BLOCK_COMMENT", Config::skipBlockComment() ? "1" : "0");
+        env.insert("LEXER_SKIP_HASH_COMMENT", Config::skipHashComment() ? "1" : "0");
+        env.insert("LEXER_SKIP_SQ_STRING", Config::skipSingleQuoteString() ? "1" : "0");
+        env.insert("LEXER_SKIP_DQ_STRING", Config::skipDoubleQuoteString() ? "1" : "0");
+        env.insert("LEXER_SKIP_TPL_STRING", Config::skipTemplateString() ? "1" : "0");
+        env.insert("BYYL_GEN_DIR", Config::generatedOutputDir());
         run.setProcessEnvironment(env);
     }
     run.start(currentBinPath, args);
@@ -520,10 +543,25 @@ void MainWindow::onCompileRunClicked(bool)
     if (!selectedSamplePath.isEmpty())
         args << selectedSamplePath;
     QProcess run;
-    if (!selectedSamplePath.isEmpty() && (selectedSamplePath.endsWith(".cpp") || selectedSamplePath.endsWith(".c") || selectedSamplePath.endsWith(".hpp") || selectedSamplePath.endsWith(".h")))
     {
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        env.insert("LEXER_SKIP_HASH_COMMENT", "0");
+        auto tiers = Config::weightTiers();
+        QString wstr;
+        for (int i = 0; i < tiers.size(); ++i) {
+            if (i) wstr += ",";
+            wstr += QString::number(tiers[i].minCode);
+            wstr += ":";
+            wstr += QString::number(tiers[i].weight);
+        }
+        env.insert("LEXER_WEIGHTS", wstr);
+        env.insert("LEXER_SKIP_BRACE_COMMENT", Config::skipBraceComment() ? "1" : "0");
+        env.insert("LEXER_SKIP_LINE_COMMENT", Config::skipLineComment() ? "1" : "0");
+        env.insert("LEXER_SKIP_BLOCK_COMMENT", Config::skipBlockComment() ? "1" : "0");
+        env.insert("LEXER_SKIP_HASH_COMMENT", Config::skipHashComment() ? "1" : "0");
+        env.insert("LEXER_SKIP_SQ_STRING", Config::skipSingleQuoteString() ? "1" : "0");
+        env.insert("LEXER_SKIP_DQ_STRING", Config::skipDoubleQuoteString() ? "1" : "0");
+        env.insert("LEXER_SKIP_TPL_STRING", Config::skipTemplateString() ? "1" : "0");
+        env.insert("BYYL_GEN_DIR", Config::generatedOutputDir());
         run.setProcessEnvironment(env);
     }
     run.start(bin, args);

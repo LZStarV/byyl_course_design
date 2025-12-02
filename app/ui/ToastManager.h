@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QQueue>
 #include <QPointer>
-#include <QScreen>
+#include <QRect>
 #include <QWidget>
 #include "ToastWidget.h"
 
@@ -43,4 +43,3 @@ private:
 };
 
 #endif
-

@@ -1,5 +1,6 @@
 #include "ToastManager.h"
 #include <QApplication>
+#include <QScreen>
 #include <QStyle>
 #include <QWindow>
 
@@ -71,4 +72,3 @@ void ToastManager::layoutToasts() {
         curY += h + spacing_;
     }
 }
-
