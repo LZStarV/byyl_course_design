@@ -1,7 +1,7 @@
 #include "NotificationService.h"
 #include <QMainWindow>
 #include <QStatusBar>
-#include "../ui/ToastManager.h"
+#include "../../components/ToastManager/ToastManager.h"
 
 NotificationService::NotificationService(QMainWindow* mw) : mw_(mw) {}
 
@@ -24,3 +24,4 @@ void NotificationService::error(const QString& text)
     if (mw_ && mw_->statusBar()) mw_->statusBar()->showMessage(text);
     ToastManager::instance().showError(text);
 }
+

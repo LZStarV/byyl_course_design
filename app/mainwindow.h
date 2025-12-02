@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "services/NotificationService.h"
+#include "services/NotificationService/NotificationService.h"
 #include "../src/syntax/Grammar.h"
 #include "../src/syntax/LL1.h"
 class QTabWidget;
@@ -41,6 +41,34 @@ class MainWindow : public QMainWindow
     /** \brief 释放界面资源与关联对象 */
     ~MainWindow();
     void previewImage(const QString& pngPath, const QString& title);
+    // Public forwarding for controllers
+    void runLexer();
+    void saveLexAs();
+    void pickSample();
+    void loadRegex();
+    void saveRegex();
+    void startConvert();
+    void loadGrammar();
+    void parseGrammar();
+    void runSyntaxAnalysis();
+    void exportSyntaxDot();
+    void previewSyntaxTree();
+    Engine* getEngine() const { return engine; }
+    ParsedFile* getParsed() const { return parsedPtr; }
+    NotificationService* notifyPtr() { return &notify; }
+    QString codePath() const { return currentCodePath; }
+    void exportNfaDot();
+    void exportNfaImage();
+    void previewNfa();
+    void exportDfaDot();
+    void exportDfaImage();
+    void previewDfa();
+    void exportMinDot();
+    void exportMinImage();
+    void previewMin();
+    void tokenChanged(int);
+    void tokenChangedDfa(int);
+    void tokenChangedMin(int);
 
    private:
     Ui::MainWindow* ui;
@@ -84,6 +112,8 @@ class MainWindow : public QMainWindow
     bool            hasGrammar = false;
     NotificationService notify;
     class SyntaxController* syntaxController;
+    class TestValidationController* testController;
+   class AutomataController* automataController;
     void            setupUiCustom();
     void            fillTable(QTableWidget* tbl, const Tables& t);
     void            fillAllNFA();

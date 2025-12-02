@@ -14,28 +14,42 @@ set(APP_SOURCES
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui
-    app/ui/ToastWidget.h
-    app/ui/ToastWidget.cpp
-    app/ui/ToastManager.h
-    app/ui/ToastManager.cpp
-    app/ui/SettingsDialog.h
-    app/ui/SettingsDialog.cpp
+    app/components/ToastWidget/ToastWidget.h
+    app/components/ToastWidget/ToastWidget.cpp
+    app/components/ToastManager/ToastManager.h
+    app/components/ToastManager/ToastManager.cpp
+    app/components/SettingsDialog/SettingsDialog.h
+    app/components/SettingsDialog/SettingsDialog.cpp
     app/pages/home/HomePage.h
     app/pages/home/HomePage.cpp
     app/pages/exp1/Exp1Page.h
     app/pages/exp1/Exp1Page.cpp
     app/pages/exp2/Exp2Page.h
     app/pages/exp2/Exp2Page.cpp
-    app/controllers/SyntaxController.h
-    app/controllers/SyntaxController.cpp
-    app/services/NotificationService.h
-    app/services/NotificationService.cpp
+    app/controllers/SyntaxController/SyntaxController.h
+    app/controllers/SyntaxController/SyntaxController.cpp
+    app/controllers/TestValidationController/TestValidationController.h
+    app/controllers/TestValidationController/TestValidationController.cpp
+    app/controllers/RegexController/RegexController.h
+    app/controllers/RegexController/RegexController.cpp
+    app/controllers/AutomataController/AutomataController.h
+    app/controllers/AutomataController/AutomataController.cpp
+    app/controllers/SettingsController/SettingsController.h
+    app/controllers/SettingsController/SettingsController.cpp
+    app/controllers/CodeViewController/CodeViewController.h
+    app/controllers/CodeViewController/CodeViewController.cpp
+    app/services/NotificationService/NotificationService.h
+    app/services/NotificationService/NotificationService.cpp
+    app/services/DotService/DotService.h
+    app/services/DotService/DotService.cpp
     src/syntax/Grammar.h
     src/syntax/Grammar.cpp
     src/syntax/GrammarParser.h
     src/syntax/GrammarParser.cpp
     src/syntax/LL1.h
     src/syntax/LL1.cpp
+    src/syntax/LR0.h
+    src/syntax/LR0.cpp
     src/syntax/AST.h
     src/syntax/SyntaxParser.cpp
     src/syntax/DotGenerator.cpp
@@ -79,19 +93,27 @@ target_sources(GuiTest PRIVATE
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui
-    app/controllers/SyntaxController.h
-    app/controllers/SyntaxController.cpp
-    app/services/NotificationService.h
-    app/services/NotificationService.cpp
-    app/ui/ToastWidget.cpp
-    app/ui/ToastManager.cpp
-    app/ui/SettingsDialog.cpp
+    app/controllers/SyntaxController/SyntaxController.h
+    app/controllers/SyntaxController/SyntaxController.cpp
+    app/controllers/AutomataController/AutomataController.h
+    app/controllers/AutomataController/AutomataController.cpp
+    app/controllers/SettingsController/SettingsController.cpp
+    app/controllers/CodeViewController/CodeViewController.cpp
+    app/controllers/TestValidationController/TestValidationController.h
+    app/controllers/TestValidationController/TestValidationController.cpp
+    app/services/NotificationService/NotificationService.h
+    app/services/NotificationService/NotificationService.cpp
+    app/services/DotService/DotService.cpp
+    app/components/ToastWidget/ToastWidget.cpp
+    app/components/ToastManager/ToastManager.cpp
+    app/components/SettingsDialog/SettingsDialog.cpp
     app/pages/home/HomePage.cpp
     app/pages/exp1/Exp1Page.cpp
     app/pages/exp2/Exp2Page.cpp
     src/syntax/Grammar.cpp
     src/syntax/GrammarParser.cpp
     src/syntax/LL1.cpp
+    src/syntax/LR0.cpp
     src/syntax/SyntaxParser.cpp
     src/syntax/DotGenerator.cpp
     src/generator/SyntaxCodeGenerator.cpp
@@ -107,6 +129,7 @@ target_sources(GuiTest PRIVATE
     src/syntax/GrammarParser.cpp
     src/syntax/LL1.cpp
     src/config/Config.cpp
+    app/controllers/RegexController/RegexController.cpp
 )
 target_link_libraries(GuiTest PRIVATE Qt6::Widgets Qt6::Test)
 add_test(NAME 界面测试 COMMAND GuiTest)

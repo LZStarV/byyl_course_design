@@ -2,8 +2,11 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
-#include "../../src/syntax/Grammar.h"
-#include "../../src/syntax/LL1.h"
+#include <QLineEdit>
+#include <QTableWidget>
+#include <QGraphicsView>
+#include "../../../src/syntax/Grammar.h"
+#include "../../../src/syntax/LL1.h"
 class QWidget;
 class QTableWidget;
 class QTextEdit;
@@ -24,6 +27,9 @@ public:
     void runSyntaxAnalysis();
     void exportDot();
     void previewTree();
+    void previewLR0();
+    void exportLR0Dot();
+    void exportAstDot();
 private:
     MainWindow* mw_;
     Engine* engine_;
@@ -34,3 +40,4 @@ private:
     bool hasGrammar_ = false;
     static bool renderDotFromContentLocal(const QString& dotContent, QString& outPngPath, int dpi);
 };
+

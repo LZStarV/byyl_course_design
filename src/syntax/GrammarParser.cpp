@@ -41,10 +41,14 @@ static bool detectDirectLeftRecursion(const Grammar& g, QString& who)
         const QString& A = it.key();
         for (const auto& p : it.value())
         {
-            if (!p.right.isEmpty() && p.right[0] == A)
+            if (!p.right.isEmpty())
             {
-                who = A;
-                return true;
+                const QString& X = p.right[0];
+                if (X == A && isNonTerminal(X))
+                {
+                    who = A;
+                    return true;
+                }
             }
         }
     }

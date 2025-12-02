@@ -7,6 +7,7 @@ class QTextEdit;
 class QPlainTextEdit;
 class QTableWidget;
 class QGraphicsView;
+class QLineEdit;
 class Exp2Page : public QWidget
 {
     Q_OBJECT
@@ -23,7 +24,6 @@ class Exp2Page : public QWidget
     QPushButton* btnParseGrammar;
     QTableWidget* tblFirstSet;
     QTableWidget* tblFollowSet;
-    QTableWidget* tblParsingTable;
     QLabel*      lblSyntaxTreeTitle;
     QGraphicsView* viewSyntaxTree;
     QPushButton* btnExportSyntaxDot;
@@ -31,4 +31,9 @@ class Exp2Page : public QWidget
     QPushButton* btnRunSyntaxAnalysis;
     QLabel*      lblSyntaxCodeTitle;
     QPlainTextEdit* txtSyntaxGeneratedCode;
+    QWidget*     wLR0;
+    QPushButton* btnExportLR0;
+    QPushButton* btnPreviewLR0;
+    QLineEdit*   edtGraphDpiLR0;
+    QPlainTextEdit* txtTokensViewSyntax;
 };

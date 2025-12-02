@@ -119,4 +119,3 @@ void ToastWidget::closeAnimated() {
 }
 
 void ToastWidget::resizeEvent(QResizeEvent* e) { QWidget::resizeEvent(e); }
-

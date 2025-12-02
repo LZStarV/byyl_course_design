@@ -6,7 +6,7 @@
 #include <QPointer>
 #include <QRect>
 #include <QWidget>
-#include "ToastWidget.h"
+#include "../ToastWidget/ToastWidget.h"
 
 struct ToastItem {
     ToastWidget::Type type;
