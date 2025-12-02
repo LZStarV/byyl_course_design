@@ -36,6 +36,11 @@
 #include "../src/Engine.h"
 #include "../src/visual/DotExporter.h"
 #include "../src/config/Config.h"
+#include "../src/generator/SyntaxCodeGenerator.h"
+#include "../src/syntax/SyntaxParser.h"
+#include "../src/syntax/DotGenerator.h"
+#include "controllers/SyntaxController.h"
+#include "services/NotificationService.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -68,6 +73,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::previewImage(const QString& pngPath, const QString& title)
+{
+    showImagePreview(pngPath, title);
+}
+
 void MainWindow::setupUiCustom()
 {
     stack  = new QStackedWidget(ui->centralwidget);
@@ -76,7 +86,7 @@ void MainWindow::setupUiCustom()
     v->addWidget(stack);
     auto home = new HomePage;
     auto exp1 = new Exp1Page;
-    auto exp2 = new Exp2Page;
+    auto exp2Page = new Exp2Page;
     tabs       = new QTabWidget(exp1->contentWidget());
     auto mbar = menuBar();
     auto mSettings = mbar->addMenu("设置");
@@ -196,12 +206,12 @@ void MainWindow::setupUiCustom()
     tabs->addTab(w5, "代码查看");
     stack->addWidget(home);
     stack->addWidget(exp1);
-    stack->addWidget(exp2);
+    stack->addWidget(exp2Page);
     stack->setCurrentIndex(0);
     connect(home, &HomePage::openExp1, [this]() { stack->setCurrentIndex(1); });
     connect(home, &HomePage::openExp2, [this]() { stack->setCurrentIndex(2); });
     connect(exp1, &Exp1Page::requestBack, [this]() { stack->setCurrentIndex(0); });
-    connect(exp2, &Exp2Page::requestBack, [this]() { stack->setCurrentIndex(0); });
+    connect(exp2Page, &Exp2Page::requestBack, [this]() { stack->setCurrentIndex(0); });
     auto w6       = new QWidget;
     auto l6       = new QVBoxLayout(w6);
     auto h6       = new QHBoxLayout;
@@ -223,13 +233,23 @@ void MainWindow::setupUiCustom()
     h6->addLayout(rightCol);
     btnRunLexer = new QPushButton("运行词法分析");
     btnRunLexer->setObjectName("btnRunLexer");
+    auto btnSaveLex = new QPushButton("保存结果");
+    btnSaveLex->setObjectName("btnSaveLexResult");
+    auto btnSaveLexAs = new QPushButton("另存为...");
+    btnSaveLexAs->setObjectName("btnSaveLexResultAs");
     l6->addLayout(h6);
     l6->addWidget(btnPickSample);
     l6->addWidget(btnRunLexer);
+    auto hSave = new QHBoxLayout;
+    hSave->addWidget(btnSaveLex);
+    hSave->addWidget(btnSaveLexAs);
+    l6->addLayout(hSave);
     tabs->addTab(w6, "测试与验证");
     connect(btnStartConvert, &QPushButton::clicked, [this](bool b){ onConvertClicked(b); });
     connect(btnGenCode, &QPushButton::clicked, [this](bool b){ onGenCodeClicked(b); });
     connect(btnRunLexer, &QPushButton::clicked, [this](bool b){ onRunLexerClicked(b); });
+    connect(btnSaveLex, &QPushButton::clicked, [this](bool b){ onSaveLexResultClicked(b); });
+    connect(btnSaveLexAs, &QPushButton::clicked, [this](bool b){ onSaveLexResultAsClicked(b); });
     connect(btnPickSample, &QPushButton::clicked, [this](bool b){ onPickSampleClicked(b); });
     connect(btnCompileRun, &QPushButton::clicked, [this](bool b){ onCompileRunClicked(b); });
     connect(btnLoadRegex, &QPushButton::clicked, [this](bool b){ onLoadRegexClicked(b); });
@@ -259,6 +279,9 @@ void MainWindow::setupUiCustom()
     connect(actMinDot, &QAction::triggered, this, &MainWindow::onExportMinDot);
     connect(actMinImg, &QAction::triggered, this, &MainWindow::onExportMinImage);
     connect(btnPreviewMin, &QPushButton::clicked, [this](bool b){ onPreviewMinClicked(b); });
+    notify.setMainWindow(this);
+    syntaxController = new SyntaxController(this, engine, &notify);
+    if (auto exp2w = stack->widget(2)) { syntaxController->bind(exp2w); }
 }
 
 void MainWindow::fillTable(QTableWidget* tbl, const Tables& t)
@@ -1053,6 +1076,18 @@ void MainWindow::onTabChanged(int idx)
             f.close();
         }
     }
+    auto syntaxCodeView = w->findChild<QPlainTextEdit*>("txtSyntaxGeneratedCode");
+    if (syntaxCodeView)
+    {
+        QString path = Config::generatedOutputDir() + "/syntax/syntax_parser.cpp";
+        QFile f(path);
+        if (f.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            QTextStream in(&f);
+            syntaxCodeView->setPlainText(in.readAll());
+            f.close();
+        }
+    }
 }
 
 void MainWindow::onExportNFAClicked(bool)
@@ -1340,4 +1375,223 @@ void MainWindow::onPreviewMinClicked(bool)
     }
     showImagePreview(pngPath, "MinDFA 预览");
     QFile::remove(pngPath);
+}
+void MainWindow::onLoadGrammarClicked(bool)
+{
+    auto exp2 = stack->widget(2);
+    auto edt = exp2->findChild<QTextEdit*>("txtInputGrammar");
+    auto path = QFileDialog::getOpenFileName(this,
+                                             QStringLiteral("选择文法文件"),
+                                             QString(),
+                                             QStringLiteral("Text (*.txt *.grammar);;All (*)"));
+    if (path.isEmpty()) return;
+    QFile f(path);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        statusBar()->showMessage("文件打开失败");
+        ToastManager::instance().showError("文件打开失败");
+        return;
+    }
+    QTextStream in(&f);
+    edt->setPlainText(in.readAll());
+    f.close();
+    statusBar()->showMessage("文法加载成功");
+    ToastManager::instance().showInfo("文法加载成功");
+}
+
+void MainWindow::onParseGrammarClicked(bool)
+{
+    auto exp2 = stack->widget(2);
+    auto edt = exp2->findChild<QTextEdit*>("txtInputGrammar");
+    auto tblF = exp2->findChild<QTableWidget*>("tblFirstSet");
+    auto tblFo = exp2->findChild<QTableWidget*>("tblFollowSet");
+    auto tblP = exp2->findChild<QTableWidget*>("tblParsingTable");
+    QString err;
+    currentGrammar = engine->parseGrammarText(edt->toPlainText(), err);
+    if (!err.isEmpty() || currentGrammar.productions.isEmpty())
+    {
+        statusBar()->showMessage("文法错误：" + err);
+        ToastManager::instance().showError("文法错误：" + err);
+        return;
+    }
+    hasGrammar = true;
+    currentLL1 = engine->computeLL1(currentGrammar);
+    if (!currentLL1.conflicts.isEmpty())
+    {
+        statusBar()->showMessage("存在LL(1)冲突：" + currentLL1.conflicts.join(", "));
+        ToastManager::instance().showWarning("存在LL(1)冲突");
+    }
+    tblF->clear();
+    tblFo->clear();
+    tblP->clear();
+    tblF->setColumnCount(2);
+    tblFo->setColumnCount(2);
+    QStringList hf; hf << "非终结符" << "First"; tblF->setHorizontalHeaderLabels(hf);
+    QStringList hfo; hfo << "非终结符" << "Follow"; tblFo->setHorizontalHeaderLabels(hfo);
+    auto firstRows = engine->firstFollowAsRows(currentLL1);
+    tblF->setRowCount(firstRows.size());
+    int r = 0;
+    for (auto it = firstRows.begin(); it != firstRows.end(); ++it)
+    {
+        tblF->setItem(r, 0, new QTableWidgetItem(it.key()));
+        tblF->setItem(r, 1, new QTableWidgetItem(it.value().join(", ")));
+        r++;
+    }
+    auto followRows = currentLL1.follow;
+    tblFo->setRowCount(followRows.size());
+    r = 0;
+    for (auto it = followRows.begin(); it != followRows.end(); ++it)
+    {
+        tblFo->setItem(r, 0, new QTableWidgetItem(it.key()));
+        QStringList vals = QStringList(it.value().begin(), it.value().end());
+        tblFo->setItem(r, 1, new QTableWidgetItem(vals.join(", ")));
+        r++;
+    }
+    QStringList terms;
+    for (auto t : currentGrammar.terminals) terms << t;
+    terms << "$";
+    tblP->setColumnCount(terms.size() + 1);
+    QStringList hp; hp << "非终结符"; for (auto t : terms) hp << t; tblP->setHorizontalHeaderLabels(hp);
+    tblP->setRowCount(currentGrammar.nonterminals.size());
+    r = 0;
+    for (auto A : currentGrammar.nonterminals)
+    {
+        tblP->setItem(r, 0, new QTableWidgetItem(A));
+        for (int c = 0; c < terms.size(); ++c)
+        {
+            QString a = terms[c];
+            int idx = currentLL1.table.value(A).value(a, -1);
+            QString val;
+            if (idx >= 0)
+            {
+                const auto& p = currentGrammar.productions[A][idx];
+                val = p.left + " -> ";
+                for (int i = 0; i < p.right.size(); ++i)
+                {
+                    val += p.right[i];
+                    if (i + 1 < p.right.size()) val += " ";
+                }
+            }
+            tblP->setItem(r, c + 1, new QTableWidgetItem(val));
+        }
+        r++;
+    }
+    statusBar()->showMessage("文法分析完成");
+    ToastManager::instance().showInfo("文法分析完成");
+    QVector<QString> nts = QVector<QString>(currentGrammar.nonterminals.begin(), currentGrammar.nonterminals.end());
+    QVector<QString> ts = QVector<QString>(currentGrammar.terminals.begin(), currentGrammar.terminals.end());
+    QString src = generateSyntaxParserSource(currentLL1.table, nts, ts, currentGrammar.startSymbol);
+    QString outDir = Config::generatedOutputDir() + "/syntax";
+    QDir gd(outDir); if (!gd.exists()) gd.mkpath(".");
+    QFile fout(outDir + "/syntax_parser.cpp");
+    if (fout.open(QIODevice::WriteOnly | QIODevice::Text)) { QTextStream o(&fout); o << src; fout.close(); }
+}
+
+void MainWindow::onRunSyntaxAnalysisClicked(bool)
+{
+    if (!hasGrammar)
+    {
+        statusBar()->showMessage("请先加载并解析文法");
+        ToastManager::instance().showWarning("请先加载并解析文法");
+        return;
+    }
+    QString tokensStr = txtLexResult->toPlainText().trimmed();
+    if (tokensStr.isEmpty())
+    {
+        statusBar()->showMessage("请先运行词法分析获得Token序列");
+        ToastManager::instance().showWarning("请先运行词法分析获得Token序列");
+        return;
+    }
+    QVector<QString> tokens;
+    for (auto s : tokensStr.split(' ', Qt::SkipEmptyParts)) tokens.push_back(s);
+    auto res = parseTokens(tokens, currentGrammar, currentLL1);
+    if (res.errorPos >= 0)
+    {
+        statusBar()->showMessage("语法错误");
+        ToastManager::instance().showError("语法错误");
+        return;
+    }
+    auto dot = syntaxAstToDot(res.root);
+    QString pngPath;
+    int dpi = 150;
+    if (!renderDotFromContent(dot, pngPath, dpi))
+    {
+        statusBar()->showMessage("语法树渲染失败");
+        ToastManager::instance().showError("语法树渲染失败");
+        return;
+    }
+    showImagePreview(pngPath, "语法树 预览");
+    QFile::remove(pngPath);
+    statusBar()->showMessage("语法分析成功");
+    ToastManager::instance().showInfo("语法分析成功");
+}
+
+void MainWindow::onSaveLexResultClicked(bool)
+{
+    QString content = txtLexResult ? txtLexResult->toPlainText() : QString();
+    if (content.trimmed().isEmpty()) { statusBar()->showMessage("无可保存的结果"); ToastManager::instance().showWarning("无可保存的结果"); return; }
+    QString dir = Config::generatedOutputDir() + "/syntax";
+    QDir d(dir); if (!d.exists()) d.mkpath(".");
+    QString path = dir + "/last_tokens.txt";
+    QFile f(path);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) { statusBar()->showMessage("保存失败"); ToastManager::instance().showError("保存失败"); return; }
+    QTextStream o(&f); o << content; f.close();
+    statusBar()->showMessage("结果已保存到内部: " + path);
+    ToastManager::instance().showInfo("保存成功");
+}
+
+void MainWindow::onSaveLexResultAsClicked(bool)
+{
+    QString content = txtLexResult ? txtLexResult->toPlainText() : QString();
+    if (content.trimmed().isEmpty()) { statusBar()->showMessage("无可保存的结果"); ToastManager::instance().showWarning("无可保存的结果"); return; }
+    auto userPath = QFileDialog::getSaveFileName(this,
+                                                 QStringLiteral("另存为词法结果"),
+                                                 QString(),
+                                                 QStringLiteral("Text (*.txt);;All (*)"));
+    if (userPath.isEmpty()) return;
+    QFile fu(userPath);
+    if (!fu.open(QIODevice::WriteOnly | QIODevice::Text)) { statusBar()->showMessage("另存为失败"); ToastManager::instance().showError("另存为失败"); return; }
+    QTextStream ou(&fu); ou << content; fu.close();
+    // 同步内部保存
+    QString dir = Config::generatedOutputDir() + "/syntax";
+    QDir d(dir); if (!d.exists()) d.mkpath(".");
+    QFile fi(dir + "/last_tokens.txt");
+    if (fi.open(QIODevice::WriteOnly | QIODevice::Text)) { QTextStream oi(&fi); oi << content; fi.close(); }
+    statusBar()->showMessage("结果已另存为并同步内部保存");
+    ToastManager::instance().showInfo("保存成功");
+}
+
+void MainWindow::onExportSyntaxDotClicked(bool)
+{
+    if (!hasGrammar) return;
+    QString tokensStr = txtLexResult->toPlainText().trimmed();
+    QVector<QString> tokens;
+    for (auto s : tokensStr.split(' ', Qt::SkipEmptyParts)) tokens.push_back(s);
+    auto res = parseTokens(tokens, currentGrammar, currentLL1);
+    if (res.errorPos >= 0) { statusBar()->showMessage("语法错误"); ToastManager::instance().showError("语法错误"); return; }
+    QString dot = syntaxAstToDot(res.root);
+    QString base = Config::generatedOutputDir() + "/syntax/graphs";
+    QDir d(base); if (!d.exists()) d.mkpath(".");
+    QString ts = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+    QString out = base + "/ast_" + ts + ".dot";
+    QFile f(out);
+    if (f.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream o(&f); o << dot; f.close();
+        statusBar()->showMessage("DOT已导出:" + out);
+        ToastManager::instance().showInfo("DOT 已导出");
+    }
+}
+
+void MainWindow::onPreviewSyntaxTreeClicked(bool)
+{
+    if (!hasGrammar) return;
+    QString tokensStr = txtLexResult->toPlainText().trimmed();
+    QVector<QString> tokens; for (auto s : tokensStr.split(' ', Qt::SkipEmptyParts)) tokens.push_back(s);
+    auto res = parseTokens(tokens, currentGrammar, currentLL1);
+    if (res.errorPos >= 0) { statusBar()->showMessage("语法错误"); ToastManager::instance().showError("语法错误"); return; }
+    QString pngPath; int dpi = 150;
+    if (!renderDotFromContent(syntaxAstToDot(res.root), pngPath, dpi)) { statusBar()->showMessage("渲染失败"); ToastManager::instance().showError("渲染失败"); return; }
+    ToastManager::instance().showInfo("预览已生成");
+    showImagePreview(pngPath, "语法树 预览"); QFile::remove(pngPath);
 }

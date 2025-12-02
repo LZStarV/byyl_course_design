@@ -26,6 +26,21 @@ set(APP_SOURCES
     app/pages/exp1/Exp1Page.cpp
     app/pages/exp2/Exp2Page.h
     app/pages/exp2/Exp2Page.cpp
+    app/controllers/SyntaxController.h
+    app/controllers/SyntaxController.cpp
+    app/services/NotificationService.h
+    app/services/NotificationService.cpp
+    src/syntax/Grammar.h
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.h
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.h
+    src/syntax/LL1.cpp
+    src/syntax/AST.h
+    src/syntax/SyntaxParser.cpp
+    src/syntax/DotGenerator.cpp
+    src/generator/SyntaxCodeGenerator.cpp
+    src/generator/SyntaxCodeGenerator.h
     src/model/Alphabet.h
     src/model/Automata.h
     src/regex/RegexLexer.h
@@ -64,12 +79,22 @@ target_sources(GuiTest PRIVATE
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui
+    app/controllers/SyntaxController.h
+    app/controllers/SyntaxController.cpp
+    app/services/NotificationService.h
+    app/services/NotificationService.cpp
     app/ui/ToastWidget.cpp
     app/ui/ToastManager.cpp
     app/ui/SettingsDialog.cpp
     app/pages/home/HomePage.cpp
     app/pages/exp1/Exp1Page.cpp
     app/pages/exp2/Exp2Page.cpp
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.cpp
+    src/syntax/SyntaxParser.cpp
+    src/syntax/DotGenerator.cpp
+    src/generator/SyntaxCodeGenerator.cpp
     src/visual/DotExporter.cpp
     src/regex/RegexLexer.cpp
     src/regex/RegexParser.cpp
@@ -78,10 +103,31 @@ target_sources(GuiTest PRIVATE
     src/automata/Hopcroft.cpp
     src/generator/CodeGenerator.cpp
     src/Engine.cpp
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.cpp
     src/config/Config.cpp
 )
 target_link_libraries(GuiTest PRIVATE Qt6::Widgets Qt6::Test)
 add_test(NAME 界面测试 COMMAND GuiTest)
+
+add_executable(GrammarParserTest tests/syntax/grammar_parser_test.cpp)
+target_sources(GrammarParserTest PRIVATE
+    src/syntax/GrammarParser.cpp
+    src/syntax/Grammar.cpp
+)
+target_link_libraries(GrammarParserTest PRIVATE Qt6::Core Qt6::Test)
+add_test(NAME 文法解析测试 COMMAND GrammarParserTest)
+
+add_executable(LL1Test tests/syntax/ll1_test.cpp)
+target_sources(LL1Test PRIVATE
+    src/syntax/LL1.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/Grammar.cpp
+)
+target_link_libraries(LL1Test PRIVATE Qt6::Core Qt6::Test)
+add_test(NAME LL1算法测试 COMMAND LL1Test)
+
 
 add_executable(CliRegexTest tests/cli/cli_regex_test.cpp)
 target_sources(CliRegexTest PRIVATE
@@ -94,6 +140,9 @@ target_sources(CliRegexTest PRIVATE
     src/automata/Hopcroft.cpp
     src/generator/CodeGenerator.cpp
     src/Engine.cpp
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.cpp
     src/config/Config.cpp
 )
 target_link_libraries(CliRegexTest PRIVATE Qt6::Core Qt6::Test)
@@ -110,6 +159,9 @@ target_sources(CodegenTest PRIVATE
     src/automata/Hopcroft.cpp
     src/generator/CodeGenerator.cpp
     src/Engine.cpp
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.cpp
     src/config/Config.cpp
 )
 target_link_libraries(CodegenTest PRIVATE Qt6::Core Qt6::Test)
@@ -126,6 +178,9 @@ target_sources(ConfigWeightTest PRIVATE
     src/automata/Hopcroft.cpp
     src/generator/CodeGenerator.cpp
     src/Engine.cpp
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.cpp
     src/config/Config.cpp
 )
 target_link_libraries(ConfigWeightTest PRIVATE Qt6::Core Qt6::Test)
@@ -157,6 +212,9 @@ target_sources(DotExportTest PRIVATE
     src/automata/SubsetConstruction.cpp
     src/automata/Hopcroft.cpp
     src/Engine.cpp
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.cpp
     src/generator/CodeGenerator.cpp
     src/config/Config.cpp
 )

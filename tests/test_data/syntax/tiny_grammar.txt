@@ -1,0 +1,13 @@
+program -> stmt_list
+stmt_list -> stmt stmt_list | #
+stmt -> assign | read | write | if_stmt | repeat_stmt
+assign -> id := exp
+read -> read id
+write -> write exp
+if_stmt -> if exp then stmt_list else stmt_list end
+repeat_stmt -> repeat stmt_list until exp
+exp -> term exp_prime
+exp_prime -> + term exp_prime | - term exp_prime | #
+term -> factor term_prime
+term_prime -> * factor term_prime | / factor term_prime | #
+factor -> ( exp ) | id | number

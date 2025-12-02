@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "config/Config.h"
+#include "syntax/GrammarParser.h"
 RegexFile Engine::lexFile(const QString& text)
 {
     return RegexLexer::lex(text);
@@ -556,4 +557,57 @@ QString Engine::runMultiple(const QVector<MinDFA>& mdfas,
         }
     }
     return out.trimmed();
+}
+
+Grammar Engine::parseGrammarText(const QString& text, QString& error)
+{
+    return GrammarParser::parseString(text, error);
+}
+
+LL1Info Engine::computeLL1(const Grammar& g)
+{
+    return LL1::compute(g);
+}
+
+QMap<QString, QVector<QString>> Engine::firstFollowAsRows(const LL1Info& info)
+{
+    QMap<QString, QVector<QString>> r;
+    for (auto it = info.first.begin(); it != info.first.end(); ++it)
+    {
+        QVector<QString> v;
+        QList<QString> s = QList<QString>(it.value().begin(), it.value().end());
+        std::sort(s.begin(), s.end());
+        for (auto x : s) v.push_back(x);
+        r[it.key()] = v;
+    }
+    return r;
+}
+
+QMap<QString, QMap<QString, QString>> Engine::parsingTableAsRows(const Grammar& g, const LL1Info& info)
+{
+    QMap<QString, QMap<QString, QString>> r;
+    for (auto A : g.nonterminals)
+    {
+        QMap<QString, QString> row;
+        for (auto a : g.terminals)
+        {
+            int idx = info.table.value(A).value(a, -1);
+            if (idx >= 0)
+            {
+                const auto& p = g.productions[A][idx];
+                QString rhs;
+                for (int i = 0; i < p.right.size(); ++i)
+                {
+                    rhs += p.right[i];
+                    if (i + 1 < p.right.size()) rhs += " ";
+                }
+                row[a] = rhs;
+            }
+        }
+        row["$"] = info.table.value(A).contains("$")
+                        ? row.value("$")
+                        : QString();
+        r[A] = row;
+    }
+    return r;
 }

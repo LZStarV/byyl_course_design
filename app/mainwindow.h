@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "services/NotificationService.h"
+#include "../src/syntax/Grammar.h"
+#include "../src/syntax/LL1.h"
 class QTabWidget;
 class QTextEdit;
 class QPlainTextEdit;
@@ -37,6 +40,7 @@ class MainWindow : public QMainWindow
     MainWindow(QWidget* parent = nullptr);
     /** \brief 释放界面资源与关联对象 */
     ~MainWindow();
+    void previewImage(const QString& pngPath, const QString& title);
 
    private:
     Ui::MainWindow* ui;
@@ -75,6 +79,11 @@ class MainWindow : public QMainWindow
     Engine*         engine;
     ParsedFile*     parsedPtr;
     MinDFA*         lastMinPtr;
+    Grammar         currentGrammar;
+    LL1Info         currentLL1;
+    bool            hasGrammar = false;
+    NotificationService notify;
+    class SyntaxController* syntaxController;
     void            setupUiCustom();
     void            fillTable(QTableWidget* tbl, const Tables& t);
     void            fillAllNFA();
@@ -121,5 +130,12 @@ class MainWindow : public QMainWindow
     void onExportDFAImage();
     void onExportMinDot();
     void onExportMinImage();
+    void onLoadGrammarClicked(bool);
+    void onParseGrammarClicked(bool);
+    void onRunSyntaxAnalysisClicked(bool);
+    void onExportSyntaxDotClicked(bool);
+    void onPreviewSyntaxTreeClicked(bool);
+    void onSaveLexResultClicked(bool);
+    void onSaveLexResultAsClicked(bool);
 };
 #endif  // MAINWINDOW_H

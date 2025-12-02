@@ -8,6 +8,8 @@
 #include "automata/SubsetConstruction.h"
 #include "automata/Hopcroft.h"
 #include "generator/CodeGenerator.h"
+#include "syntax/Grammar.h"
+#include "syntax/LL1.h"
 /**
  * \brief 状态表结构
  *
@@ -55,4 +57,8 @@ class Engine
     QString runMultiple(const QVector<MinDFA>& mdfas,
                         const QVector<int>&    codes,
                         const QString&         source);
+    Grammar parseGrammarText(const QString& text, QString& error);
+    LL1Info computeLL1(const Grammar& g);
+    QMap<QString, QVector<QString>> firstFollowAsRows(const LL1Info& info);
+    QMap<QString, QMap<QString, QString>> parsingTableAsRows(const Grammar& g, const LL1Info& info);
 };
