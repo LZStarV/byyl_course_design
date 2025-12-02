@@ -18,6 +18,7 @@
 #include <QProcess>
 #include <QDir>
 #include <QComboBox>
+#include "ui/ToastManager.h"
 #include <QDateTime>
 #include <QCryptographicHash>
 #include "../src/Engine.h"
@@ -34,6 +35,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     currentCodePath    = QString();
     currentBinPath     = QString();
     setupUiCustom();
+    ToastManager::instance().setAnchor(this);
 }
 
 MainWindow::~MainWindow()
@@ -200,6 +202,7 @@ void MainWindow::onConvertClicked(bool)
     if (parsed.tokens.isEmpty())
     {
         statusBar()->showMessage("未找到Token定义");
+        ToastManager::instance().showWarning("未找到Token定义");
         return;
     }
     parsedPtr        = new ParsedFile(parsed);
@@ -237,6 +240,7 @@ void MainWindow::onConvertClicked(bool)
     onTokenChangedDFA(0);
     onTokenChangedMin(0);
     statusBar()->showMessage("转换成功");
+    ToastManager::instance().showInfo("转换成功");
 }
 
 void MainWindow::onGenCodeClicked(bool)
@@ -268,6 +272,7 @@ void MainWindow::onGenCodeClicked(bool)
         currentCodePath = savePath;
         currentBinPath  = base + "/bin/" + QFileInfo(savePath).completeBaseName();
         statusBar()->showMessage("组合扫描器代码已生成并保存到 generated/lex");
+        ToastManager::instance().showInfo("组合扫描器代码已生成");
         return;
     }
     if (!lastMinPtr)
@@ -276,6 +281,7 @@ void MainWindow::onGenCodeClicked(bool)
         if (!lastMinPtr)
         {
             statusBar()->showMessage("请先转换");
+            ToastManager::instance().showWarning("请先转换");
             return;
         }
     }
@@ -287,6 +293,7 @@ void MainWindow::onGenCodeClicked(bool)
     auto s = engine->generateCode(*lastMinPtr, codesMap);
     txtGeneratedCode->setPlainText(s);
     statusBar()->showMessage("代码已生成");
+    ToastManager::instance().showInfo("代码已生成");
 }
 
 void MainWindow::onRunLexerClicked(bool)
@@ -299,6 +306,7 @@ void MainWindow::onRunLexerClicked(bool)
         if (parsed.tokens.isEmpty())
         {
             statusBar()->showMessage("未找到Token定义");
+            ToastManager::instance().showWarning("未找到Token定义");
             return;
         }
         parsedPtr = new ParsedFile(parsed);
@@ -333,6 +341,7 @@ void MainWindow::onRunLexerClicked(bool)
     {
         txtLexResult->setPlainText(QString::fromUtf8(proc.readAllStandardError()));
         statusBar()->showMessage("编译失败");
+        ToastManager::instance().showError("编译失败");
         return;
     }
     // 准备输入：优先选中的样例文件，其次文本框内容，最后使用内置示例
@@ -387,6 +396,10 @@ void MainWindow::onRunLexerClicked(bool)
         statusBar()->showMessage("存在未识别的词法单元(ERR)，请检查正则与输入");
     else
         statusBar()->showMessage("测试完成");
+    if (output.contains("ERR"))
+        ToastManager::instance().showWarning("存在未识别的词法单元(ERR)");
+    else
+        ToastManager::instance().showInfo("测试完成");
 }
 
 void MainWindow::onSaveRegexClicked(bool)
@@ -401,12 +414,14 @@ void MainWindow::onSaveRegexClicked(bool)
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         statusBar()->showMessage("文件保存失败");
+        ToastManager::instance().showError("文件保存失败");
         return;
     }
     QTextStream out(&f);
     out << txtInputRegex->toPlainText();
     f.close();
     statusBar()->showMessage("正则已保存");
+    ToastManager::instance().showInfo("正则已保存");
 }
 
 void MainWindow::onLoadRegexClicked(bool)
@@ -421,12 +436,14 @@ void MainWindow::onLoadRegexClicked(bool)
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         statusBar()->showMessage("文件打开失败");
+        ToastManager::instance().showError("文件打开失败");
         return;
     }
     QTextStream in(&f);
     auto        content = in.readAll();
     txtInputRegex->setPlainText(content);
     statusBar()->showMessage("正则已加载");
+    ToastManager::instance().showInfo("正则已加载");
 }
 void MainWindow::onPickSampleClicked(bool)
 {
@@ -443,6 +460,7 @@ void MainWindow::onPickSampleClicked(bool)
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         statusBar()->showMessage("样例文件打开失败");
+        ToastManager::instance().showError("样例文件打开失败");
         return;
     }
     QTextStream in(&f);
@@ -450,6 +468,7 @@ void MainWindow::onPickSampleClicked(bool)
     txtSourceTiny->setPlainText(content);
     selectedSamplePath = path;
     statusBar()->showMessage("样例已加载");
+    ToastManager::instance().showInfo("样例已加载");
 }
 void MainWindow::onCompileRunClicked(bool)
 {
@@ -460,8 +479,9 @@ void MainWindow::onCompileRunClicked(bool)
         auto parsed = engine->parseFile(rf);
         if (parsed.tokens.isEmpty())
         {
-            statusBar()->showMessage("未找到Token定义");
-            return;
+        statusBar()->showMessage("未找到Token定义");
+        ToastManager::instance().showWarning("未找到Token定义");
+        return;
         }
         parsedPtr = new ParsedFile(parsed);
     }
@@ -492,6 +512,7 @@ void MainWindow::onCompileRunClicked(bool)
     {
         txtLexResult->setPlainText(QString::fromUtf8(proc.readAllStandardError()));
         statusBar()->showMessage("编译失败");
+        ToastManager::instance().showError("编译失败");
         return;
     }
     currentBinPath = bin;
@@ -519,6 +540,7 @@ void MainWindow::onCompileRunClicked(bool)
     auto output = QString::fromUtf8(run.readAllStandardOutput());
     txtLexResult->setPlainText(output);
     statusBar()->showMessage("生成器运行完成");
+    ToastManager::instance().showInfo("生成器运行完成");
 }
 void MainWindow::onTokenChanged(int idx)
 {

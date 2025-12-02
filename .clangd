@@ -1,16 +1,15 @@
 CompileFlags:
-  CompilationDatabase: compile_commands.json
   Add:
-    - -std=gnu++17
-    - -DQT_CORE_LIB
-    - -DQT_GUI_LIB
-    - -DQT_WIDGETS_LIB
-    - -DQT_NO_DEBUG
     - -isystem
-    - /opt/homebrew/lib/QtCore.framework/Headers
+    - /opt/homebrew/Cellar/qtbase/6.9.3_1/lib/QtCore.framework/Headers
     - -isystem
-    - /opt/homebrew/lib/QtGui.framework/Headers
-    - -isystem
-    - /opt/homebrew/lib/QtWidgets.framework/Headers
+    - /opt/homebrew/Cellar/qtbase/6.9.3_1/lib/QtWidgets.framework/Headers
     - -iframework
-    - /opt/homebrew/lib
+    - /opt/homebrew/Cellar/qtbase/6.9.3_1/lib
+    - -I
+    - dist/byyl_autogen/include
+    - -I
+    - build-macos/byyl_autogen/include
+    - -std=c++17
+Index:
+  Background: Build

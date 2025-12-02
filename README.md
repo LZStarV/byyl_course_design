@@ -1,9 +1,48 @@
 # byyl 词法分析生成器（Qt+CMake）
 
 - 环境：macOS，Qt 6.9.3，CMake 4.2.0，Ninja 1.13.2
-- 构建：`qt-cmake -S . -B dist -G Ninja`，`cmake --build dist -j`
+
+## 快速开始（CMake 统一构建）
+- 配置：`qt-cmake -S . -B dist -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+- 编译：`cmake --build dist -j`
 - 运行：`open dist/byyl.app` 或 `dist/byyl.app/Contents/MacOS/byyl`
 - 测试：`ctest --test-dir dist -V`
+- 说明：完整细节见下文“构建指南（CMake Only）”。
+
+## 构建指南（CMake Only）
+- 依赖准备：
+  - 安装 Qt/CMake/Ninja：`brew install qt cmake ninja`
+  - 如不使用 `qt-cmake`，为 `cmake` 指定 Qt 路径：`-DCMAKE_PREFIX_PATH=$(brew --prefix qt)`
+- 配置（初次或变更后）：
+  - `qt-cmake -S . -B dist -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+  - 可选：`ln -sf dist/compile_commands.json compile_commands.json`
+- 编译：
+  - `cmake --build dist -j`
+- 运行 GUI：
+  - `open dist/byyl.app`
+  - 或 `dist/byyl.app/Contents/MacOS/byyl`
+- 运行测试：
+  - `ctest --test-dir dist -V`
+- 清理/重建：
+  - `rm -rf dist && qt-cmake -S . -B dist -G Ninja && cmake --build dist -j`
+- 重要说明：
+  - 本项目统一使用 CMake 构建（不使用 qmake）。
+
+### 修改代码后的重新构建
+- 常规代码改动（源文件/头文件）：
+  - 运行 `cmake --build dist -j` 即可增量编译，Ninja 只会重新编译受影响的目标。
+- 构建配置改动（`CMakeLists.txt`、新增/删除源文件、切换 Qt/CMake 版本）：
+  - 先重新配置：`qt-cmake -S . -B dist -G Ninja`
+  - 然后编译：`cmake --build dist -j`
+- 运行与测试：
+  - 运行 GUI：`open dist/byyl.app`
+  - 运行测试：`ctest --test-dir dist -V`
+
+### 编辑器诊断（可选但推荐）
+- 为 clangd 生成并启用编译数据库（使 IDE 正确解析 Qt 头与 AUTOUIC 产物）：
+  - `qt-cmake -S . -B dist -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+  - `ln -sf dist/compile_commands.json compile_commands.json`
+- 当切换构建目录时（如 `build`），请同步更新上述链接。
 
 ## 功能概览
 - 正则解析：支持连接、`|`、`*`、`+`、`?`、`[]`、`()`、`\` 转义、命名宏 `name = expr`
@@ -12,6 +51,31 @@
 - 代码生成：从 MinDFA 生成 C/C++ 源码（方法二：Switch-Case）
 - 生成代码持久化与复用：完整合并扫描器源码按时间戳+正则哈希保存至 `byyl.app/generated/lex`，并编译到 `byyl.app/generated/lex/bin`；在未更换正则表达式时，GUI 与测试复用当前生成文件
 - 测试与验证：并行扫描所有 Token 规则，最长匹配 + 权重策略；跳过空白；按配置跳过注释/字符串（默认跳过 `//`、`/*...*/`、`#` 注释及 `'"`、`""`、`` `...${...}` `` 字符串；TINY 的 `{...}` 注释默认关闭）
+
+## 正则规则约定与示例
+- Token 命名约定：`_name<code>[S] = expr`
+  - 以 `_` 开头表示 Token；`<code>` 为整数编码；可选 `S` 表示该 Token 为分组选项（按 `|` 展开）
+  - 非 `_` 开头的规则为宏（可在表达式中引用），不会参与扫描输出
+- 元字符与转义：解析器将 `| * + ? ( ) [ ]` 视为元字符；如需匹配其字面量，请使用反斜杠转义：`\|`、`\+`、`\*`、`\(`、`\)`、`\[`、`\]`
+- 操作符 Token 示例：
+  - 单行写法：
+    - `_symbol220S = \+ | - | \* | / | % | & | \| | < | > | <= | >= | == | != | = | \+= | -= | \*= | /= | %= | &= | \^= | <<= | >>= | << | >> | \^`
+  - 拆分宏写法（更易维护）：
+    - `kw_ops1 = \+ | - | \* | / | % | & | \|`
+    - `kw_ops2 = < | > | <= | >= | == | != | =`
+    - `kw_ops3 = \+= | -= | \*= | /= | %= | &= | \^= | <<= | >>= | << | >> | \^`
+    - `_symbol220S = kw_ops1 | kw_ops2 | kw_ops3`
+
+## 错误分析与排查指引
+- 未找到 Token 定义：
+  - 原因：规则未按 `_name<code>[S] = expr` 命名，或全部是宏（不参与扫描）
+  - 处理：至少添加一条以 `_` 开头且含编码的 Token 规则；例如：`_identifier100 = letter(letter|digit)*`
+- 元字符未转义：
+  - 现象：大量 `ERR` 或分组被错误拆分
+  - 处理：将 `| * + ? ( ) [ ]` 作为字面量使用时加 `\` 转义；例如 `\|`、`\+`、`\*`、`\(`、`\)`、`\[`、`\]`
+- 预处理行被跳过：
+  - 现象：C/C++ 的 `#include` 行无输出
+  - 处理：在 C/C++ 样例环境下关闭 `LEXER_SKIP_HASH_COMMENT`，或在操作符集中加入 `#`
 
 ## 界面使用
 - 页签与控件（objectName）：
@@ -30,8 +94,8 @@
 
 ## 命令行测试
 - 构建与运行全部测试：
-  - `cmake --build build-macos -j`
-  - `ctest --test-dir build-macos -V`
+  - `cmake --build dist -j`
+  - `ctest --test-dir dist -V`
 - 测试目标：
   - `GuiTest`：UI 自动化，验证关键控件与基本流程
   - `CliRegexTest`：命令行管线（lex→parse→NFA→DFA→MinDFA→runMultiple），严格断言无 `ERR`
@@ -66,7 +130,7 @@
 
 ## 目录结构
  - `app/`：主窗口与 UI（`mainwindow.h/.cpp/.ui`，`main.cpp`）
- - `app/app.pro`：qmake 项目文件（可选）
+ - `app/ui/`：可复用 UI 组件（ToastManager/ToastWidget）
  - `src/`：核心逻辑（与 GUI 解耦）
   - `regex/`：`RegexLexer.*`，`RegexParser.*`
   - `automata/`：`Thompson.*`，`SubsetConstruction.*`，`Hopcroft.*`
@@ -86,10 +150,7 @@
 - `CMakeLists.txt`：应用与测试目标定义
 
 ## 构建与运行
-- 配置：`qt-cmake -S . -B build-macos -G Ninja`
-- 编译：`cmake --build build-macos -j`
-- 运行 GUI：`open build-macos/byyl.app` 或 `build-macos/byyl.app/Contents/MacOS/byyl`
-- 运行测试：`ctest --test-dir build-macos -V`
+- 参考“构建指南（CMake Only）”。
 
 ## 常见问题
 - 找不到 Qt：优先使用 `qt-cmake`，或为 `cmake` 添加 `-DCMAKE_PREFIX_PATH=$(brew --prefix qt)`

@@ -14,6 +14,10 @@ set(APP_SOURCES
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui
+    app/ui/ToastWidget.h
+    app/ui/ToastWidget.cpp
+    app/ui/ToastManager.h
+    app/ui/ToastManager.cpp
     src/model/Alphabet.h
     src/model/Automata.h
     src/regex/RegexLexer.h
@@ -50,6 +54,8 @@ target_sources(GuiTest PRIVATE
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui
+    app/ui/ToastWidget.cpp
+    app/ui/ToastManager.cpp
     src/regex/RegexLexer.cpp
     src/regex/RegexParser.cpp
     src/automata/Thompson.cpp
