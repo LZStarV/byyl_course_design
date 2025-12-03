@@ -8,12 +8,11 @@ class QPushButton;
 class NFAViewTab : public QWidget
 {
     Q_OBJECT
-public:
+   public:
     explicit NFAViewTab(QWidget* parent = nullptr);
-    QComboBox* cmbTokens;
+    QComboBox*    cmbTokens;
     QTableWidget* tblNFA;
-    QLineEdit* edtGraphDpiNfa;
-    QPushButton* btnExportNFA;
-    QPushButton* btnPreviewNFA;
+    QLineEdit*    edtGraphDpiNfa;
+    QPushButton*  btnExportNFA;
+    QPushButton*  btnPreviewNFA;
 };
-

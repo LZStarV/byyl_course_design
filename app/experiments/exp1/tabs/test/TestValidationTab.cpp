@@ -7,12 +7,12 @@
 
 TestValidationTab::TestValidationTab(QWidget* parent) : QWidget(parent)
 {
-    auto l = new QVBoxLayout(this);
-    auto h = new QHBoxLayout;
-    auto left = new QVBoxLayout;
-    auto right = new QVBoxLayout;
-    auto lblSrc = new QLabel("源程序输入");
-    auto lblOut = new QLabel("Token 编码输出");
+    auto l        = new QVBoxLayout(this);
+    auto h        = new QHBoxLayout;
+    auto left     = new QVBoxLayout;
+    auto right    = new QVBoxLayout;
+    auto lblSrc   = new QLabel("源程序输入");
+    auto lblOut   = new QLabel("Token 编码输出");
     txtSourceTiny = new QPlainTextEdit;
     txtSourceTiny->setObjectName("txtSourceTiny");
     txtLexResult = new QPlainTextEdit;
@@ -36,4 +36,3 @@ TestValidationTab::TestValidationTab(QWidget* parent) : QWidget(parent)
     hBtns->addWidget(btnSaveLexResultAs);
     l->addLayout(hBtns);
 }
-

@@ -7,15 +7,15 @@ class QPushButton;
 class ImagePreviewDialog : public QDialog
 {
     Q_OBJECT
-public:
+   public:
     explicit ImagePreviewDialog(QWidget* parent = nullptr);
     bool loadImage(const QString& pngPath);
-private:
-    QGraphicsView* view_;
-    QGraphicsScene* scene_;
-    QPushButton* btnZoomIn_;
-    QPushButton* btnZoomOut_;
-    QPushButton* btnFit_;
-    QPushButton* btnReset_;
-};
 
+   private:
+    QGraphicsView*  view_;
+    QGraphicsScene* scene_;
+    QPushButton*    btnZoomIn_;
+    QPushButton*    btnZoomOut_;
+    QPushButton*    btnFit_;
+    QPushButton*    btnReset_;
+};

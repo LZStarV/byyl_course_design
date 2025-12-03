@@ -8,13 +8,12 @@ class QPushButton;
 class MinDFAViewTab : public QWidget
 {
     Q_OBJECT
-public:
+   public:
     explicit MinDFAViewTab(QWidget* parent = nullptr);
-    QComboBox* cmbTokensMin;
+    QComboBox*    cmbTokensMin;
     QTableWidget* tblMinDFA;
-    QLineEdit* edtGraphDpiMin;
-    QPushButton* btnExportMin;
-    QPushButton* btnPreviewMin;
-    QPushButton* btnGenCode;
+    QLineEdit*    edtGraphDpiMin;
+    QPushButton*  btnExportMin;
+    QPushButton*  btnPreviewMin;
+    QPushButton*  btnGenCode;
 };
-

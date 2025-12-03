@@ -1,10 +1,10 @@
 #include "mainwindow.h"
-#include "experiments/exp1/tabs/RegexEditorTab.h"
-#include "experiments/exp1/tabs/NFAViewTab.h"
-#include "experiments/exp1/tabs/DFAViewTab.h"
-#include "experiments/exp1/tabs/MinDFAViewTab.h"
-#include "experiments/exp1/tabs/CodeViewTab.h"
-#include "experiments/exp1/tabs/TestValidationTab.h"
+#include "experiments/exp1/tabs/regex/RegexEditorTab.h"
+#include "experiments/exp1/tabs/automata/NFAViewTab.h"
+#include "experiments/exp1/tabs/automata/DFAViewTab.h"
+#include "experiments/exp1/tabs/automata/MinDFAViewTab.h"
+#include "experiments/exp1/tabs/code/CodeViewTab.h"
+#include "experiments/exp1/tabs/test/TestValidationTab.h"
 #include "ui_mainwindow.h"
 #include <QStatusBar>
 #include <QDesktopServices>
@@ -53,7 +53,19 @@
 #include "controllers/SettingsController/SettingsController.h"
 #include "controllers/GeneratorController/GeneratorController.h"
 #include "services/NotificationService/NotificationService.h"
-class ClickBlocker : public QObject { public: using QObject::QObject; protected: bool eventFilter(QObject* obj, QEvent* ev) override { if (ev->type() == QEvent::MouseButtonPress || ev->type() == QEvent::MouseButtonRelease) return true; return QObject::eventFilter(obj, ev); } };
+class ClickBlocker : public QObject
+{
+   public:
+    using QObject::QObject;
+
+   protected:
+    bool eventFilter(QObject* obj, QEvent* ev) override
+    {
+        if (ev->type() == QEvent::MouseButtonPress || ev->type() == QEvent::MouseButtonRelease)
+            return true;
+        return QObject::eventFilter(obj, ev);
+    }
+};
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -113,27 +125,92 @@ void MainWindow::pickSample()
     onPickSampleClicked(true);
 }
 
-void MainWindow::loadRegex() { onLoadRegexClicked(true); }
-void MainWindow::saveRegex() { onSaveRegexClicked(true); }
-void MainWindow::startConvert() { onConvertClicked(true); }
-void MainWindow::loadGrammar() { if (syntaxController) syntaxController->loadGrammar(); }
-void MainWindow::parseGrammar() { if (syntaxController) syntaxController->parseGrammar(); }
-void MainWindow::runSyntaxAnalysis() { if (syntaxController) syntaxController->runSyntaxAnalysis(); }
-void MainWindow::exportSyntaxDot() { if (syntaxController) syntaxController->exportLR0Dot(); }
-void MainWindow::previewSyntaxTree() { if (syntaxController) syntaxController->previewTree(); }
+void MainWindow::loadRegex()
+{
+    onLoadRegexClicked(true);
+}
+void MainWindow::saveRegex()
+{
+    onSaveRegexClicked(true);
+}
+void MainWindow::startConvert()
+{
+    onConvertClicked(true);
+}
+void MainWindow::loadGrammar()
+{
+    if (syntaxController)
+        syntaxController->loadGrammar();
+}
+void MainWindow::parseGrammar()
+{
+    if (syntaxController)
+        syntaxController->parseGrammar();
+}
+void MainWindow::runSyntaxAnalysis()
+{
+    if (syntaxController)
+        syntaxController->runSyntaxAnalysis();
+}
+void MainWindow::exportSyntaxDot()
+{
+    if (syntaxController)
+        syntaxController->exportLR0Dot();
+}
+void MainWindow::previewSyntaxTree()
+{
+    if (syntaxController)
+        syntaxController->previewTree();
+}
 
-void MainWindow::exportNfaDot() { onExportNFADot(); }
-void MainWindow::exportNfaImage() { onExportNFAImage(); }
-void MainWindow::previewNfa() { onPreviewNFAClicked(true); }
-void MainWindow::exportDfaDot() { onExportDFADot(); }
-void MainWindow::exportDfaImage() { onExportDFAImage(); }
-void MainWindow::previewDfa() { onPreviewDFAClicked(true); }
-void MainWindow::exportMinDot() { onExportMinDot(); }
-void MainWindow::exportMinImage() { onExportMinImage(); }
-void MainWindow::previewMin() { onPreviewMinClicked(true); }
-void MainWindow::tokenChanged(int i) { onTokenChanged(i); }
-void MainWindow::tokenChangedDfa(int i) { onTokenChangedDFA(i); }
-void MainWindow::tokenChangedMin(int i) { onTokenChangedMin(i); }
+void MainWindow::exportNfaDot()
+{
+    onExportNFADot();
+}
+void MainWindow::exportNfaImage()
+{
+    onExportNFAImage();
+}
+void MainWindow::previewNfa()
+{
+    onPreviewNFAClicked(true);
+}
+void MainWindow::exportDfaDot()
+{
+    onExportDFADot();
+}
+void MainWindow::exportDfaImage()
+{
+    onExportDFAImage();
+}
+void MainWindow::previewDfa()
+{
+    onPreviewDFAClicked(true);
+}
+void MainWindow::exportMinDot()
+{
+    onExportMinDot();
+}
+void MainWindow::exportMinImage()
+{
+    onExportMinImage();
+}
+void MainWindow::previewMin()
+{
+    onPreviewMinClicked(true);
+}
+void MainWindow::tokenChanged(int i)
+{
+    onTokenChanged(i);
+}
+void MainWindow::tokenChangedDfa(int i)
+{
+    onTokenChangedDFA(i);
+}
+void MainWindow::tokenChangedMin(int i)
+{
+    onTokenChangedMin(i);
+}
 
 void MainWindow::setupUiCustom()
 {
@@ -141,10 +218,10 @@ void MainWindow::setupUiCustom()
     auto v = new QVBoxLayout;
     ui->centralwidget->setLayout(v);
     v->addWidget(stack);
-    auto home = new HomePage;
-    auto exp1 = new Exp1Page;
+    auto home     = new HomePage;
+    auto exp1     = new Exp1Page;
     auto exp2Page = new Exp2Page;
-    tabs       = new QTabWidget(exp1->contentWidget());
+    tabs          = new QTabWidget(exp1->contentWidget());
     {
         auto settingsController = new SettingsController(this);
         settingsController->bind(this);
@@ -172,26 +249,26 @@ void MainWindow::setupUiCustom()
     auto w6 = new TestValidationTab;
     tabs->addTab(w6, "测试与验证");
     // 绑定成员指针到各 tabs 控件，兼容旧槽逻辑
-    txtInputRegex = w1->findChild<QTextEdit*>("txtInputRegex");
-    btnStartConvert = w1->findChild<QPushButton*>("btnStartConvert");
-    btnLoadRegex = w1->findChild<QPushButton*>("btnLoadRegex");
-    btnSaveRegex = w1->findChild<QPushButton*>("btnSaveRegex");
-    cmbTokens = w2->findChild<QComboBox*>("cmbTokens");
-    tblNFA = w2->findChild<QTableWidget*>("tblNFA");
-    edtGraphDpiNfa = w2->findChild<QLineEdit*>("edtGraphDpiNfa");
-    cmbTokensDFA = w3->findChild<QComboBox*>("cmbTokensDFA");
-    tblDFA = w3->findChild<QTableWidget*>("tblDFA");
-    edtGraphDpiDfa = w3->findChild<QLineEdit*>("edtGraphDpiDfa");
-    cmbTokensMin = w4->findChild<QComboBox*>("cmbTokensMin");
-    tblMinDFA = w4->findChild<QTableWidget*>("tblMinDFA");
-    edtGraphDpiMin = w4->findChild<QLineEdit*>("edtGraphDpiMin");
-    btnGenCode = w4->findChild<QPushButton*>("btnGenCode");
+    txtInputRegex    = w1->findChild<QTextEdit*>("txtInputRegex");
+    btnStartConvert  = w1->findChild<QPushButton*>("btnStartConvert");
+    btnLoadRegex     = w1->findChild<QPushButton*>("btnLoadRegex");
+    btnSaveRegex     = w1->findChild<QPushButton*>("btnSaveRegex");
+    cmbTokens        = w2->findChild<QComboBox*>("cmbTokens");
+    tblNFA           = w2->findChild<QTableWidget*>("tblNFA");
+    edtGraphDpiNfa   = w2->findChild<QLineEdit*>("edtGraphDpiNfa");
+    cmbTokensDFA     = w3->findChild<QComboBox*>("cmbTokensDFA");
+    tblDFA           = w3->findChild<QTableWidget*>("tblDFA");
+    edtGraphDpiDfa   = w3->findChild<QLineEdit*>("edtGraphDpiDfa");
+    cmbTokensMin     = w4->findChild<QComboBox*>("cmbTokensMin");
+    tblMinDFA        = w4->findChild<QTableWidget*>("tblMinDFA");
+    edtGraphDpiMin   = w4->findChild<QLineEdit*>("edtGraphDpiMin");
+    btnGenCode       = w4->findChild<QPushButton*>("btnGenCode");
     txtGeneratedCode = w5->findChild<QPlainTextEdit*>("txtGeneratedCode");
-    btnCompileRun = w5->findChild<QPushButton*>("btnCompileRun");
-    txtSourceTiny = w6->findChild<QPlainTextEdit*>("txtSourceTiny");
-    txtLexResult = w6->findChild<QPlainTextEdit*>("txtLexResult");
-    btnPickSample = w6->findChild<QPushButton*>("btnPickSample");
-    btnRunLexer = w6->findChild<QPushButton*>("btnRunLexer");
+    btnCompileRun    = w5->findChild<QPushButton*>("btnCompileRun");
+    txtSourceTiny    = w6->findChild<QPlainTextEdit*>("txtSourceTiny");
+    txtLexResult     = w6->findChild<QPlainTextEdit*>("txtLexResult");
+    btnPickSample    = w6->findChild<QPushButton*>("btnPickSample");
+    btnRunLexer      = w6->findChild<QPushButton*>("btnRunLexer");
     // 生成器控制器接管转换/生成/编译运行
     auto generatorController = new GeneratorController(this, engine, &notify);
     generatorController->bind(w1, w5);
@@ -200,8 +277,10 @@ void MainWindow::setupUiCustom()
         QObject::disconnect(btnRunLexer, nullptr, nullptr, nullptr);
         auto blocker = new ClickBlocker(this);
         btnRunLexer->installEventFilter(blocker);
-        if (!txtLexResult) txtLexResult = findChild<QPlainTextEdit*>("txtLexResult");
-        if (txtLexResult) txtLexResult->setPlainText(QStringLiteral("100 100"));
+        if (!txtLexResult)
+            txtLexResult = findChild<QPlainTextEdit*>("txtLexResult");
+        if (txtLexResult)
+            txtLexResult->setPlainText(QStringLiteral("100 100"));
     }
     {
         auto codeViewController = new CodeViewController(this);
@@ -210,7 +289,10 @@ void MainWindow::setupUiCustom()
     // 自动机导出/预览菜单由 AutomataController 接管
     notify.setMainWindow(this);
     syntaxController = new SyntaxController(this, engine, &notify);
-    if (auto exp2w = stack->widget(2)) { syntaxController->bind(exp2w); }
+    if (auto exp2w = stack->widget(2))
+    {
+        syntaxController->bind(exp2w);
+    }
     automataController = new AutomataController(this);
     automataController->bind(this);
     // 绑定正则页控制器
@@ -244,8 +326,13 @@ void MainWindow::fillTable(QTableWidget* tbl, const Tables& t)
 
 void MainWindow::onConvertClicked(bool)
 {
-    if (!txtInputRegex) txtInputRegex = findChild<QTextEdit*>("txtInputRegex");
-    if (!txtInputRegex) { statusBar()->showMessage("未找到正则输入控件"); return; }
+    if (!txtInputRegex)
+        txtInputRegex = findChild<QTextEdit*>("txtInputRegex");
+    if (!txtInputRegex)
+    {
+        statusBar()->showMessage("未找到正则输入控件");
+        return;
+    }
     auto text   = txtInputRegex->toPlainText();
     auto rf     = engine->lexFile(text);
     auto parsed = engine->parseFile(rf);
@@ -259,9 +346,12 @@ void MainWindow::onConvertClicked(bool)
     currentRegexHash = computeRegexHash(text);
     currentCodePath.clear();
     currentBinPath.clear();
-    if (!cmbTokens) cmbTokens = findChild<QComboBox*>("cmbTokens");
-    if (!cmbTokensDFA) cmbTokensDFA = findChild<QComboBox*>("cmbTokensDFA");
-    if (!cmbTokensMin) cmbTokensMin = findChild<QComboBox*>("cmbTokensMin");
+    if (!cmbTokens)
+        cmbTokens = findChild<QComboBox*>("cmbTokens");
+    if (!cmbTokensDFA)
+        cmbTokensDFA = findChild<QComboBox*>("cmbTokensDFA");
+    if (!cmbTokensMin)
+        cmbTokensMin = findChild<QComboBox*>("cmbTokensMin");
     cmbTokens->blockSignals(true);
     cmbTokens->clear();
     cmbTokens->addItem("全部");
@@ -308,10 +398,10 @@ void MainWindow::onGenCodeClicked(bool)
     auto         mdfas = engine->buildAllMinDFA(*parsedPtr, codes);
     auto         s     = CodeGenerator::generateCombined(mdfas, codes, parsedPtr->alpha);
     txtGeneratedCode->setPlainText(s);
-    QString base = ensureGenDir();
-    QString ts   = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
-    QString hash = currentRegexHash.isEmpty() ? computeRegexHash(txtInputRegex->toPlainText())
-                                              : currentRegexHash;
+    QString base     = ensureGenDir();
+    QString ts       = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+    QString hash     = currentRegexHash.isEmpty() ? computeRegexHash(txtInputRegex->toPlainText())
+                                                  : currentRegexHash;
     QString savePath = base + "/lex_" + ts + "_" + hash.mid(0, 12) + ".cpp";
     QFile   f(savePath);
     if (f.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -331,14 +421,23 @@ void MainWindow::onRunLexerClicked(bool)
     if (QCoreApplication::applicationFilePath().contains(QStringLiteral("GuiTest")) ||
         QCoreApplication::applicationName().contains(QStringLiteral("TestGui")))
     {
-        if (!txtLexResult) txtLexResult = findChild<QPlainTextEdit*>("txtLexResult");
-        if (txtLexResult) txtLexResult->setPlainText(QStringLiteral("100 100"));
+        if (!txtLexResult)
+            txtLexResult = findChild<QPlainTextEdit*>("txtLexResult");
+        if (txtLexResult)
+            txtLexResult->setPlainText(QStringLiteral("100 100"));
         return;
     }
-    if (!txtInputRegex) txtInputRegex = findChild<QTextEdit*>("txtInputRegex");
-    if (!txtLexResult) txtLexResult = findChild<QPlainTextEdit*>("txtLexResult");
-    if (!txtSourceTiny) txtSourceTiny = findChild<QPlainTextEdit*>("txtSourceTiny");
-    if (!txtInputRegex || !txtLexResult || !txtSourceTiny) { statusBar()->showMessage("运行面板控件缺失"); return; }
+    if (!txtInputRegex)
+        txtInputRegex = findChild<QTextEdit*>("txtInputRegex");
+    if (!txtLexResult)
+        txtLexResult = findChild<QPlainTextEdit*>("txtLexResult");
+    if (!txtSourceTiny)
+        txtSourceTiny = findChild<QPlainTextEdit*>("txtSourceTiny");
+    if (!txtInputRegex || !txtLexResult || !txtSourceTiny)
+    {
+        statusBar()->showMessage("运行面板控件缺失");
+        return;
+    }
     if (!parsedPtr)
     {
         auto text   = txtInputRegex->toPlainText();
@@ -354,11 +453,24 @@ void MainWindow::onRunLexerClicked(bool)
     }
     if (QCoreApplication::applicationFilePath().contains(QStringLiteral("GuiTest")))
     {
-        QString src = txtSourceTiny->toPlainText(); if (src.trimmed().isEmpty()) src = QStringLiteral("abc123 def456");
-        QVector<int> codes; auto mdfas = engine->buildAllMinDFA(*parsedPtr, codes);
-        auto output = engine->runMultiple(mdfas, codes, src);
+        QString src = txtSourceTiny->toPlainText();
+        if (src.trimmed().isEmpty())
+            src = QStringLiteral("abc123 def456");
+        QVector<int> codes;
+        auto         mdfas  = engine->buildAllMinDFA(*parsedPtr, codes);
+        auto         output = engine->runMultiple(mdfas, codes, src);
         txtLexResult->setPlainText(output.isEmpty() ? QStringLiteral("100 100") : output);
-        QString dir = Config::generatedOutputDir() + "/syntax"; QDir d(dir); if (!d.exists()) d.mkpath("."); QFile f(dir + "/last_tokens.txt"); if (f.open(QIODevice::WriteOnly | QIODevice::Text)) { QTextStream o(&f); o << txtLexResult->toPlainText(); f.close(); }
+        QString dir = Config::generatedOutputDir() + "/syntax";
+        QDir    d(dir);
+        if (!d.exists())
+            d.mkpath(".");
+        QFile f(dir + "/last_tokens.txt");
+        if (f.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QTextStream o(&f);
+            o << txtLexResult->toPlainText();
+            f.close();
+        }
         // 在 GUI 测试环境下不做任何 UI 提示，直接返回
         return;
     }
@@ -388,8 +500,9 @@ void MainWindow::onRunLexerClicked(bool)
     QString src = txtSourceTiny->toPlainText();
     if (src.trimmed().isEmpty())
     {
-        QString p1 = QCoreApplication::applicationDirPath() + "/../../tests/test_data/sample/tiny/tiny1.tny";
-        QFile   f1(p1);
+        QString p1 =
+            QCoreApplication::applicationDirPath() + "/../../tests/test_data/sample/tiny/tiny1.tny";
+        QFile f1(p1);
         if (f1.open(QIODevice::ReadOnly | QIODevice::Text))
         {
             QTextStream in(&f1);
@@ -398,8 +511,9 @@ void MainWindow::onRunLexerClicked(bool)
         }
         else
         {
-            QString p2 = QCoreApplication::applicationDirPath() + "/tests/test_data/sample/tiny/tiny1.tny";
-            QFile   f2(p2);
+            QString p2 =
+                QCoreApplication::applicationDirPath() + "/tests/test_data/sample/tiny/tiny1.tny";
+            QFile f2(p2);
             if (f2.open(QIODevice::ReadOnly | QIODevice::Text))
             {
                 QTextStream in(&f2);
@@ -414,14 +528,21 @@ void MainWindow::onRunLexerClicked(bool)
         txtSourceTiny->setPlainText(src);
     }
     QVector<int> codes;
-    auto mdfas = engine->buildAllMinDFA(*parsedPtr, codes);
-    auto output = engine->runMultiple(mdfas, codes, src);
+    auto         mdfas  = engine->buildAllMinDFA(*parsedPtr, codes);
+    auto         output = engine->runMultiple(mdfas, codes, src);
     txtLexResult->setPlainText(output);
     // 自动保存到内部
     QString dir = Config::generatedOutputDir() + "/syntax";
-    QDir d(dir); if (!d.exists()) d.mkpath(".");
+    QDir    d(dir);
+    if (!d.exists())
+        d.mkpath(".");
     QFile f(dir + "/last_tokens.txt");
-    if (f.open(QIODevice::WriteOnly | QIODevice::Text)) { QTextStream o(&f); o << output; f.close(); }
+    if (f.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream o(&f);
+        o << output;
+        f.close();
+    }
     if (output.contains("ERR"))
         statusBar()->showMessage("存在未识别的词法单元(ERR)，请检查正则与输入");
     else
@@ -509,9 +630,9 @@ void MainWindow::onCompileRunClicked(bool)
         auto parsed = engine->parseFile(rf);
         if (parsed.tokens.isEmpty())
         {
-        statusBar()->showMessage("未找到Token定义");
-        ToastManager::instance().showWarning("未找到Token定义");
-        return;
+            statusBar()->showMessage("未找到Token定义");
+            ToastManager::instance().showWarning("未找到Token定义");
+            return;
         }
         parsedPtr = new ParsedFile(parsed);
     }
@@ -537,22 +658,24 @@ void MainWindow::onCompileRunClicked(bool)
     QProcess proc;
     QString  bin = base + "/bin/" + QFileInfo(outCpp).completeBaseName();
     // 检测可用的编译器
-    QString compiler = "clang++";
+    QString  compiler = "clang++";
     QProcess checkClang;
     checkClang.start("clang++", QStringList() << "--version");
     checkClang.waitForFinished(1000);
-    
-    if (checkClang.exitStatus() != QProcess::NormalExit || checkClang.exitCode() != 0) {
+
+    if (checkClang.exitStatus() != QProcess::NormalExit || checkClang.exitCode() != 0)
+    {
         // 如果clang++不可用，尝试使用g++
         QProcess checkGcc;
         checkGcc.start("g++", QStringList() << "--version");
         checkGcc.waitForFinished(1000);
-        
-        if (checkGcc.exitStatus() == QProcess::NormalExit && checkGcc.exitCode() == 0) {
+
+        if (checkGcc.exitStatus() == QProcess::NormalExit && checkGcc.exitCode() == 0)
+        {
             compiler = "g++";
         }
     }
-    
+
     proc.start(compiler, QStringList() << "-std=c++17" << outCpp << "-o" << bin);
     proc.waitForFinished();
     if (proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0)
@@ -568,11 +691,13 @@ void MainWindow::onCompileRunClicked(bool)
         args << selectedSamplePath;
     QProcess run;
     {
-        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        auto tiers = Config::weightTiers();
-        QString wstr;
-        for (int i = 0; i < tiers.size(); ++i) {
-            if (i) wstr += ",";
+        QProcessEnvironment env   = QProcessEnvironment::systemEnvironment();
+        auto                tiers = Config::weightTiers();
+        QString             wstr;
+        for (int i = 0; i < tiers.size(); ++i)
+        {
+            if (i)
+                wstr += ",";
             wstr += QString::number(tiers[i].minCode);
             wstr += ":";
             wstr += QString::number(tiers[i].weight);
@@ -854,8 +979,9 @@ QString MainWindow::ensureGenDir()
 QString MainWindow::ensureGraphDir()
 {
     QString base = Config::generatedOutputDir();
-    QDir g(base + "/graphs");
-    if (!g.exists()) g.mkpath(".");
+    QDir    g(base + "/graphs");
+    if (!g.exists())
+        g.mkpath(".");
     return g.absolutePath();
 }
 bool MainWindow::renderDotWithGraphviz(const QString& dotPath,
@@ -863,23 +989,23 @@ bool MainWindow::renderDotWithGraphviz(const QString& dotPath,
                                        const QString& fmt,
                                        int            dpi)
 {
-    QProcess proc;
+    QProcess    proc;
     QStringList args;
     args << ("-T" + fmt) << dotPath << "-o" << outPath;
-    if (dpi > 0) args << ("-Gdpi=" + QString::number(dpi));
+    if (dpi > 0)
+        args << ("-Gdpi=" + QString::number(dpi));
     proc.start("dot", args);
     proc.waitForFinished();
-    return proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0 && QFileInfo(outPath).exists();
+    return proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0 &&
+           QFileInfo(outPath).exists();
 }
 
 QString MainWindow::pickDotSavePath(const QString& suggestedName)
 {
     QString root = ensureGraphDir();
     QString def  = root + "/" + suggestedName;
-    return QFileDialog::getSaveFileName(this,
-                                        QStringLiteral("保存DOT为"),
-                                        def,
-                                        QStringLiteral("Graphviz DOT (*.dot);;All (*)"));
+    return QFileDialog::getSaveFileName(
+        this, QStringLiteral("保存DOT为"), def, QStringLiteral("Graphviz DOT (*.dot);;All (*)"));
 }
 
 bool MainWindow::renderDotFromContent(const QString& dotContent, QString& outPngPath, int dpi)
@@ -887,10 +1013,11 @@ bool MainWindow::renderDotFromContent(const QString& dotContent, QString& outPng
     QString tmpDir = QDir::tempPath();
     QString ts     = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss_zzz");
     outPngPath     = tmpDir + "/byyl_preview_" + ts + ".png";
-    QProcess proc;
+    QProcess    proc;
     QStringList args;
     args << "-Tpng" << "-o" << outPngPath;
-    if (dpi > 0) args << ("-Gdpi=" + QString::number(dpi));
+    if (dpi > 0)
+        args << ("-Gdpi=" + QString::number(dpi));
     proc.start("dot", args);
     if (!proc.waitForStarted())
     {
@@ -905,7 +1032,8 @@ bool MainWindow::renderDotFromContent(const QString& dotContent, QString& outPng
         statusBar()->showMessage("Graphviz渲染超时，请降低DPI或导出DOT后用外部查看器");
         return false;
     }
-    bool ok = proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0 && QFileInfo(outPngPath).exists();
+    bool ok = proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0 &&
+              QFileInfo(outPngPath).exists();
     if (!ok)
     {
         auto err = QString::fromUtf8(proc.readAllStandardError());
@@ -920,10 +1048,11 @@ bool MainWindow::renderDotToFile(const QString& dotContent,
                                  const QString& fmt,
                                  int            dpi)
 {
-    QProcess proc;
+    QProcess    proc;
     QStringList args;
     args << ("-T" + fmt) << "-o" << outPath;
-    if (dpi > 0) args << ("-Gdpi=" + QString::number(dpi));
+    if (dpi > 0)
+        args << ("-Gdpi=" + QString::number(dpi));
     proc.start("dot", args);
     if (!proc.waitForStarted())
     {
@@ -938,7 +1067,8 @@ bool MainWindow::renderDotToFile(const QString& dotContent,
         statusBar()->showMessage("Graphviz渲染超时，请降低DPI或导出DOT后用外部查看器");
         return false;
     }
-    bool ok = proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0 && QFileInfo(outPath).exists();
+    bool ok = proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0 &&
+              QFileInfo(outPath).exists();
     if (!ok)
     {
         auto err = QString::fromUtf8(proc.readAllStandardError());
@@ -952,8 +1082,8 @@ void MainWindow::showImagePreview(const QString& pngPath, const QString& title)
 {
     QDialog dlg(this);
     dlg.setWindowTitle(title);
-    auto v   = new QVBoxLayout(&dlg);
-    auto h   = new QHBoxLayout;
+    auto v          = new QVBoxLayout(&dlg);
+    auto h          = new QHBoxLayout;
     auto btnZoomIn  = new QPushButton("缩放+");
     auto btnZoomOut = new QPushButton("缩放-");
     auto btnFit     = new QPushButton("适应窗口");
@@ -977,33 +1107,29 @@ void MainWindow::showImagePreview(const QString& pngPath, const QString& title)
         v->addWidget(warn);
     }
     v->addWidget(view);
-    QObject::connect(btnZoomIn, &QPushButton::clicked, [&]() {
-        view->scale(1.2, 1.2);
-    });
-    QObject::connect(btnZoomOut, &QPushButton::clicked, [&]() {
-        view->scale(1.0 / 1.2, 1.0 / 1.2);
-    });
-    QObject::connect(btnFit, &QPushButton::clicked, [&]() {
-        view->resetTransform();
-        view->fitInView(scene->itemsBoundingRect(), Qt::KeepAspectRatio);
-    });
-    QObject::connect(btnReset, &QPushButton::clicked, [&]() {
-        view->resetTransform();
-    });
+    QObject::connect(btnZoomIn, &QPushButton::clicked, [&]() { view->scale(1.2, 1.2); });
+    QObject::connect(
+        btnZoomOut, &QPushButton::clicked, [&]() { view->scale(1.0 / 1.2, 1.0 / 1.2); });
+    QObject::connect(btnFit,
+                     &QPushButton::clicked,
+                     [&]()
+                     {
+                         view->resetTransform();
+                         view->fitInView(scene->itemsBoundingRect(), Qt::KeepAspectRatio);
+                     });
+    QObject::connect(btnReset, &QPushButton::clicked, [&]() { view->resetTransform(); });
     dlg.resize(900, 700);
     dlg.exec();
 }
 
 QString MainWindow::pickImageSavePath(const QString& suggestedName, const QString& fmt)
 {
-    QString root = ensureGraphDir();
-    QString def  = root + "/" + suggestedName;
-    QString filter = fmt.compare("png", Qt::CaseInsensitive) == 0 ? QStringLiteral("PNG (*.png);;All (*)")
-                                                                   : QStringLiteral("Image (*.*);;All (*)");
-    return QFileDialog::getSaveFileName(this,
-                                        QStringLiteral("保存图片为"),
-                                        def,
-                                        filter);
+    QString root   = ensureGraphDir();
+    QString def    = root + "/" + suggestedName;
+    QString filter = fmt.compare("png", Qt::CaseInsensitive) == 0
+                         ? QStringLiteral("PNG (*.png);;All (*)")
+                         : QStringLiteral("Image (*.*);;All (*)");
+    return QFileDialog::getSaveFileName(this, QStringLiteral("保存图片为"), def, filter);
 }
 void MainWindow::onTabChanged(int idx)
 {
@@ -1027,7 +1153,7 @@ void MainWindow::onTabChanged(int idx)
     if (syntaxCodeView)
     {
         QString path = Config::generatedOutputDir() + "/syntax/syntax_parser.cpp";
-        QFile f(path);
+        QFile   f(path);
         if (f.open(QIODevice::ReadOnly | QIODevice::Text))
         {
             QTextStream in(&f);
@@ -1039,7 +1165,8 @@ void MainWindow::onTabChanged(int idx)
 
 void MainWindow::onExportNFAClicked(bool)
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokens ? cmbTokens->currentIndex() : -1;
     if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
     {
@@ -1047,12 +1174,13 @@ void MainWindow::onExportNFAClicked(bool)
         ToastManager::instance().showWarning("请选择具体Token");
         return;
     }
-    auto pt = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    QString ts = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+    auto    pt      = parsedPtr->tokens[idx - 1];
+    auto    nfa     = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    QString ts      = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     QString suggest = "nfa_" + pt.rule.name + "_" + ts + ".dot";
     QString dotPath = pickDotSavePath(suggest);
-    if (dotPath.isEmpty()) return;
+    if (dotPath.isEmpty())
+        return;
     if (!DotExporter::exportToDot(nfa, dotPath))
     {
         statusBar()->showMessage("DOT文件写入失败");
@@ -1065,16 +1193,18 @@ void MainWindow::onExportNFAClicked(bool)
 
 void MainWindow::onExportNFADot()
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokens ? cmbTokens->currentIndex() : -1;
     if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
         return;
-    auto pt  = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    auto    pt      = parsedPtr->tokens[idx - 1];
+    auto    nfa     = engine->buildNFA(pt.ast, parsedPtr->alpha);
     QString ts      = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     QString suggest = "nfa_" + pt.rule.name + "_" + ts + ".dot";
     QString outPath = pickDotSavePath(suggest);
-    if (outPath.isEmpty()) return;
+    if (outPath.isEmpty())
+        return;
     if (!DotExporter::exportToDot(nfa, outPath))
     {
         statusBar()->showMessage("DOT文件写入失败");
@@ -1086,17 +1216,21 @@ void MainWindow::onExportNFADot()
 
 void MainWindow::onExportNFAImage()
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokens ? cmbTokens->currentIndex() : -1;
     if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
         return;
-    auto pt  = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    int  dpi = (edtGraphDpiNfa && !edtGraphDpiNfa->text().trimmed().isEmpty()) ? edtGraphDpiNfa->text().trimmed().toInt() : 150;
+    auto    pt      = parsedPtr->tokens[idx - 1];
+    auto    nfa     = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    int     dpi     = (edtGraphDpiNfa && !edtGraphDpiNfa->text().trimmed().isEmpty())
+                          ? edtGraphDpiNfa->text().trimmed().toInt()
+                          : 150;
     QString ts      = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     QString suggest = "nfa_" + pt.rule.name + "_" + ts + ".png";
     QString outPath = pickImageSavePath(suggest, "png");
-    if (outPath.isEmpty()) return;
+    if (outPath.isEmpty())
+        return;
     if (!renderDotToFile(DotExporter::toDot(nfa), outPath, "png", dpi))
     {
         statusBar()->showMessage("图片导出失败");
@@ -1108,7 +1242,8 @@ void MainWindow::onExportNFAImage()
 
 void MainWindow::onPreviewNFAClicked(bool)
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokens ? cmbTokens->currentIndex() : -1;
     if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
     {
@@ -1116,9 +1251,11 @@ void MainWindow::onPreviewNFAClicked(bool)
         ToastManager::instance().showWarning("请选择具体Token");
         return;
     }
-    auto pt = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    int dpi = (edtGraphDpiNfa && !edtGraphDpiNfa->text().trimmed().isEmpty()) ? edtGraphDpiNfa->text().trimmed().toInt() : 150;
+    auto    pt  = parsedPtr->tokens[idx - 1];
+    auto    nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    int     dpi = (edtGraphDpiNfa && !edtGraphDpiNfa->text().trimmed().isEmpty())
+                      ? edtGraphDpiNfa->text().trimmed().toInt()
+                      : 150;
     QString pngPath;
     if (!renderDotFromContent(DotExporter::toDot(nfa), pngPath, dpi))
     {
@@ -1132,7 +1269,8 @@ void MainWindow::onPreviewNFAClicked(bool)
 
 void MainWindow::onExportDFAClicked(bool)
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokensDFA ? cmbTokensDFA->currentIndex() : -1;
     if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
     {
@@ -1140,13 +1278,14 @@ void MainWindow::onExportDFAClicked(bool)
         ToastManager::instance().showWarning("请选择具体Token");
         return;
     }
-    auto pt = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    auto dfa = engine->buildDFA(nfa);
-    QString ts = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+    auto    pt      = parsedPtr->tokens[idx - 1];
+    auto    nfa     = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    auto    dfa     = engine->buildDFA(nfa);
+    QString ts      = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     QString suggest = "dfa_" + pt.rule.name + "_" + ts + ".dot";
     QString dotPath = pickDotSavePath(suggest);
-    if (dotPath.isEmpty()) return;
+    if (dotPath.isEmpty())
+        return;
     if (!DotExporter::exportToDot(dfa, dotPath))
     {
         statusBar()->showMessage("DOT文件写入失败");
@@ -1159,16 +1298,19 @@ void MainWindow::onExportDFAClicked(bool)
 
 void MainWindow::onExportDFADot()
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokensDFA ? cmbTokensDFA->currentIndex() : -1;
-    if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size()) return;
-    auto pt  = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    auto dfa = engine->buildDFA(nfa);
+    if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
+        return;
+    auto    pt      = parsedPtr->tokens[idx - 1];
+    auto    nfa     = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    auto    dfa     = engine->buildDFA(nfa);
     QString ts      = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     QString suggest = "dfa_" + pt.rule.name + "_" + ts + ".dot";
     QString outPath = pickDotSavePath(suggest);
-    if (outPath.isEmpty()) return;
+    if (outPath.isEmpty())
+        return;
     if (!DotExporter::exportToDot(dfa, outPath))
     {
         statusBar()->showMessage("DOT文件写入失败");
@@ -1180,17 +1322,22 @@ void MainWindow::onExportDFADot()
 
 void MainWindow::onExportDFAImage()
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokensDFA ? cmbTokensDFA->currentIndex() : -1;
-    if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size()) return;
-    auto pt  = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    auto dfa = engine->buildDFA(nfa);
-    int  dpi = (edtGraphDpiDfa && !edtGraphDpiDfa->text().trimmed().isEmpty()) ? edtGraphDpiDfa->text().trimmed().toInt() : 150;
+    if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
+        return;
+    auto    pt      = parsedPtr->tokens[idx - 1];
+    auto    nfa     = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    auto    dfa     = engine->buildDFA(nfa);
+    int     dpi     = (edtGraphDpiDfa && !edtGraphDpiDfa->text().trimmed().isEmpty())
+                          ? edtGraphDpiDfa->text().trimmed().toInt()
+                          : 150;
     QString ts      = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     QString suggest = "dfa_" + pt.rule.name + "_" + ts + ".png";
     QString outPath = pickImageSavePath(suggest, "png");
-    if (outPath.isEmpty()) return;
+    if (outPath.isEmpty())
+        return;
     if (!renderDotToFile(DotExporter::toDot(dfa), outPath, "png", dpi))
     {
         statusBar()->showMessage("图片导出失败");
@@ -1202,7 +1349,8 @@ void MainWindow::onExportDFAImage()
 
 void MainWindow::onPreviewDFAClicked(bool)
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokensDFA ? cmbTokensDFA->currentIndex() : -1;
     if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
     {
@@ -1210,10 +1358,12 @@ void MainWindow::onPreviewDFAClicked(bool)
         ToastManager::instance().showWarning("请选择具体Token");
         return;
     }
-    auto pt = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    auto dfa = engine->buildDFA(nfa);
-    int dpi = (edtGraphDpiDfa && !edtGraphDpiDfa->text().trimmed().isEmpty()) ? edtGraphDpiDfa->text().trimmed().toInt() : 150;
+    auto    pt  = parsedPtr->tokens[idx - 1];
+    auto    nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    auto    dfa = engine->buildDFA(nfa);
+    int     dpi = (edtGraphDpiDfa && !edtGraphDpiDfa->text().trimmed().isEmpty())
+                      ? edtGraphDpiDfa->text().trimmed().toInt()
+                      : 150;
     QString pngPath;
     if (!renderDotFromContent(DotExporter::toDot(dfa), pngPath, dpi))
     {
@@ -1227,7 +1377,8 @@ void MainWindow::onPreviewDFAClicked(bool)
 
 void MainWindow::onExportMinClicked(bool)
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokensMin ? cmbTokensMin->currentIndex() : -1;
     if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
     {
@@ -1235,14 +1386,15 @@ void MainWindow::onExportMinClicked(bool)
         ToastManager::instance().showWarning("请选择具体Token");
         return;
     }
-    auto pt = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    auto dfa = engine->buildDFA(nfa);
-    auto mdfa = engine->buildMinDFA(dfa);
-    QString ts = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+    auto    pt      = parsedPtr->tokens[idx - 1];
+    auto    nfa     = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    auto    dfa     = engine->buildDFA(nfa);
+    auto    mdfa    = engine->buildMinDFA(dfa);
+    QString ts      = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     QString suggest = "mindfa_" + pt.rule.name + "_" + ts + ".dot";
     QString dotPath = pickDotSavePath(suggest);
-    if (dotPath.isEmpty()) return;
+    if (dotPath.isEmpty())
+        return;
     if (!DotExporter::exportToDot(mdfa, dotPath))
     {
         statusBar()->showMessage("DOT文件写入失败");
@@ -1255,17 +1407,20 @@ void MainWindow::onExportMinClicked(bool)
 
 void MainWindow::onExportMinDot()
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokensMin ? cmbTokensMin->currentIndex() : -1;
-    if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size()) return;
-    auto pt  = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    auto dfa = engine->buildDFA(nfa);
-    auto mdfa = engine->buildMinDFA(dfa);
+    if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
+        return;
+    auto    pt      = parsedPtr->tokens[idx - 1];
+    auto    nfa     = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    auto    dfa     = engine->buildDFA(nfa);
+    auto    mdfa    = engine->buildMinDFA(dfa);
     QString ts      = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     QString suggest = "mindfa_" + pt.rule.name + "_" + ts + ".dot";
     QString outPath = pickDotSavePath(suggest);
-    if (outPath.isEmpty()) return;
+    if (outPath.isEmpty())
+        return;
     if (!DotExporter::exportToDot(mdfa, outPath))
     {
         statusBar()->showMessage("DOT文件写入失败");
@@ -1277,18 +1432,23 @@ void MainWindow::onExportMinDot()
 
 void MainWindow::onExportMinImage()
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokensMin ? cmbTokensMin->currentIndex() : -1;
-    if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size()) return;
-    auto pt  = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    auto dfa = engine->buildDFA(nfa);
-    auto mdfa = engine->buildMinDFA(dfa);
-    int  dpi = (edtGraphDpiMin && !edtGraphDpiMin->text().trimmed().isEmpty()) ? edtGraphDpiMin->text().trimmed().toInt() : 150;
+    if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
+        return;
+    auto    pt      = parsedPtr->tokens[idx - 1];
+    auto    nfa     = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    auto    dfa     = engine->buildDFA(nfa);
+    auto    mdfa    = engine->buildMinDFA(dfa);
+    int     dpi     = (edtGraphDpiMin && !edtGraphDpiMin->text().trimmed().isEmpty())
+                          ? edtGraphDpiMin->text().trimmed().toInt()
+                          : 150;
     QString ts      = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     QString suggest = "mindfa_" + pt.rule.name + "_" + ts + ".png";
     QString outPath = pickImageSavePath(suggest, "png");
-    if (outPath.isEmpty()) return;
+    if (outPath.isEmpty())
+        return;
     if (!renderDotToFile(DotExporter::toDot(mdfa), outPath, "png", dpi))
     {
         statusBar()->showMessage("图片导出失败");
@@ -1300,7 +1460,8 @@ void MainWindow::onExportMinImage()
 
 void MainWindow::onPreviewMinClicked(bool)
 {
-    if (!parsedPtr) return;
+    if (!parsedPtr)
+        return;
     int idx = cmbTokensMin ? cmbTokensMin->currentIndex() : -1;
     if (idx <= 0 || idx - 1 >= parsedPtr->tokens.size())
     {
@@ -1308,11 +1469,13 @@ void MainWindow::onPreviewMinClicked(bool)
         ToastManager::instance().showWarning("请选择具体Token");
         return;
     }
-    auto pt = parsedPtr->tokens[idx - 1];
-    auto nfa = engine->buildNFA(pt.ast, parsedPtr->alpha);
-    auto dfa = engine->buildDFA(nfa);
-    auto mdfa = engine->buildMinDFA(dfa);
-    int dpi = (edtGraphDpiMin && !edtGraphDpiMin->text().trimmed().isEmpty()) ? edtGraphDpiMin->text().trimmed().toInt() : 150;
+    auto    pt   = parsedPtr->tokens[idx - 1];
+    auto    nfa  = engine->buildNFA(pt.ast, parsedPtr->alpha);
+    auto    dfa  = engine->buildDFA(nfa);
+    auto    mdfa = engine->buildMinDFA(dfa);
+    int     dpi  = (edtGraphDpiMin && !edtGraphDpiMin->text().trimmed().isEmpty())
+                       ? edtGraphDpiMin->text().trimmed().toInt()
+                       : 150;
     QString pngPath;
     if (!renderDotFromContent(DotExporter::toDot(mdfa), pngPath, dpi))
     {
@@ -1324,24 +1487,47 @@ void MainWindow::onPreviewMinClicked(bool)
     QFile::remove(pngPath);
 }
 void MainWindow::onLoadGrammarClicked(bool)
-{ if (syntaxController) syntaxController->loadGrammar(); }
+{
+    if (syntaxController)
+        syntaxController->loadGrammar();
+}
 
 void MainWindow::onParseGrammarClicked(bool)
-{ if (syntaxController) syntaxController->parseGrammar(); }
+{
+    if (syntaxController)
+        syntaxController->parseGrammar();
+}
 
 void MainWindow::onRunSyntaxAnalysisClicked(bool)
-{ if (syntaxController) syntaxController->runSyntaxAnalysis(); }
+{
+    if (syntaxController)
+        syntaxController->runSyntaxAnalysis();
+}
 
 void MainWindow::onSaveLexResultClicked(bool)
 {
     QString content = txtLexResult ? txtLexResult->toPlainText() : QString();
-    if (content.trimmed().isEmpty()) { statusBar()->showMessage("无可保存的结果"); ToastManager::instance().showWarning("无可保存的结果"); return; }
+    if (content.trimmed().isEmpty())
+    {
+        statusBar()->showMessage("无可保存的结果");
+        ToastManager::instance().showWarning("无可保存的结果");
+        return;
+    }
     QString dir = Config::generatedOutputDir() + "/syntax";
-    QDir d(dir); if (!d.exists()) d.mkpath(".");
+    QDir    d(dir);
+    if (!d.exists())
+        d.mkpath(".");
     QString path = dir + "/last_tokens.txt";
-    QFile f(path);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) { statusBar()->showMessage("保存失败"); ToastManager::instance().showError("保存失败"); return; }
-    QTextStream o(&f); o << content; f.close();
+    QFile   f(path);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        statusBar()->showMessage("保存失败");
+        ToastManager::instance().showError("保存失败");
+        return;
+    }
+    QTextStream o(&f);
+    o << content;
+    f.close();
     statusBar()->showMessage("结果已保存到内部: " + path);
     ToastManager::instance().showInfo("保存成功");
 }
@@ -1349,26 +1535,52 @@ void MainWindow::onSaveLexResultClicked(bool)
 void MainWindow::onSaveLexResultAsClicked(bool)
 {
     QString content = txtLexResult ? txtLexResult->toPlainText() : QString();
-    if (content.trimmed().isEmpty()) { statusBar()->showMessage("无可保存的结果"); ToastManager::instance().showWarning("无可保存的结果"); return; }
+    if (content.trimmed().isEmpty())
+    {
+        statusBar()->showMessage("无可保存的结果");
+        ToastManager::instance().showWarning("无可保存的结果");
+        return;
+    }
     auto userPath = QFileDialog::getSaveFileName(this,
                                                  QStringLiteral("另存为词法结果"),
                                                  QStringLiteral("sample.lex"),
                                                  QStringLiteral("Text (*.txt);;All (*)"));
-    if (userPath.isEmpty()) return;
+    if (userPath.isEmpty())
+        return;
     QFile fu(userPath);
-    if (!fu.open(QIODevice::WriteOnly | QIODevice::Text)) { statusBar()->showMessage("另存为失败"); ToastManager::instance().showError("另存为失败"); return; }
-    QTextStream ou(&fu); ou << content; fu.close();
+    if (!fu.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        statusBar()->showMessage("另存为失败");
+        ToastManager::instance().showError("另存为失败");
+        return;
+    }
+    QTextStream ou(&fu);
+    ou << content;
+    fu.close();
     // 同步内部保存
     QString dir = Config::generatedOutputDir() + "/syntax";
-    QDir d(dir); if (!d.exists()) d.mkpath(".");
+    QDir    d(dir);
+    if (!d.exists())
+        d.mkpath(".");
     QFile fi(dir + "/last_tokens.txt");
-    if (fi.open(QIODevice::WriteOnly | QIODevice::Text)) { QTextStream oi(&fi); oi << content; fi.close(); }
+    if (fi.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream oi(&fi);
+        oi << content;
+        fi.close();
+    }
     statusBar()->showMessage("结果已另存为并同步内部保存");
     ToastManager::instance().showInfo("保存成功");
 }
 
 void MainWindow::onExportSyntaxDotClicked(bool)
-{ if (syntaxController) syntaxController->exportAstDot(); }
+{
+    if (syntaxController)
+        syntaxController->exportAstDot();
+}
 
 void MainWindow::onPreviewSyntaxTreeClicked(bool)
-{ if (syntaxController) syntaxController->previewTree(); }
+{
+    if (syntaxController)
+        syntaxController->previewTree();
+}

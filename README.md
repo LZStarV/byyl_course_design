@@ -27,7 +27,7 @@
   - `services/`：`DotService`、`FileService`、`NotificationService`
   - `experiments/exp1/tabs/`：正则编辑、NFA/DFA/MinDFA、代码查看、测试与验证
   - `experiments/exp2/tabs/`：文法编辑、First&Follow、语法树、语法代码查看
-  - `pages/exp2/`：实验二容器页
+  - `pages/`：页面容器（主页、实验一/二）
 - `src/`：核心逻辑（regex/automata/syntax/generator/model/Engine）
 - `tests/`：UI、CLI、代码生成、配置、DOT 与语法模块测试
 - `generated/lex/` 与 `generated/syntax/`：生成源码与图导出
@@ -50,3 +50,10 @@
 - `CliRegexTest`：词法命令行管线
 - `CodegenTest`：组合扫描器源码编译运行
 - `GrammarParserTest`、`LL1Test`、`DotExportTest`：语法与导出模块
+
+## 代码格式化
+- 统一使用项目根目录的 `.clang-format`：
+  - 全量格式化命令：
+    - `find . -type f \( -name "*.h" -o -name "*.cpp" \) -not -path "./dist/*" -not -path "./build/*" -print0 | xargs -0 -n 50 clang-format -i -style=file`
+  - 单文件示例：
+    - `clang-format -i -style=file app/mainwindow.cpp`

@@ -15,6 +15,7 @@ class Exp2Page : public QWidget
     explicit Exp2Page(QWidget* parent = nullptr);
    signals:
     void requestBack();
+
    private:
     QPushButton* btnBack;
     QTabWidget*  tabSyntax;

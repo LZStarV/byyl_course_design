@@ -3,4 +3,3 @@
 #include "AST.h"
 
 QString syntaxAstToDot(SyntaxASTNode* root);
-

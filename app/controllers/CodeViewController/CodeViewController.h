@@ -7,12 +7,12 @@ class MainWindow;
 class CodeViewController : public QObject
 {
     Q_OBJECT
-public:
+   public:
     explicit CodeViewController(MainWindow* mw);
     void bind(QTabWidget* tabs);
-public slots:
+   public slots:
     void onOuterTabChanged(int idx);
-private:
+
+   private:
     MainWindow* mw_;
 };
-

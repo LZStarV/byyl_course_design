@@ -4,7 +4,18 @@
 #include <QScreen>
 #include <QApplication>
 
-ToastWidget::ToastWidget(Type type, QWidget* parent) : QWidget(parent), icon_(new QLabel), text_(new QLabel), close_(new QPushButton), timer_(new QTimer(this)), fade_(nullptr), slide_(nullptr), opacity_(nullptr), shadow_(nullptr), durationMs_(3000) {
+ToastWidget::ToastWidget(Type type, QWidget* parent) :
+    QWidget(parent),
+    icon_(new QLabel),
+    text_(new QLabel),
+    close_(new QPushButton),
+    timer_(new QTimer(this)),
+    fade_(nullptr),
+    slide_(nullptr),
+    opacity_(nullptr),
+    shadow_(nullptr),
+    durationMs_(3000)
+{
     setWindowFlags(Qt::FramelessWindowHint | Qt::ToolTip | Qt::WindowStaysOnTopHint);
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_ShowWithoutActivating);
@@ -26,12 +37,15 @@ ToastWidget::ToastWidget(Type type, QWidget* parent) : QWidget(parent), icon_(ne
     applyType(type);
 }
 
-void ToastWidget::ensureEffects() {
-    if (!opacity_) {
+void ToastWidget::ensureEffects()
+{
+    if (!opacity_)
+    {
         opacity_ = new QGraphicsOpacityEffect(this);
         setGraphicsEffect(opacity_);
     }
-    if (!shadow_) {
+    if (!shadow_)
+    {
         shadow_ = new QGraphicsDropShadowEffect(this);
         shadow_->setBlurRadius(16);
         shadow_->setOffset(0, 2);
@@ -41,46 +55,67 @@ void ToastWidget::ensureEffects() {
     }
 }
 
-void ToastWidget::applyType(Type type) {
+void ToastWidget::applyType(Type type)
+{
     QPalette pal = palette();
-    QColor bg;
-    QColor border;
-    QColor fg;
-    QIcon ico;
-    if (type == Info) {
-        bg = QColor("#E6F0FF");
-        border = QColor("#2B78E4");
-        fg = QColor("#1C3B70");
-        ico = style()->standardIcon(QStyle::SP_MessageBoxInformation);
+    QColor   bg;
+    QColor   border;
+    QColor   fg;
+    QIcon    ico;
+    if (type == Info)
+    {
+        bg          = QColor("#E6F0FF");
+        border      = QColor("#2B78E4");
+        fg          = QColor("#1C3B70");
+        ico         = style()->standardIcon(QStyle::SP_MessageBoxInformation);
         durationMs_ = 3000;
-    } else if (type == Warning) {
-        bg = QColor("#FFF8E1");
-        border = QColor("#F5A623");
-        fg = QColor("#7A4B00");
-        ico = style()->standardIcon(QStyle::SP_MessageBoxWarning);
+    }
+    else if (type == Warning)
+    {
+        bg          = QColor("#FFF8E1");
+        border      = QColor("#F5A623");
+        fg          = QColor("#7A4B00");
+        ico         = style()->standardIcon(QStyle::SP_MessageBoxWarning);
         durationMs_ = 5000;
-    } else {
-        bg = QColor("#FFE9E9");
-        border = QColor("#D0021B");
-        fg = QColor("#680012");
-        ico = style()->standardIcon(QStyle::SP_MessageBoxCritical);
+    }
+    else
+    {
+        bg          = QColor("#FFE9E9");
+        border      = QColor("#D0021B");
+        fg          = QColor("#680012");
+        ico         = style()->standardIcon(QStyle::SP_MessageBoxCritical);
         durationMs_ = 8000;
     }
-    setStyleSheet(QString("QWidget{background:%1;border:1px solid %2;border-radius:8px;} QLabel{color:%3;} QPushButton{border:none;background:transparent;color:%3;}").arg(bg.name(), border.name(), fg.name()));
+    setStyleSheet(
+        QString("QWidget{background:%1;border:1px solid %2;border-radius:8px;} QLabel{color:%3;} "
+                "QPushButton{border:none;background:transparent;color:%3;}")
+            .arg(bg.name(), border.name(), fg.name()));
     setIcon(ico);
     text_->setPalette(pal);
 }
 
-void ToastWidget::setText(const QString& t) { text_->setText(t); }
+void ToastWidget::setText(const QString& t)
+{
+    text_->setText(t);
+}
 
-void ToastWidget::setDuration(int ms) { durationMs_ = ms; }
+void ToastWidget::setDuration(int ms)
+{
+    durationMs_ = ms;
+}
 
-void ToastWidget::setIcon(const QIcon& ico) { icon_->setPixmap(ico.pixmap(20, 20)); }
+void ToastWidget::setIcon(const QIcon& ico)
+{
+    icon_->setPixmap(ico.pixmap(20, 20));
+}
 
-void ToastWidget::showAnimated() {
+void ToastWidget::showAnimated()
+{
     opacity_->setOpacity(0.0);
-    if (fade_) fade_->deleteLater();
-    if (slide_) slide_->deleteLater();
+    if (fade_)
+        fade_->deleteLater();
+    if (slide_)
+        slide_->deleteLater();
     fade_ = new QPropertyAnimation(opacity_, "opacity", this);
     fade_->setDuration(220);
     fade_->setStartValue(0.0);
@@ -98,10 +133,13 @@ void ToastWidget::showAnimated() {
     timer_->start(durationMs_);
 }
 
-void ToastWidget::closeAnimated() {
+void ToastWidget::closeAnimated()
+{
     timer_->stop();
-    if (fade_) fade_->stop();
-    if (slide_) slide_->stop();
+    if (fade_)
+        fade_->stop();
+    if (slide_)
+        slide_->stop();
     auto f = new QPropertyAnimation(opacity_, "opacity", this);
     f->setDuration(180);
     f->setStartValue(opacity_->opacity());
@@ -113,9 +151,20 @@ void ToastWidget::closeAnimated() {
     QPoint p = pos();
     s->setStartValue(p);
     s->setEndValue(QPoint(p.x(), p.y() - 12));
-    connect(f, &QPropertyAnimation::finished, this, [this]() { emit closed(this); hide(); deleteLater(); });
+    connect(f,
+            &QPropertyAnimation::finished,
+            this,
+            [this]()
+            {
+                emit closed(this);
+                hide();
+                deleteLater();
+            });
     f->start();
     s->start();
 }
 
-void ToastWidget::resizeEvent(QResizeEvent* e) { QWidget::resizeEvent(e); }
+void ToastWidget::resizeEvent(QResizeEvent* e)
+{
+    QWidget::resizeEvent(e);
+}

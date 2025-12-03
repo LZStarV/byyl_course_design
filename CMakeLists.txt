@@ -9,65 +9,7 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets Test)
 
-set(APP_SOURCES
-    app/main.cpp
-    app/mainwindow.cpp
-    app/mainwindow.h
-    app/mainwindow.ui
-    app/components/ToastWidget/ToastWidget.h
-    app/components/ToastWidget/ToastWidget.cpp
-    app/components/ToastManager/ToastManager.h
-    app/components/ToastManager/ToastManager.cpp
-    app/components/SettingsDialog/SettingsDialog.h
-    app/components/SettingsDialog/SettingsDialog.cpp
-    app/components/ImagePreviewDialog/ImagePreviewDialog.h
-    app/components/ImagePreviewDialog/ImagePreviewDialog.cpp
-    app/pages/home/HomePage.h
-    app/pages/home/HomePage.cpp
-    app/pages/exp1/Exp1Page.h
-    app/pages/exp1/Exp1Page.cpp
-    app/pages/exp2/Exp2Page.h
-    app/pages/exp2/Exp2Page.cpp
-    app/experiments/exp2/tabs/GrammarEditorTab.h
-    app/experiments/exp2/tabs/GrammarEditorTab.cpp
-    app/experiments/exp2/tabs/FirstFollowTab.h
-    app/experiments/exp2/tabs/FirstFollowTab.cpp
-    app/experiments/exp2/tabs/SyntaxTreeTab.h
-    app/experiments/exp2/tabs/SyntaxTreeTab.cpp
-    app/experiments/exp2/tabs/SyntaxCodeViewTab.h
-    app/experiments/exp2/tabs/SyntaxCodeViewTab.cpp
-    app/experiments/exp1/tabs/RegexEditorTab.h
-    app/experiments/exp1/tabs/RegexEditorTab.cpp
-    app/experiments/exp1/tabs/NFAViewTab.h
-    app/experiments/exp1/tabs/NFAViewTab.cpp
-    app/experiments/exp1/tabs/DFAViewTab.h
-    app/experiments/exp1/tabs/DFAViewTab.cpp
-    app/experiments/exp1/tabs/MinDFAViewTab.h
-    app/experiments/exp1/tabs/MinDFAViewTab.cpp
-    app/experiments/exp1/tabs/CodeViewTab.h
-    app/experiments/exp1/tabs/CodeViewTab.cpp
-    app/experiments/exp1/tabs/TestValidationTab.h
-    app/experiments/exp1/tabs/TestValidationTab.cpp
-    app/controllers/SyntaxController/SyntaxController.h
-    app/controllers/SyntaxController/SyntaxController.cpp
-    app/controllers/TestValidationController/TestValidationController.h
-    app/controllers/TestValidationController/TestValidationController.cpp
-    app/controllers/RegexController/RegexController.h
-    app/controllers/RegexController/RegexController.cpp
-    app/controllers/AutomataController/AutomataController.h
-    app/controllers/AutomataController/AutomataController.cpp
-    app/controllers/SettingsController/SettingsController.h
-    app/controllers/SettingsController/SettingsController.cpp
-    app/controllers/GeneratorController/GeneratorController.h
-    app/controllers/GeneratorController/GeneratorController.cpp
-    app/controllers/CodeViewController/CodeViewController.h
-    app/controllers/CodeViewController/CodeViewController.cpp
-    app/services/NotificationService/NotificationService.h
-    app/services/NotificationService/NotificationService.cpp
-    app/services/FileService/FileService.h
-    app/services/FileService/FileService.cpp
-    app/services/DotService/DotService.h
-    app/services/DotService/DotService.cpp
+set(CORE_SOURCES
     src/syntax/Grammar.h
     src/syntax/Grammar.cpp
     src/syntax/GrammarParser.h
@@ -103,11 +45,80 @@ set(APP_SOURCES
     src/config/Config.cpp
 )
 
+set(APP_SOURCES
+    app/main.cpp
+    app/mainwindow.cpp
+    app/mainwindow.h
+    app/mainwindow.ui
+    app/components/ToastWidget/ToastWidget.h
+    app/components/ToastWidget/ToastWidget.cpp
+    app/components/ToastManager/ToastManager.h
+    app/components/ToastManager/ToastManager.cpp
+    app/components/SettingsDialog/SettingsDialog.h
+    app/components/SettingsDialog/SettingsDialog.cpp
+    app/components/ImagePreviewDialog/ImagePreviewDialog.h
+    app/components/ImagePreviewDialog/ImagePreviewDialog.cpp
+    app/pages/home/HomePage.h
+    app/pages/home/HomePage.cpp
+    app/pages/exp1/Exp1Page.h
+    app/pages/exp1/Exp1Page.cpp
+    app/pages/exp2/Exp2Page.h
+    app/pages/exp2/Exp2Page.cpp
+    app/experiments/exp1/helpers/AutomataTableHelper.h
+    app/experiments/exp1/helpers/AutomataTableHelper.cpp
+    app/experiments/exp2/helpers/SyntaxTableHelper.h
+    app/experiments/exp2/helpers/SyntaxTableHelper.cpp
+    app/experiments/exp2/tabs/grammar/GrammarEditorTab.h
+    app/experiments/exp2/tabs/grammar/GrammarEditorTab.cpp
+    app/experiments/exp2/tabs/grammar/FirstFollowTab.h
+    app/experiments/exp2/tabs/grammar/FirstFollowTab.cpp
+    app/experiments/exp2/tabs/syntax/SyntaxTreeTab.h
+    app/experiments/exp2/tabs/syntax/SyntaxTreeTab.cpp
+    app/experiments/exp2/tabs/syntax/SyntaxCodeViewTab.h
+    app/experiments/exp2/tabs/syntax/SyntaxCodeViewTab.cpp
+    app/experiments/exp1/tabs/regex/RegexEditorTab.h
+    app/experiments/exp1/tabs/regex/RegexEditorTab.cpp
+    app/experiments/exp1/tabs/automata/NFAViewTab.h
+    app/experiments/exp1/tabs/automata/NFAViewTab.cpp
+    app/experiments/exp1/tabs/automata/DFAViewTab.h
+    app/experiments/exp1/tabs/automata/DFAViewTab.cpp
+    app/experiments/exp1/tabs/automata/MinDFAViewTab.h
+    app/experiments/exp1/tabs/automata/MinDFAViewTab.cpp
+    app/experiments/exp1/tabs/code/CodeViewTab.h
+    app/experiments/exp1/tabs/code/CodeViewTab.cpp
+    app/experiments/exp1/tabs/test/TestValidationTab.h
+    app/experiments/exp1/tabs/test/TestValidationTab.cpp
+    app/controllers/SyntaxController/SyntaxController.h
+    app/controllers/SyntaxController/SyntaxController.cpp
+    app/controllers/TestValidationController/TestValidationController.h
+    app/controllers/TestValidationController/TestValidationController.cpp
+    app/controllers/RegexController/RegexController.h
+    app/controllers/RegexController/RegexController.cpp
+    app/controllers/AutomataController/AutomataController.h
+    app/controllers/AutomataController/AutomataController.cpp
+    app/controllers/SettingsController/SettingsController.h
+    app/controllers/SettingsController/SettingsController.cpp
+    app/controllers/GeneratorController/GeneratorController.h
+    app/controllers/GeneratorController/GeneratorController.cpp
+    app/controllers/CodeViewController/CodeViewController.h
+    app/controllers/CodeViewController/CodeViewController.cpp
+    app/services/NotificationService/NotificationService.h
+    app/services/NotificationService/NotificationService.cpp
+    app/services/FileService/FileService.h
+    app/services/FileService/FileService.cpp
+    app/services/DotService/DotService.h
+    app/services/DotService/DotService.cpp
+)
+
+add_library(byyl_core STATIC ${CORE_SOURCES})
+target_include_directories(byyl_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(byyl_core PRIVATE Qt6::Core)
+
 qt_add_executable(byyl
     ${APP_SOURCES}
 )
 
-target_link_libraries(byyl PRIVATE Qt6::Widgets)
+target_link_libraries(byyl PRIVATE Qt6::Widgets byyl_core)
 
 if(APPLE)
     set_target_properties(byyl PROPERTIES
@@ -141,16 +152,18 @@ target_sources(GuiTest PRIVATE
     app/pages/home/HomePage.cpp
     app/pages/exp1/Exp1Page.cpp
     app/pages/exp2/Exp2Page.cpp
-    app/experiments/exp2/tabs/GrammarEditorTab.cpp
-    app/experiments/exp2/tabs/FirstFollowTab.cpp
-    app/experiments/exp2/tabs/SyntaxTreeTab.cpp
-    app/experiments/exp2/tabs/SyntaxCodeViewTab.cpp
-    app/experiments/exp1/tabs/RegexEditorTab.cpp
-    app/experiments/exp1/tabs/NFAViewTab.cpp
-    app/experiments/exp1/tabs/DFAViewTab.cpp
-    app/experiments/exp1/tabs/MinDFAViewTab.cpp
-    app/experiments/exp1/tabs/CodeViewTab.cpp
-    app/experiments/exp1/tabs/TestValidationTab.cpp
+    app/experiments/exp1/helpers/AutomataTableHelper.cpp
+    app/experiments/exp2/helpers/SyntaxTableHelper.cpp
+    app/experiments/exp2/tabs/grammar/GrammarEditorTab.cpp
+    app/experiments/exp2/tabs/grammar/FirstFollowTab.cpp
+    app/experiments/exp2/tabs/syntax/SyntaxTreeTab.cpp
+    app/experiments/exp2/tabs/syntax/SyntaxCodeViewTab.cpp
+    app/experiments/exp1/tabs/regex/RegexEditorTab.cpp
+    app/experiments/exp1/tabs/automata/NFAViewTab.cpp
+    app/experiments/exp1/tabs/automata/DFAViewTab.cpp
+    app/experiments/exp1/tabs/automata/MinDFAViewTab.cpp
+    app/experiments/exp1/tabs/code/CodeViewTab.cpp
+    app/experiments/exp1/tabs/test/TestValidationTab.cpp
     src/syntax/Grammar.cpp
     src/syntax/GrammarParser.cpp
     src/syntax/LL1.cpp

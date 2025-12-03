@@ -9,14 +9,14 @@
 
 DFAViewTab::DFAViewTab(QWidget* parent) : QWidget(parent)
 {
-    auto l = new QVBoxLayout(this);
-    auto hSel = new QHBoxLayout;
-    auto lbl = new QLabel("选择Token");
+    auto l       = new QVBoxLayout(this);
+    auto hSel    = new QHBoxLayout;
+    auto lbl     = new QLabel("选择Token");
     cmbTokensDFA = new QComboBox;
     cmbTokensDFA->setObjectName("cmbTokensDFA");
     hSel->addWidget(lbl);
     hSel->addWidget(cmbTokensDFA);
-    auto hTools = new QHBoxLayout;
+    auto hTools  = new QHBoxLayout;
     btnExportDFA = new QPushButton("导出(DFA)");
     btnExportDFA->setObjectName("btnExportDFA");
     btnPreviewDFA = new QPushButton("预览(DFA)");
@@ -34,4 +34,3 @@ DFAViewTab::DFAViewTab(QWidget* parent) : QWidget(parent)
     l->addLayout(hTools);
     l->addWidget(tblDFA);
 }
-

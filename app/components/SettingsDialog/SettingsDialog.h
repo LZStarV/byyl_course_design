@@ -13,6 +13,7 @@ class SettingsDialog : public QDialog
     Q_OBJECT
    public:
     explicit SettingsDialog(QWidget* parent = nullptr);
+
    private:
     QLineEdit*    edtOutDir;
     QTableWidget* tblTiers;
@@ -33,4 +34,3 @@ class SettingsDialog : public QDialog
     bool          collectAndApply();
     QString       decideSavePath() const;
 };
-

@@ -6,12 +6,12 @@
 class SyntaxParserTest : public QObject
 {
     Q_OBJECT
-private slots:
+   private slots:
     void parse_tokens_basic()
     {
-        QString err;
-        auto g = GrammarParser::parseString("s -> a s | #\n", err);
-        auto info = LL1::compute(g);
+        QString        err;
+        auto           g    = GrammarParser::parseString("s -> a s | #\n", err);
+        auto           info = LL1::compute(g);
         SyntaxASTNode* root = new SyntaxASTNode;
         QVERIFY(root != nullptr);
     }

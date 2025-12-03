@@ -6,12 +6,11 @@ class QPushButton;
 class TestValidationTab : public QWidget
 {
     Q_OBJECT
-public:
+   public:
     explicit TestValidationTab(QWidget* parent = nullptr);
     QPlainTextEdit* txtSourceTiny;
     QPlainTextEdit* txtLexResult;
-    QPushButton* btnPickSample;
-    QPushButton* btnRunLexer;
-    QPushButton* btnSaveLexResultAs;
+    QPushButton*    btnPickSample;
+    QPushButton*    btnRunLexer;
+    QPushButton*    btnSaveLexResultAs;
 };
-

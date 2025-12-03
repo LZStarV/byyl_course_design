@@ -5,7 +5,7 @@
 class ConfigWeightTest : public QObject
 {
     Q_OBJECT
-  private slots:
+   private slots:
     void test_weight_tie_break_env()
     {
         Engine   eng;

@@ -5,8 +5,7 @@ class QMainWindow;
 class SettingsController : public QObject
 {
     Q_OBJECT
-public:
+   public:
     explicit SettingsController(QMainWindow* parent = nullptr);
     void bind(QMainWindow* mw);
 };
-

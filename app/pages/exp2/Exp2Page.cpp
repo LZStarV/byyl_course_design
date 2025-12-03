@@ -3,20 +3,20 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QTabWidget>
-#include "../../experiments/exp2/tabs/GrammarEditorTab.h"
-#include "../../experiments/exp2/tabs/FirstFollowTab.h"
-#include "../../experiments/exp2/tabs/SyntaxTreeTab.h"
-#include "../../experiments/exp2/tabs/SyntaxCodeViewTab.h"
+#include "../../experiments/exp2/tabs/grammar/GrammarEditorTab.h"
+#include "../../experiments/exp2/tabs/grammar/FirstFollowTab.h"
+#include "../../experiments/exp2/tabs/syntax/SyntaxTreeTab.h"
+#include "../../experiments/exp2/tabs/syntax/SyntaxCodeViewTab.h"
 
 Exp2Page::Exp2Page(QWidget* parent) : QWidget(parent)
 {
-    auto v = new QVBoxLayout;
+    auto v   = new QVBoxLayout;
     auto bar = new QHBoxLayout;
-    btnBack = new QPushButton("← 返回");
+    btnBack  = new QPushButton("← 返回");
     bar->addWidget(btnBack);
     bar->addStretch(1);
     v->addLayout(bar);
-    tabSyntax = new QTabWidget;
+    tabSyntax     = new QTabWidget;
     auto wGrammar = new GrammarEditorTab;
     tabSyntax->addTab(wGrammar, "文法分析");
     auto wFF = new FirstFollowTab;

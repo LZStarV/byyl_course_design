@@ -4,13 +4,13 @@ class QMainWindow;
 
 class NotificationService
 {
-public:
+   public:
     explicit NotificationService(QMainWindow* mw = nullptr);
     void setMainWindow(QMainWindow* mw);
     void info(const QString& text);
     void warning(const QString& text);
     void error(const QString& text);
-private:
+
+   private:
     QMainWindow* mw_;
 };
-

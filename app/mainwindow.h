@@ -42,27 +42,59 @@ class MainWindow : public QMainWindow
     ~MainWindow();
     void previewImage(const QString& pngPath, const QString& title);
     // Public forwarding for controllers
-    void runLexer();
-    void saveLexAs();
-    void pickSample();
-    void loadRegex();
-    void saveRegex();
-    void startConvert();
-    void loadGrammar();
-    void parseGrammar();
-    void runSyntaxAnalysis();
-    void exportSyntaxDot();
-    void previewSyntaxTree();
-    Engine* getEngine() const { return engine; }
-    ParsedFile* getParsed() const { return parsedPtr; }
-    NotificationService* notifyPtr() { return &notify; }
-    QString codePath() const { return currentCodePath; }
-    void setParsed(ParsedFile* p) { parsedPtr = p; }
-    void setRegexHash(const QString& h) { currentRegexHash = h; }
-    void clearPaths() { currentCodePath.clear(); currentBinPath.clear(); }
-    void setCodePaths(const QString& code, const QString& bin) { currentCodePath = code; currentBinPath = bin; }
-    QString computeRegexHashPublic(const QString& text) { return computeRegexHash(text); }
-    QString ensureGenDirPublic() { return ensureGenDir(); }
+    void    runLexer();
+    void    saveLexAs();
+    void    pickSample();
+    void    loadRegex();
+    void    saveRegex();
+    void    startConvert();
+    void    loadGrammar();
+    void    parseGrammar();
+    void    runSyntaxAnalysis();
+    void    exportSyntaxDot();
+    void    previewSyntaxTree();
+    Engine* getEngine() const
+    {
+        return engine;
+    }
+    ParsedFile* getParsed() const
+    {
+        return parsedPtr;
+    }
+    NotificationService* notifyPtr()
+    {
+        return &notify;
+    }
+    QString codePath() const
+    {
+        return currentCodePath;
+    }
+    void setParsed(ParsedFile* p)
+    {
+        parsedPtr = p;
+    }
+    void setRegexHash(const QString& h)
+    {
+        currentRegexHash = h;
+    }
+    void clearPaths()
+    {
+        currentCodePath.clear();
+        currentBinPath.clear();
+    }
+    void setCodePaths(const QString& code, const QString& bin)
+    {
+        currentCodePath = code;
+        currentBinPath  = bin;
+    }
+    QString computeRegexHashPublic(const QString& text)
+    {
+        return computeRegexHash(text);
+    }
+    QString ensureGenDirPublic()
+    {
+        return ensureGenDir();
+    }
     void exportNfaDot();
     void exportNfaImage();
     void previewNfa();
@@ -77,71 +109,69 @@ class MainWindow : public QMainWindow
     void tokenChangedMin(int);
 
    private:
-    Ui::MainWindow* ui;
-    QStackedWidget* stack;
-    QTabWidget*     tabs;
-    QTextEdit*      txtInputRegex;
-    QTableWidget*   tblNFA;
-    QTableWidget*   tblDFA;
-    QTableWidget*   tblMinDFA;
-    QComboBox*      cmbTokens;
-    QComboBox*      cmbTokensDFA;
-    QComboBox*      cmbTokensMin;
-    QPushButton*    btnExportNFA;
-    QPushButton*    btnPreviewNFA;
-    QPushButton*    btnExportDFA;
-    QPushButton*    btnPreviewDFA;
-    QPushButton*    btnExportMin;
-    QPushButton*    btnPreviewMin;
-    QLineEdit*      edtGraphDpiNfa;
-    QLineEdit*      edtGraphDpiDfa;
-    QLineEdit*      edtGraphDpiMin;
-    QPlainTextEdit* txtGeneratedCode;
-    QPlainTextEdit* txtSourceTiny;
-    QPlainTextEdit* txtLexResult;
-    QPushButton*    btnStartConvert;
-    QPushButton*    btnGenCode;
-    QPushButton*    btnCompileRun;
-    QPushButton*    btnRunLexer;
-    QPushButton*    btnLoadRegex;
-    QPushButton*    btnSaveRegex;
-    QPushButton*    btnPickSample;
-    QString         selectedSamplePath;
-    QString         currentRegexHash;
-    QString         currentCodePath;
-    QString         currentBinPath;
-    Engine*         engine;
-    ParsedFile*     parsedPtr;
-    MinDFA*         lastMinPtr;
-    Grammar         currentGrammar;
-    LL1Info         currentLL1;
-    bool            hasGrammar = false;
-    NotificationService notify;
-    class SyntaxController* syntaxController;
+    Ui::MainWindow*                 ui;
+    QStackedWidget*                 stack;
+    QTabWidget*                     tabs;
+    QTextEdit*                      txtInputRegex;
+    QTableWidget*                   tblNFA;
+    QTableWidget*                   tblDFA;
+    QTableWidget*                   tblMinDFA;
+    QComboBox*                      cmbTokens;
+    QComboBox*                      cmbTokensDFA;
+    QComboBox*                      cmbTokensMin;
+    QPushButton*                    btnExportNFA;
+    QPushButton*                    btnPreviewNFA;
+    QPushButton*                    btnExportDFA;
+    QPushButton*                    btnPreviewDFA;
+    QPushButton*                    btnExportMin;
+    QPushButton*                    btnPreviewMin;
+    QLineEdit*                      edtGraphDpiNfa;
+    QLineEdit*                      edtGraphDpiDfa;
+    QLineEdit*                      edtGraphDpiMin;
+    QPlainTextEdit*                 txtGeneratedCode;
+    QPlainTextEdit*                 txtSourceTiny;
+    QPlainTextEdit*                 txtLexResult;
+    QPushButton*                    btnStartConvert;
+    QPushButton*                    btnGenCode;
+    QPushButton*                    btnCompileRun;
+    QPushButton*                    btnRunLexer;
+    QPushButton*                    btnLoadRegex;
+    QPushButton*                    btnSaveRegex;
+    QPushButton*                    btnPickSample;
+    QString                         selectedSamplePath;
+    QString                         currentRegexHash;
+    QString                         currentCodePath;
+    QString                         currentBinPath;
+    Engine*                         engine;
+    ParsedFile*                     parsedPtr;
+    MinDFA*                         lastMinPtr;
+    Grammar                         currentGrammar;
+    LL1Info                         currentLL1;
+    bool                            hasGrammar = false;
+    NotificationService             notify;
+    class SyntaxController*         syntaxController;
     class TestValidationController* testController;
-   class AutomataController* automataController;
-    void            setupUiCustom();
-    void            fillTable(QTableWidget* tbl, const Tables& t);
-    void            fillAllNFA();
-    void            fillAllDFA();
-    void            fillAllMin();
-    QString         computeRegexHash(const QString& text);
-    QString         ensureGenDir();
-    QString         ensureGraphDir();
-    bool            renderDotWithGraphviz(const QString& dotPath,
-                                          const QString& outPath,
-                                          const QString& fmt,
-                                          int            dpi);
-    QString         pickDotSavePath(const QString& suggestedName);
-    bool            renderDotFromContent(const QString& dotContent,
-                                         QString&       outPngPath,
-                                         int            dpi);
-    bool            renderDotToFile(const QString& dotContent,
-                                    const QString& outPath,
-                                    const QString& fmt,
-                                    int            dpi);
-    void            showImagePreview(const QString& pngPath, const QString& title);
-    QString         pickImageSavePath(const QString& suggestedName, const QString& fmt);
+    class AutomataController*       automataController;
+    void                            setupUiCustom();
+    void                            fillTable(QTableWidget* tbl, const Tables& t);
+    void                            fillAllNFA();
+    void                            fillAllDFA();
+    void                            fillAllMin();
+    QString                         computeRegexHash(const QString& text);
+    QString                         ensureGenDir();
+    QString                         ensureGraphDir();
+    bool                            renderDotWithGraphviz(const QString& dotPath,
+                                                          const QString& outPath,
+                                                          const QString& fmt,
+                                                          int            dpi);
+    QString                         pickDotSavePath(const QString& suggestedName);
+    bool    renderDotFromContent(const QString& dotContent, QString& outPngPath, int dpi);
+    bool    renderDotToFile(const QString& dotContent,
+                            const QString& outPath,
+                            const QString& fmt,
+                            int            dpi);
+    void    showImagePreview(const QString& pngPath, const QString& title);
+    QString pickImageSavePath(const QString& suggestedName, const QString& fmt);
    private slots:
     void onConvertClicked(bool);
     void onGenCodeClicked(bool);

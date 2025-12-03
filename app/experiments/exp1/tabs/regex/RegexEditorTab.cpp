@@ -6,10 +6,10 @@
 
 RegexEditorTab::RegexEditorTab(QWidget* parent) : QWidget(parent)
 {
-    auto l = new QVBoxLayout(this);
+    auto l        = new QVBoxLayout(this);
     txtInputRegex = new QTextEdit;
     txtInputRegex->setObjectName("txtInputRegex");
-    auto h = new QHBoxLayout;
+    auto h       = new QHBoxLayout;
     btnLoadRegex = new QPushButton("从文件加载");
     btnLoadRegex->setObjectName("btnLoadRegex");
     btnSaveRegex = new QPushButton("保存正则");
@@ -22,4 +22,3 @@ RegexEditorTab::RegexEditorTab(QWidget* parent) : QWidget(parent)
     l->addWidget(txtInputRegex);
     l->addLayout(h);
 }
-

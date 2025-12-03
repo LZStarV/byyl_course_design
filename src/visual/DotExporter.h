@@ -12,4 +12,3 @@ class DotExporter
     static bool    exportToDot(const DFA& dfa, const QString& filename);
     static bool    exportToDot(const MinDFA& mdfa, const QString& filename);
 };
-

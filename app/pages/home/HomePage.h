@@ -13,6 +13,7 @@ class HomePage : public QWidget
    signals:
     void openExp1();
     void openExp2();
+
    private:
     QFrame*      banner;
     QLabel*      lblTitle;

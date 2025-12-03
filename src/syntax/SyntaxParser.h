@@ -7,11 +7,8 @@
 
 struct SyntaxResult
 {
-    SyntaxASTNode* root = nullptr;
-    int errorPos = -1;
+    SyntaxASTNode* root     = nullptr;
+    int            errorPos = -1;
 };
 
-SyntaxResult parseTokens(const QVector<QString>& tokens,
-                         const Grammar& g,
-                         const LL1Info& info);
-
+SyntaxResult parseTokens(const QVector<QString>& tokens, const Grammar& g, const LL1Info& info);

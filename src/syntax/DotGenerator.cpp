@@ -4,7 +4,10 @@
 #include <QFile>
 #include <QMap>
 
-static void emitNode(QTextStream& o, const SyntaxASTNode* n, int& id, QMap<const SyntaxASTNode*, int>& ids)
+static void emitNode(QTextStream&                     o,
+                     const SyntaxASTNode*             n,
+                     int&                             id,
+                     QMap<const SyntaxASTNode*, int>& ids)
 {
     int nid = ++id;
     ids.insert(n, nid);
@@ -19,12 +22,13 @@ static void emitNode(QTextStream& o, const SyntaxASTNode* n, int& id, QMap<const
 
 QString syntaxAstToDot(SyntaxASTNode* root)
 {
-    QString s;
+    QString     s;
     QTextStream o(&s);
     o << "digraph G {\nrankdir=TB\n";
-    int id = 0;
+    int                             id = 0;
     QMap<const SyntaxASTNode*, int> ids;
-    if (root) emitNode(o, root, id, ids);
+    if (root)
+        emitNode(o, root, id, ids);
     o << "}\n";
     return s;
 }

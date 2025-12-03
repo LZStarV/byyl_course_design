@@ -6,9 +6,8 @@ class QPushButton;
 class CodeViewTab : public QWidget
 {
     Q_OBJECT
-public:
+   public:
     explicit CodeViewTab(QWidget* parent = nullptr);
     QPlainTextEdit* txtGeneratedCode;
-    QPushButton* btnCompileRun;
+    QPushButton*    btnCompileRun;
 };
-

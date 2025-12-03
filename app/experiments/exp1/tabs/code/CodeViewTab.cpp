@@ -5,7 +5,7 @@
 
 CodeViewTab::CodeViewTab(QWidget* parent) : QWidget(parent)
 {
-    auto l = new QVBoxLayout(this);
+    auto l           = new QVBoxLayout(this);
     txtGeneratedCode = new QPlainTextEdit;
     txtGeneratedCode->setObjectName("txtGeneratedCode");
     btnCompileRun = new QPushButton("编译并运行生成器");
@@ -13,4 +13,3 @@ CodeViewTab::CodeViewTab(QWidget* parent) : QWidget(parent)
     l->addWidget(txtGeneratedCode);
     l->addWidget(btnCompileRun);
 }
-

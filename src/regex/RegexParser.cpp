@@ -234,8 +234,10 @@ ParsedFile RegexParser::parse(const RegexFile& file)
     if (out.macros.contains("letter"))
     {
         auto expr = out.macros.value("letter").expr;
-        if (expr.contains('_')) out.alpha.allowUnderscoreInLetter = true;
-        if (expr.contains('$')) out.alpha.allowDollarInLetter     = true;
+        if (expr.contains('_'))
+            out.alpha.allowUnderscoreInLetter = true;
+        if (expr.contains('$'))
+            out.alpha.allowDollarInLetter = true;
     }
     return out;
 }

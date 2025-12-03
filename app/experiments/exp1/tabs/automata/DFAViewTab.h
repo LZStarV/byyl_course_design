@@ -8,12 +8,11 @@ class QPushButton;
 class DFAViewTab : public QWidget
 {
     Q_OBJECT
-public:
+   public:
     explicit DFAViewTab(QWidget* parent = nullptr);
-    QComboBox* cmbTokensDFA;
+    QComboBox*    cmbTokensDFA;
     QTableWidget* tblDFA;
-    QLineEdit* edtGraphDpiDfa;
-    QPushButton* btnExportDFA;
-    QPushButton* btnPreviewDFA;
+    QLineEdit*    edtGraphDpiDfa;
+    QPushButton*  btnExportDFA;
+    QPushButton*  btnPreviewDFA;
 };
-

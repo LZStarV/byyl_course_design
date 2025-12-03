@@ -4,6 +4,6 @@
 
 struct SyntaxASTNode
 {
-    QString symbol;
+    QString                 symbol;
     QVector<SyntaxASTNode*> children;
 };

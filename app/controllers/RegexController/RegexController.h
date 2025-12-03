@@ -6,10 +6,10 @@ class MainWindow;
 class RegexController : public QObject
 {
     Q_OBJECT
-public:
+   public:
     explicit RegexController(MainWindow* mw);
     void bind(QWidget* regexPage);
-private:
+
+   private:
     MainWindow* mw_;
 };
-

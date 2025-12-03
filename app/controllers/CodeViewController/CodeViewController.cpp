@@ -10,15 +10,18 @@ CodeViewController::CodeViewController(MainWindow* mw) : mw_(mw) {}
 
 void CodeViewController::bind(QTabWidget* tabs)
 {
-    QObject::connect(tabs, &QTabWidget::currentChanged, this, &CodeViewController::onOuterTabChanged);
+    QObject::connect(
+        tabs, &QTabWidget::currentChanged, this, &CodeViewController::onOuterTabChanged);
 }
 
 void CodeViewController::onOuterTabChanged(int idx)
 {
-    if (idx < 0) return;
-    auto tabs = qobject_cast<QTabWidget*>(sender());
-    QWidget* w = tabs ? tabs->widget(idx) : nullptr;
-    if (!w) return;
+    if (idx < 0)
+        return;
+    auto     tabs = qobject_cast<QTabWidget*>(sender());
+    QWidget* w    = tabs ? tabs->widget(idx) : nullptr;
+    if (!w)
+        return;
     if (auto codeView = w->findChild<QPlainTextEdit*>("txtGeneratedCode"))
     {
         QString path = mw_->codePath();
@@ -36,7 +39,7 @@ void CodeViewController::onOuterTabChanged(int idx)
     if (auto syntaxCodeView = w->findChild<QPlainTextEdit*>("txtSyntaxGeneratedCode"))
     {
         QString path = Config::generatedOutputDir() + "/syntax/syntax_parser.cpp";
-        QFile f(path);
+        QFile   f(path);
         if (f.open(QIODevice::ReadOnly | QIODevice::Text))
         {
             QTextStream in(&f);

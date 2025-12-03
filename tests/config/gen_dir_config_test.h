@@ -4,7 +4,7 @@
 class GenDirConfigTest : public QObject
 {
     Q_OBJECT
-  private slots:
+   private slots:
     void test_gen_dir_env_override()
     {
         qunsetenv("BYYL_GEN_DIR");

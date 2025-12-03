@@ -4,11 +4,11 @@
 class GrammarParserTest : public QObject
 {
     Q_OBJECT
-private slots:
+   private slots:
     void parse_simple_grammar()
     {
         QString err;
-        auto g = GrammarParser::parseString("S -> a S | #\n", err);
+        auto    g = GrammarParser::parseString("S -> a S | #\n", err);
         QVERIFY(err.isEmpty());
         QVERIFY(!g.productions.isEmpty());
         QVERIFY(g.startSymbol == "S");
@@ -17,4 +17,3 @@ private slots:
 
 QTEST_MAIN(GrammarParserTest)
 #include "grammar_parser_test.moc"
-

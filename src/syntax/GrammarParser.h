@@ -6,5 +6,4 @@ namespace GrammarParser
 {
     Grammar parseFile(const QString& path, QString& error);
     Grammar parseString(const QString& text, QString& error);
-}
-
+}  // namespace GrammarParser

@@ -9,14 +9,14 @@
 
 NFAViewTab::NFAViewTab(QWidget* parent) : QWidget(parent)
 {
-    auto l = new QVBoxLayout(this);
+    auto l    = new QVBoxLayout(this);
     auto hSel = new QHBoxLayout;
-    auto lbl = new QLabel("选择Token");
+    auto lbl  = new QLabel("选择Token");
     cmbTokens = new QComboBox;
     cmbTokens->setObjectName("cmbTokens");
     hSel->addWidget(lbl);
     hSel->addWidget(cmbTokens);
-    auto hTools = new QHBoxLayout;
+    auto hTools  = new QHBoxLayout;
     btnExportNFA = new QPushButton("导出(NFA)");
     btnExportNFA->setObjectName("btnExportNFA");
     btnPreviewNFA = new QPushButton("预览(NFA)");
@@ -34,4 +34,3 @@ NFAViewTab::NFAViewTab(QWidget* parent) : QWidget(parent)
     l->addLayout(hTools);
     l->addWidget(tblNFA);
 }
-

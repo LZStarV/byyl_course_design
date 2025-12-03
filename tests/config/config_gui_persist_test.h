@@ -10,11 +10,11 @@
 class ConfigGuiPersistTest : public QObject
 {
     Q_OBJECT
-  private slots:
+   private slots:
     void test_save_and_reload()
     {
-        QTemporaryDir tmp;
-        QString path = tmp.path() + "/lexer.json";
+        QTemporaryDir               tmp;
+        QString                     path = tmp.path() + "/lexer.json";
         QVector<Config::WeightTier> tiers;
         tiers.push_back({300, 9});
         tiers.push_back({100, 2});
@@ -46,12 +46,12 @@ class ConfigGuiPersistTest : public QObject
         QVERIFY(f.open(QIODevice::ReadOnly | QIODevice::Text));
         auto data = f.readAll();
         f.close();
-        QFile cfg(QCoreApplication::applicationDirPath() + "/../../config/lexer.json");
-        QFileInfo fi(cfg);
-        bool ok = true;
+        QFile           cfg(QCoreApplication::applicationDirPath() + "/../../config/lexer.json");
+        QFileInfo       fi(cfg);
+        bool            ok = true;
         QJsonParseError err;
-        auto doc = QJsonDocument::fromJson(data, &err);
-        ok = ok && err.error == QJsonParseError::NoError && doc.isObject();
+        auto            doc = QJsonDocument::fromJson(data, &err);
+        ok                  = ok && err.error == QJsonParseError::NoError && doc.isObject();
         QVERIFY(ok);
         auto obj = doc.object();
         auto arr = obj.value("weight_tiers").toArray();

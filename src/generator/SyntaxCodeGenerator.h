@@ -4,7 +4,6 @@
 #include <QVector>
 
 QString generateSyntaxParserSource(const QMap<QString, QMap<QString, int>>& table,
-                                   const QVector<QString>&                    nonterms,
-                                   const QVector<QString>&                    terms,
-                                   const QString&                             start);
-
+                                   const QVector<QString>&                  nonterms,
+                                   const QVector<QString>&                  terms,
+                                   const QString&                           start);

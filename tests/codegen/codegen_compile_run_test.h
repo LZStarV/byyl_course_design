@@ -9,11 +9,12 @@
 class CodegenTest : public QObject
 {
     Q_OBJECT
-  private:
+   private:
     QString readAll(const QString& path)
     {
         QFile f(path);
-        if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) return QString();
+        if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+            return QString();
         QTextStream in(&f);
         return in.readAll();
     }
@@ -21,16 +22,19 @@ class CodegenTest : public QObject
     {
         QString p1 = QCoreApplication::applicationDirPath() + "/../../" + rel;
         auto    t  = readAll(p1);
-        if (!t.isEmpty()) return t;
+        if (!t.isEmpty())
+            return t;
         QString p2 = QCoreApplication::applicationDirPath() + "/" + rel;
         t          = readAll(p2);
-        if (!t.isEmpty()) return t;
+        if (!t.isEmpty())
+            return t;
         QString p3 = rel;
         t          = readAll(p3);
-        if (!t.isEmpty()) return t;
+        if (!t.isEmpty())
+            return t;
         return QString();
     }
-  private slots:
+   private slots:
     void test_generate_compile_run()
     {
         Engine   eng;
@@ -53,7 +57,9 @@ class CodegenTest : public QObject
         ASTNode* unionLD   = new ASTNode{ASTNode::Union, QString("|"), {refLetter, refDigit}};
         ASTNode* starUnion = new ASTNode{ASTNode::Star, QString(), {unionLD}};
         ASTNode* concatId =
-            new ASTNode{ASTNode::Concat, QString(), {new ASTNode{ASTNode::Ref, QString("letter"), {}}, starUnion}};
+            new ASTNode{ASTNode::Concat,
+                        QString(),
+                        {new ASTNode{ASTNode::Ref, QString("letter"), {}}, starUnion}};
         auto               nfa  = eng.buildNFA(concatId, alpha);
         auto               dfa  = eng.buildDFA(nfa);
         auto               mdfa = eng.buildMinDFA(dfa);
@@ -61,33 +67,37 @@ class CodegenTest : public QObject
         codes.insert("_identifier100", 100);
         auto    srcCore = CodeGenerator::generate(mdfa, codes);
         int     codeNum = codes.value("_identifier100", 100);
-        QString src = QString("#include <iostream>\n") + QString("%1\n").arg(srcCore) +
-                      QString(
-                          "int main(){ std::string input; std::string line; "
-                          "while(std::getline(std::cin,line)){ if(!input.empty()) input+='\\n'; input+=line; "
-                          "} std::string out; size_t pos=0; while(pos<input.size()){ char c=input[pos++]; "
-                          "if(c==' '||c=='\\t'||c=='\\n'||c=='\\r'){ continue; } if(c=='{'){ "
-                          "while(pos<input.size() && input[pos++]!='}'){} continue; } int state=") +
-                      QString::number(mdfa.start) +
-                      QString(
-                          "; bool moved=true; while(moved){ int ns=Step(state,c); if(ns==-1){ moved=false; "
-                          "break; } state=ns; if(pos<input.size()) c=input[pos++]; else c='\\0'; "
-                          "if(c=='\\0') break; } if(AcceptState(state)){ if(!out.empty()) out+=' '; "
-                          "out+=std::to_string(") +
-                      QString::number(codeNum) +
-                      QString(
-                          "); } else { if(!out.empty()) out+=' '; out+=std::string(\"ERR\"); } } "
-                          "std::cout<<out; return 0; }\n");
+        QString src =
+            QString("#include <iostream>\n") + QString("%1\n").arg(srcCore) +
+            QString(
+                "int main(){ std::string input; std::string line; "
+                "while(std::getline(std::cin,line)){ if(!input.empty()) input+='\\n'; input+=line; "
+                "} std::string out; size_t pos=0; while(pos<input.size()){ char c=input[pos++]; "
+                "if(c==' '||c=='\\t'||c=='\\n'||c=='\\r'){ continue; } if(c=='{'){ "
+                "while(pos<input.size() && input[pos++]!='}'){} continue; } int state=") +
+            QString::number(mdfa.start) +
+            QString(
+                "; bool moved=true; while(moved){ int ns=Step(state,c); if(ns==-1){ moved=false; "
+                "break; } state=ns; if(pos<input.size()) c=input[pos++]; else c='\\0'; "
+                "if(c=='\\0') break; } if(AcceptState(state)){ if(!out.empty()) out+=' '; "
+                "out+=std::to_string(") +
+            QString::number(codeNum) +
+            QString(
+                "); } else { if(!out.empty()) out+=' '; out+=std::string(\"ERR\"); } } "
+                "std::cout<<out; return 0; }\n");
         QString outPath = QDir::currentPath() + "/gen_lex.cpp";
         QFile   of(outPath);
         of.open(QIODevice::WriteOnly | QIODevice::Text);
         of.write(src.toUtf8());
         of.close();
         QProcess proc;
-        proc.start("clang++", QStringList() << "-std=c++17" << outPath << "-o" << QDir::currentPath() + "/gen_lex_bin");
+        proc.start("clang++",
+                   QStringList() << "-std=c++17" << outPath << "-o"
+                                 << QDir::currentPath() + "/gen_lex_bin");
         proc.waitForFinished();
         QTextStream(stdout) << "【生成器编译退出码】" << proc.exitCode() << "\n";
-        QTextStream(stdout) << "【编译器错误输出】" << QString::fromUtf8(proc.readAllStandardError()) << "\n";
+        QTextStream(stdout) << "【编译器错误输出】"
+                            << QString::fromUtf8(proc.readAllStandardError()) << "\n";
         QVERIFY(proc.exitStatus() == QProcess::NormalExit);
         QProcess run;
         run.start(QDir::currentPath() + "/gen_lex_bin");

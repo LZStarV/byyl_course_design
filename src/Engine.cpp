@@ -370,8 +370,10 @@ static int matchLen(const MinDFA& mdfa, const QString& src, int pos)
             if (a.compare("letter", Qt::CaseInsensitive) == 0)
             {
                 bool ok = ch.isLetter();
-                if (!ok && mdfa.alpha.allowUnderscoreInLetter && ch == '_') ok = true;
-                if (!ok && mdfa.alpha.allowDollarInLetter && ch == '$') ok = true;
+                if (!ok && mdfa.alpha.allowUnderscoreInLetter && ch == '_')
+                    ok = true;
+                if (!ok && mdfa.alpha.allowDollarInLetter && ch == '$')
+                    ok = true;
                 if (ok)
                 {
                     state = t;
@@ -575,7 +577,7 @@ QMap<QString, QVector<QString>> Engine::firstFollowAsRows(const LL1Info& info)
     for (auto it = info.first.begin(); it != info.first.end(); ++it)
     {
         QVector<QString> v;
-        QList<QString> s = QList<QString>(it.value().begin(), it.value().end());
+        QList<QString>   s = QList<QString>(it.value().begin(), it.value().end());
         std::sort(s.begin(), s.end());
         for (auto x : s) v.push_back(x);
         r[it.key()] = v;
@@ -583,7 +585,8 @@ QMap<QString, QVector<QString>> Engine::firstFollowAsRows(const LL1Info& info)
     return r;
 }
 
-QMap<QString, QMap<QString, QString>> Engine::parsingTableAsRows(const Grammar& g, const LL1Info& info)
+QMap<QString, QMap<QString, QString>> Engine::parsingTableAsRows(const Grammar& g,
+                                                                 const LL1Info& info)
 {
     QMap<QString, QMap<QString, QString>> r;
     for (auto A : g.nonterminals)
@@ -595,19 +598,18 @@ QMap<QString, QMap<QString, QString>> Engine::parsingTableAsRows(const Grammar& 
             if (idx >= 0)
             {
                 const auto& p = g.productions[A][idx];
-                QString rhs;
+                QString     rhs;
                 for (int i = 0; i < p.right.size(); ++i)
                 {
                     rhs += p.right[i];
-                    if (i + 1 < p.right.size()) rhs += " ";
+                    if (i + 1 < p.right.size())
+                        rhs += " ";
                 }
                 row[a] = rhs;
             }
         }
-        row["$"] = info.table.value(A).contains("$")
-                        ? row.value("$")
-                        : QString();
-        r[A] = row;
+        row["$"] = info.table.value(A).contains("$") ? row.value("$") : QString();
+        r[A]     = row;
     }
     return r;
 }

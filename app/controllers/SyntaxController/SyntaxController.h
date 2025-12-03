@@ -19,7 +19,7 @@ class NotificationService;
 class SyntaxController : public QObject
 {
     Q_OBJECT
-public:
+   public:
     SyntaxController(MainWindow* mw, Engine* engine, NotificationService* notify);
     void bind(QWidget* exp2Page);
     void loadGrammar();
@@ -30,14 +30,14 @@ public:
     void previewLR0();
     void exportLR0Dot();
     void exportAstDot();
-private:
-    MainWindow* mw_;
-    Engine* engine_;
+
+   private:
+    MainWindow*          mw_;
+    Engine*              engine_;
     NotificationService* notify_;
-    QWidget* page_ = nullptr;
-    struct Grammar grammar_;
-    struct LL1Info ll1_;
-    bool hasGrammar_ = false;
+    QWidget*             page_ = nullptr;
+    struct Grammar       grammar_;
+    struct LL1Info       ll1_;
+    bool                 hasGrammar_ = false;
     static bool renderDotFromContentLocal(const QString& dotContent, QString& outPngPath, int dpi);
 };
-

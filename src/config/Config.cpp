@@ -7,27 +7,27 @@
 #include <QDir>
 #include <QFileInfo>
 
-bool                        Config::s_loaded            = false;
+bool                        Config::s_loaded = false;
 QVector<Config::WeightTier> Config::s_tiers;
 QString                     Config::s_outDir;
 bool                        Config::s_hasOutDirOverride = false;
 QString                     Config::s_outDirOverride;
-bool                        Config::s_hasTiersOverride  = false;
+bool                        Config::s_hasTiersOverride = false;
 QVector<Config::WeightTier> Config::s_tiersOverride;
-bool                        Config::s_hasSkipBrace      = false;
-bool                        Config::s_skipBrace         = false;
-bool                        Config::s_hasSkipLine       = false;
-bool                        Config::s_skipLine          = false;
-bool                        Config::s_hasSkipBlock      = false;
-bool                        Config::s_skipBlock         = false;
-bool                        Config::s_hasSkipHash       = false;
-bool                        Config::s_skipHash          = false;
-bool                        Config::s_hasSkipSingle     = false;
-bool                        Config::s_skipSingle        = false;
-bool                        Config::s_hasSkipDouble     = false;
-bool                        Config::s_skipDouble        = false;
-bool                        Config::s_hasSkipTemplate   = false;
-bool                        Config::s_skipTemplate      = false;
+bool                        Config::s_hasSkipBrace    = false;
+bool                        Config::s_skipBrace       = false;
+bool                        Config::s_hasSkipLine     = false;
+bool                        Config::s_skipLine        = false;
+bool                        Config::s_hasSkipBlock    = false;
+bool                        Config::s_skipBlock       = false;
+bool                        Config::s_hasSkipHash     = false;
+bool                        Config::s_skipHash        = false;
+bool                        Config::s_hasSkipSingle   = false;
+bool                        Config::s_skipSingle      = false;
+bool                        Config::s_hasSkipDouble   = false;
+bool                        Config::s_skipDouble      = false;
+bool                        Config::s_hasSkipTemplate = false;
+bool                        Config::s_skipTemplate    = false;
 
 static QVector<Config::WeightTier> defaultTiers()
 {
@@ -43,9 +43,9 @@ void Config::load()
 {
     if (s_loaded)
         return;
-    s_loaded = true;
-    s_tiers  = defaultTiers();
-    s_outDir = QString();
+    s_loaded            = true;
+    s_tiers             = defaultTiers();
+    s_outDir            = QString();
     s_hasOutDirOverride = false;
     s_hasTiersOverride  = false;
     s_hasSkipBrace      = false;
@@ -182,7 +182,8 @@ int Config::weightForCode(int c)
 QVector<Config::WeightTier> Config::weightTiers()
 {
     load();
-    if (s_hasTiersOverride && !s_tiersOverride.isEmpty()) return s_tiersOverride;
+    if (s_hasTiersOverride && !s_tiersOverride.isEmpty())
+        return s_tiersOverride;
     return s_tiers;
 }
 
@@ -545,9 +546,11 @@ bool Config::saveJson(const QString& path)
 {
     load();
     QJsonObject obj;
-    obj.insert("generated_output_dir", s_hasOutDirOverride && !s_outDirOverride.isEmpty() ? s_outDirOverride : s_outDir);
-    QJsonArray tiersArr;
-    const auto& tiersUse = s_hasTiersOverride && !s_tiersOverride.isEmpty() ? s_tiersOverride : s_tiers;
+    obj.insert("generated_output_dir",
+               s_hasOutDirOverride && !s_outDirOverride.isEmpty() ? s_outDirOverride : s_outDir);
+    QJsonArray  tiersArr;
+    const auto& tiersUse =
+        s_hasTiersOverride && !s_tiersOverride.isEmpty() ? s_tiersOverride : s_tiers;
     for (const auto& t : tiersUse)
     {
         QJsonObject o;
@@ -560,8 +563,10 @@ bool Config::saveJson(const QString& path)
     obj.insert("skip_line_comment", s_hasSkipLine ? s_skipLine : skipLineComment());
     obj.insert("skip_block_comment", s_hasSkipBlock ? s_skipBlock : skipBlockComment());
     obj.insert("skip_hash_comment", s_hasSkipHash ? s_skipHash : skipHashComment());
-    obj.insert("skip_single_quote_string", s_hasSkipSingle ? s_skipSingle : skipSingleQuoteString());
-    obj.insert("skip_double_quote_string", s_hasSkipDouble ? s_skipDouble : skipDoubleQuoteString());
+    obj.insert("skip_single_quote_string",
+               s_hasSkipSingle ? s_skipSingle : skipSingleQuoteString());
+    obj.insert("skip_double_quote_string",
+               s_hasSkipDouble ? s_skipDouble : skipDoubleQuoteString());
     obj.insert("skip_template_string", s_hasSkipTemplate ? s_skipTemplate : skipTemplateString());
     QJsonDocument doc(obj);
     QFile         f(path);

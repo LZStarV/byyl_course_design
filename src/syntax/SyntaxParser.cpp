@@ -2,7 +2,7 @@
 
 static SyntaxASTNode* makeNode(const QString& sym)
 {
-    auto n = new SyntaxASTNode();
+    auto n    = new SyntaxASTNode();
     n->symbol = sym;
     return n;
 }
@@ -12,18 +12,16 @@ static bool isTerminal(const QSet<QString>& terms, const QString& s)
     return terms.contains(s) || s == "$";
 }
 
-SyntaxResult parseTokens(const QVector<QString>& tokens,
-                         const Grammar&         g,
-                         const LL1Info&         info)
+SyntaxResult parseTokens(const QVector<QString>& tokens, const Grammar& g, const LL1Info& info)
 {
-    SyntaxResult r;
+    SyntaxResult     r;
     QVector<QString> input = tokens;
     input.push_back("$");
     QVector<QString> st;
     st.push_back("$");
     st.push_back(g.startSymbol);
     QVector<SyntaxASTNode*> nodes;
-    auto root = makeNode(g.startSymbol);
+    auto                    root = makeNode(g.startSymbol);
     nodes.push_back(makeNode("$"));
     nodes.push_back(root);
     int ip = 0;
@@ -68,7 +66,8 @@ SyntaxResult parseTokens(const QVector<QString>& tokens,
             }
         }
     }
-    if (!root) root = makeNode(g.startSymbol);
+    if (!root)
+        root = makeNode(g.startSymbol);
     r.root = root;
     return r;
 }

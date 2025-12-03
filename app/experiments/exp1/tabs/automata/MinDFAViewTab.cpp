@@ -9,14 +9,14 @@
 
 MinDFAViewTab::MinDFAViewTab(QWidget* parent) : QWidget(parent)
 {
-    auto l = new QVBoxLayout(this);
-    auto hSel = new QHBoxLayout;
-    auto lbl = new QLabel("选择Token");
+    auto l       = new QVBoxLayout(this);
+    auto hSel    = new QHBoxLayout;
+    auto lbl     = new QLabel("选择Token");
     cmbTokensMin = new QComboBox;
     cmbTokensMin->setObjectName("cmbTokensMin");
     hSel->addWidget(lbl);
     hSel->addWidget(cmbTokensMin);
-    auto hTools = new QHBoxLayout;
+    auto hTools  = new QHBoxLayout;
     btnExportMin = new QPushButton("导出(MinDFA)");
     btnExportMin->setObjectName("btnExportMin");
     btnPreviewMin = new QPushButton("预览(MinDFA)");
@@ -37,4 +37,3 @@ MinDFAViewTab::MinDFAViewTab(QWidget* parent) : QWidget(parent)
     l->addWidget(tblMinDFA);
     l->addWidget(btnGenCode);
 }
-

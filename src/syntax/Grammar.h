@@ -6,18 +6,17 @@
 
 struct Production
 {
-    QString left;
+    QString          left;
     QVector<QString> right;
-    int line = -1;
+    int              line = -1;
 };
 
 class Grammar
 {
    public:
-    QSet<QString> terminals;
-    QSet<QString> nonterminals;
-    QString startSymbol;
+    QSet<QString>                      terminals;
+    QSet<QString>                      nonterminals;
+    QString                            startSymbol;
     QMap<QString, QVector<Production>> productions;
-    bool hasEpsilon(const QVector<QString>& rhs) const;
+    bool                               hasEpsilon(const QVector<QString>& rhs) const;
 };
-

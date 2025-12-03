@@ -6,11 +6,10 @@ class QPushButton;
 class RegexEditorTab : public QWidget
 {
     Q_OBJECT
-public:
+   public:
     explicit RegexEditorTab(QWidget* parent = nullptr);
-    QTextEdit* txtInputRegex;
+    QTextEdit*   txtInputRegex;
     QPushButton* btnLoadRegex;
     QPushButton* btnSaveRegex;
     QPushButton* btnStartConvert;
 };
-

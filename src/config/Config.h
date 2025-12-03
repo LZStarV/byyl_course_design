@@ -23,14 +23,14 @@ class Config
     static void load();
     static void reload();
     /** \brief 获取指定编码的权重 */
-    static int weightForCode(int c);
+    static int                 weightForCode(int c);
     static QVector<WeightTier> weightTiers();
     /** \brief 词法生成输出目录路径 */
     static QString generatedOutputDir();
     /** \brief 是否跳过花括号注释块 */
     static bool skipBraceComment();
     /** \brief 是否跳过行注释（//）*/
-    static bool                                           skipLineComment();
+    static bool skipLineComment();
     /** \brief 是否跳过块注释（slash-star … star-slash）*/
     static bool skipBlockComment();
     /** \brief 是否跳过井号注释（#）*/

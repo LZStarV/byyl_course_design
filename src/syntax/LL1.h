@@ -7,10 +7,10 @@
 
 struct LL1Info
 {
-    QMap<QString, QSet<QString>> first;
-    QMap<QString, QSet<QString>> follow;
+    QMap<QString, QSet<QString>>      first;
+    QMap<QString, QSet<QString>>      follow;
     QMap<QString, QMap<QString, int>> table;
-    QVector<QString> conflicts;
+    QVector<QString>                  conflicts;
 };
 
 class LL1

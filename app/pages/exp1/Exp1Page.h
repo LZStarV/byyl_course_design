@@ -10,9 +10,9 @@ class Exp1Page : public QWidget
     QWidget* contentWidget() const;
    signals:
     void requestBack();
+
    private:
     QPushButton* btnBack;
     QWidget*     content;
     QVBoxLayout* vroot;
 };
-

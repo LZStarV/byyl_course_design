@@ -5,23 +5,26 @@
 #include <QSet>
 #include "Grammar.h"
 
-struct LR0Item {
-    QString left;
+struct LR0Item
+{
+    QString          left;
     QVector<QString> right;
-    int dot = 0;
-    bool operator==(const LR0Item& o) const {
+    int              dot = 0;
+    bool             operator==(const LR0Item& o) const
+    {
         return left == o.left && right == o.right && dot == o.dot;
     }
 };
 
-struct LR0Graph {
-    QVector<QVector<LR0Item>> states;
+struct LR0Graph
+{
+    QVector<QVector<LR0Item>>     states;
     QMap<int, QMap<QString, int>> edges;
 };
 
-class LR0Builder {
-public:
+class LR0Builder
+{
+   public:
     static LR0Graph build(const Grammar& g);
-    static QString toDot(const LR0Graph& gr);
+    static QString  toDot(const LR0Graph& gr);
 };
-
