@@ -18,22 +18,5 @@ class Exp2Page : public QWidget
    private:
     QPushButton* btnBack;
     QTabWidget*  tabSyntax;
-    QLabel*      lblGrammarTitle;
-    QTextEdit*   txtInputGrammar;
-    QPushButton* btnLoadGrammar;
-    QPushButton* btnParseGrammar;
-    QTableWidget* tblFirstSet;
-    QTableWidget* tblFollowSet;
-    QLabel*      lblSyntaxTreeTitle;
-    QGraphicsView* viewSyntaxTree;
-    QPushButton* btnExportSyntaxDot;
-    QPushButton* btnPreviewSyntaxTree;
-    QPushButton* btnRunSyntaxAnalysis;
-    QLabel*      lblSyntaxCodeTitle;
-    QPlainTextEdit* txtSyntaxGeneratedCode;
-    QWidget*     wLR0;
-    QPushButton* btnExportLR0;
-    QPushButton* btnPreviewLR0;
-    QLineEdit*   edtGraphDpiLR0;
-    QPlainTextEdit* txtTokensViewSyntax;
+    // tabs 封装了控件，保留对象名用于 findChild 查询
 };

@@ -28,6 +28,14 @@ set(APP_SOURCES
     app/pages/exp1/Exp1Page.cpp
     app/pages/exp2/Exp2Page.h
     app/pages/exp2/Exp2Page.cpp
+    app/experiments/exp2/tabs/GrammarEditorTab.h
+    app/experiments/exp2/tabs/GrammarEditorTab.cpp
+    app/experiments/exp2/tabs/FirstFollowTab.h
+    app/experiments/exp2/tabs/FirstFollowTab.cpp
+    app/experiments/exp2/tabs/SyntaxTreeTab.h
+    app/experiments/exp2/tabs/SyntaxTreeTab.cpp
+    app/experiments/exp2/tabs/SyntaxCodeViewTab.h
+    app/experiments/exp2/tabs/SyntaxCodeViewTab.cpp
     app/experiments/exp1/tabs/RegexEditorTab.h
     app/experiments/exp1/tabs/RegexEditorTab.cpp
     app/experiments/exp1/tabs/NFAViewTab.h
@@ -50,10 +58,14 @@ set(APP_SOURCES
     app/controllers/AutomataController/AutomataController.cpp
     app/controllers/SettingsController/SettingsController.h
     app/controllers/SettingsController/SettingsController.cpp
+    app/controllers/GeneratorController/GeneratorController.h
+    app/controllers/GeneratorController/GeneratorController.cpp
     app/controllers/CodeViewController/CodeViewController.h
     app/controllers/CodeViewController/CodeViewController.cpp
     app/services/NotificationService/NotificationService.h
     app/services/NotificationService/NotificationService.cpp
+    app/services/FileService/FileService.h
+    app/services/FileService/FileService.cpp
     app/services/DotService/DotService.h
     app/services/DotService/DotService.cpp
     src/syntax/Grammar.h
@@ -114,12 +126,14 @@ target_sources(GuiTest PRIVATE
     app/controllers/AutomataController/AutomataController.h
     app/controllers/AutomataController/AutomataController.cpp
     app/controllers/SettingsController/SettingsController.cpp
+    app/controllers/GeneratorController/GeneratorController.cpp
     app/controllers/CodeViewController/CodeViewController.cpp
     app/controllers/TestValidationController/TestValidationController.h
     app/controllers/TestValidationController/TestValidationController.cpp
     app/services/NotificationService/NotificationService.h
     app/services/NotificationService/NotificationService.cpp
     app/services/DotService/DotService.cpp
+    app/services/FileService/FileService.cpp
     app/components/ToastWidget/ToastWidget.cpp
     app/components/ToastManager/ToastManager.cpp
     app/components/SettingsDialog/SettingsDialog.cpp
@@ -127,6 +141,10 @@ target_sources(GuiTest PRIVATE
     app/pages/home/HomePage.cpp
     app/pages/exp1/Exp1Page.cpp
     app/pages/exp2/Exp2Page.cpp
+    app/experiments/exp2/tabs/GrammarEditorTab.cpp
+    app/experiments/exp2/tabs/FirstFollowTab.cpp
+    app/experiments/exp2/tabs/SyntaxTreeTab.cpp
+    app/experiments/exp2/tabs/SyntaxCodeViewTab.cpp
     app/experiments/exp1/tabs/RegexEditorTab.cpp
     app/experiments/exp1/tabs/NFAViewTab.cpp
     app/experiments/exp1/tabs/DFAViewTab.cpp

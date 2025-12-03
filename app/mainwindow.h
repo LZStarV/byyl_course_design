@@ -57,6 +57,12 @@ class MainWindow : public QMainWindow
     ParsedFile* getParsed() const { return parsedPtr; }
     NotificationService* notifyPtr() { return &notify; }
     QString codePath() const { return currentCodePath; }
+    void setParsed(ParsedFile* p) { parsedPtr = p; }
+    void setRegexHash(const QString& h) { currentRegexHash = h; }
+    void clearPaths() { currentCodePath.clear(); currentBinPath.clear(); }
+    void setCodePaths(const QString& code, const QString& bin) { currentCodePath = code; currentBinPath = bin; }
+    QString computeRegexHashPublic(const QString& text) { return computeRegexHash(text); }
+    QString ensureGenDirPublic() { return ensureGenDir(); }
     void exportNfaDot();
     void exportNfaImage();
     void previewNfa();

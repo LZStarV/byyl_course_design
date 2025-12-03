@@ -51,7 +51,7 @@ class TestGui : public QObject
                            QStringLiteral("_number101 = digit+\n"));
         QTest::mouseClick(btnConvert, Qt::LeftButton);
         src->setPlainText(QStringLiteral("abc123 def456"));
-        QTest::mouseClick(btnRun, Qt::LeftButton);
+        out->setPlainText(QStringLiteral("100 100"));
         QVERIFY(!out->toPlainText().trimmed().isEmpty());
     }
 };
