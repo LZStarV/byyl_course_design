@@ -35,8 +35,8 @@ QString syntaxAstToDot(SyntaxASTNode* root)
 }
 
 static void emitParseNode(QTextStream&                     o,
-                          const ParseTreeNode*            n,
-                          int&                            id,
+                          const ParseTreeNode*             n,
+                          int&                             id,
                           QMap<const ParseTreeNode*, int>& ids)
 {
     int nid = ++id;
@@ -55,7 +55,7 @@ QString parseTreeToDot(ParseTreeNode* root)
     QString     s;
     QTextStream o(&s);
     o << "digraph G {\nrankdir=TB\n";
-    int                            id = 0;
+    int                             id = 0;
     QMap<const ParseTreeNode*, int> ids;
     if (root)
         emitParseNode(o, root, id, ids);

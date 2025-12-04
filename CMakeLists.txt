@@ -24,6 +24,8 @@ set(CORE_SOURCES
     src/syntax/LR1.cpp
     src/syntax/LR1Parser.h
     src/syntax/LR1Parser.cpp
+    src/syntax/TokenMapBuilder.h
+    src/syntax/TokenMapBuilder.cpp
     src/syntax/AST.h
     src/syntax/SyntaxParser.cpp
     src/syntax/DotGenerator.cpp
@@ -204,6 +206,7 @@ target_sources(GuiTest PRIVATE
     src/syntax/LR0.cpp
     src/syntax/LR1.cpp
     src/syntax/LR1Parser.cpp
+    src/syntax/TokenMapBuilder.cpp
     src/syntax/SLR.cpp
     src/syntax/SyntaxParser.cpp
     src/syntax/DotGenerator.cpp
@@ -246,11 +249,33 @@ add_test(NAME LL1算法测试 COMMAND LL1Test)
 add_executable(LR1Test tests/syntax/lr1_test.cpp)
 target_sources(LR1Test PRIVATE
     src/syntax/LR1.cpp
+    src/syntax/LL1.cpp
+    src/syntax/TokenMapBuilder.cpp
     src/syntax/GrammarParser.cpp
     src/syntax/Grammar.cpp
 )
 target_link_libraries(LR1Test PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME LR1算法测试 COMMAND LR1Test)
+
+add_executable(TinyLR1FlowTest tests/syntax/tiny_lr1_flow_test.cpp)
+target_sources(TinyLR1FlowTest PRIVATE
+    src/Engine.cpp
+    src/regex/RegexLexer.cpp
+    src/regex/RegexParser.cpp
+    src/config/Config.cpp
+    src/generator/CodeGenerator.cpp
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.cpp
+    src/syntax/LR1.cpp
+    src/syntax/LR1Parser.cpp
+    src/syntax/TokenMapBuilder.cpp
+    src/automata/Thompson.cpp
+    src/automata/SubsetConstruction.cpp
+    src/automata/Hopcroft.cpp
+)
+target_link_libraries(TinyLR1FlowTest PRIVATE Qt6::Core Qt6::Test)
+add_test(NAME TinyLR1流程测试 COMMAND TinyLR1FlowTest)
 
 
 add_executable(LR0Test tests/syntax/lr0_test.cpp)

@@ -1,13 +1,15 @@
-program -> stmt_list
-stmt_list -> stmt stmt_list | #
-stmt -> assign | read | write | if_stmt | repeat_stmt
-assign -> id := exp
-read -> read id
-write -> write exp
-if_stmt -> if exp then stmt_list else stmt_list end
-repeat_stmt -> repeat stmt_list until exp
-exp -> term exp_prime
-exp_prime -> + term exp_prime | - term exp_prime | #
-term -> factor term_prime
-term_prime -> * factor term_prime | / factor term_prime | #
-factor -> ( exp ) | id | number
+program->stmt-sequence
+stmt-sequence-> stmt-sequence ;statement |statement
+statement->if-stmt|repeat-stmt|assign-stmt|read-stmt|write-stmt
+if-stmt->if exp then stmt-sequence end|if exp then stmt-sequence else stmt-sequence end
+repeat-stmt->repeat stmt-sequence until exp
+assign-stmt->identifier := exp
+read-stmt->read identifier
+write-stmt->write exp
+exp->simple-exp comparison-op simple-exp |simple-exp
+comparison-op-> < |> | = |<= | <> |>= 
+simple-exp->simple-exp addop term |term 
+addop-> + |-
+term->term mulop factor | factor 
+mulop-> * | / |% |^
+factor->(exp) | number | identifier

@@ -47,6 +47,7 @@
 #include "../src/syntax/DotGenerator.h"
 #include "controllers/SyntaxController/SyntaxController.h"
 #include "controllers/SyntaxController/LR1Controller.h"
+#include "../src/syntax/TokenMapBuilder.h"
 #include "controllers/TestValidationController/TestValidationController.h"
 #include "controllers/AutomataController/AutomataController.h"
 #include "controllers/RegexController/RegexController.h"
@@ -388,6 +389,22 @@ void MainWindow::onConvertClicked(bool)
     onTokenChanged(0);
     onTokenChangedDFA(0);
     onTokenChangedMin(0);
+    // 保存正则文本与生成 Token→终结符映射
+    {
+        QString dir = Config::generatedOutputDir() + "/syntax";
+        QDir    d(dir);
+        if (!d.exists())
+            d.mkpath(".");
+        QFile fr(dir + "/last_regex.txt");
+        if (fr.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QTextStream o(&fr);
+            o << txtInputRegex->toPlainText();
+            fr.close();
+        }
+        auto map = TokenMapBuilder::build(txtInputRegex->toPlainText(), *parsedPtr);
+        TokenMapBuilder::saveJson(map, dir + "/token_map.json");
+    }
     statusBar()->showMessage("转换成功");
     if (!QCoreApplication::applicationFilePath().contains(QStringLiteral("GuiTest")))
         ToastManager::instance().showInfo("转换成功");
@@ -484,6 +501,19 @@ void MainWindow::onRunLexerClicked(bool)
             os << src;
             fs.close();
         }
+        QFile fr(dir + "/last_regex.txt");
+        if (fr.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QTextStream o(&fr);
+            o << (txtInputRegex ? txtInputRegex->toPlainText() : QString());
+            fr.close();
+        }
+        if (parsedPtr)
+        {
+            auto map = TokenMapBuilder::build(
+                txtInputRegex ? txtInputRegex->toPlainText() : QString(), *parsedPtr);
+            TokenMapBuilder::saveJson(map, dir + "/token_map.json");
+        }
         // 在 GUI 测试环境下不做任何 UI 提示，直接返回
         return;
     }
@@ -562,6 +592,19 @@ void MainWindow::onRunLexerClicked(bool)
         QTextStream os(&fs);
         os << src;
         fs.close();
+    }
+    QFile fr(dir + "/last_regex.txt");
+    if (fr.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream o(&fr);
+        o << (txtInputRegex ? txtInputRegex->toPlainText() : QString());
+        fr.close();
+    }
+    if (parsedPtr)
+    {
+        auto map = TokenMapBuilder::build(txtInputRegex ? txtInputRegex->toPlainText() : QString(),
+                                          *parsedPtr);
+        TokenMapBuilder::saveJson(map, dir + "/token_map.json");
     }
     if (output.contains("ERR"))
         statusBar()->showMessage("存在未识别的词法单元(ERR)，请检查正则与输入");

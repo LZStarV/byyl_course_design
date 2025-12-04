@@ -1,11 +1,15 @@
 #include "LR1.h"
+#include "LL1.h"
 
 static bool isTerminal(const QSet<QString>& terms, const QString& s)
 {
     return terms.contains(s) || s == "$";
 }
 
-static QSet<QString> firstSeq(const Grammar& g, const QVector<QString>& seq, const QString& la)
+static QSet<QString> firstSeqLL1(const Grammar&          g,
+                                 const LL1Info&          info,
+                                 const QVector<QString>& seq,
+                                 const QString&          la)
 {
     QSet<QString> res;
     if (seq.isEmpty())
@@ -13,44 +17,33 @@ static QSet<QString> firstSeq(const Grammar& g, const QVector<QString>& seq, con
         res.insert(la);
         return res;
     }
-    bool eps = true;
+    bool allEps = true;
     for (int i = 0; i < seq.size(); ++i)
     {
         const QString& X = seq[i];
         if (isTerminal(g.terminals, X) && X != "#")
         {
             res.insert(X);
-            eps = false;
+            allEps = false;
             break;
         }
-        // X 非终结符：其产生式右部的首符号加入，若存在 epsilon 则继续
-        bool hasEps = false;
-        auto prods  = g.productions.value(X);
-        for (const auto& p : prods)
+        // 非终结符：FIRST(X) 去除 #
+        QSet<QString> f = info.first.value(X);
+        for (const auto& a : f)
+            if (a != "#")
+                res.insert(a);
+        if (!f.contains("#"))
         {
-            if (g.hasEpsilon(p.right))
-            {
-                hasEps = true;
-            }
-            if (!p.right.isEmpty() && p.right[0] != "#")
-            {
-                const QString& Y = p.right[0];
-                if (isTerminal(g.terminals, Y))
-                    res.insert(Y);
-            }
-        }
-        if (!hasEps)
-        {
-            eps = false;
+            allEps = false;
             break;
         }
     }
-    if (eps)
+    if (allEps)
         res.insert(la);
     return res;
 }
 
-static QVector<LR1Item> closure(const Grammar& g, const QVector<LR1Item>& I)
+static QVector<LR1Item> closureLL1(const Grammar& g, const LL1Info& info, const QVector<LR1Item>& I)
 {
     QVector<LR1Item> items = I;
     QSet<QString>    seen;  // serialize item as string key
@@ -76,7 +69,7 @@ static QVector<LR1Item> closure(const Grammar& g, const QVector<LR1Item>& I)
                     // β = right[dot+1..]
                     QVector<QString> beta;
                     for (int k = it.dot + 1; k < it.right.size(); ++k) beta.push_back(it.right[k]);
-                    auto lookaheads = firstSeq(g, beta, it.lookahead);
+                    auto lookaheads = firstSeqLL1(g, info, beta, it.lookahead);
                     for (const auto& prod : g.productions.value(B))
                     {
                         for (const auto& a : lookaheads)
@@ -98,7 +91,10 @@ static QVector<LR1Item> closure(const Grammar& g, const QVector<LR1Item>& I)
     return items;
 }
 
-static QVector<LR1Item> goTo(const Grammar& g, const QVector<LR1Item>& I, const QString& X)
+static QVector<LR1Item> goToLL1(const Grammar&          g,
+                                const LL1Info&          info,
+                                const QVector<LR1Item>& I,
+                                const QString&          X)
 {
     if (X.isEmpty() || X == "#")
         return {};
@@ -112,7 +108,7 @@ static QVector<LR1Item> goTo(const Grammar& g, const QVector<LR1Item>& I, const 
             moved.push_back(ni);
         }
     }
-    return closure(g, moved);
+    return closureLL1(g, info, moved);
 }
 
 static QString serializeSet(const QVector<LR1Item>& I)
@@ -146,10 +142,12 @@ LR1Graph LR1Builder::build(const Grammar& g)
     {
         return LR1Graph{};
     }
+    LL1Info          info = LL1::compute(aug);
     QVector<LR1Item> I0 =
-        closure(aug,
-                QVector<LR1Item>{
-                    LR1Item{aug.startSymbol, aug.productions[aug.startSymbol][0].right, 0, "$"}});
+        closureLL1(aug,
+                   info,
+                   QVector<LR1Item>{LR1Item{
+                       aug.startSymbol, aug.productions[aug.startSymbol][0].right, 0, "$"}});
     LR1Graph gr;
     gr.states.push_back(I0);
     QMap<QString, int> stateIndex;
@@ -175,7 +173,7 @@ LR1Graph LR1Builder::build(const Grammar& g)
             for (auto ns = nextSymbols.begin(); ns != nextSymbols.end(); ++ns)
             {
                 QString X = *ns;
-                auto    J = goTo(aug, I, X);
+                auto    J = goToLL1(aug, info, I, X);
                 if (J.isEmpty())
                     continue;
                 QString keyJ = serializeSet(J);
@@ -199,8 +197,7 @@ QString LR1Builder::toDot(const LR1Graph& gr)
     QString dot = "digraph LR1 {\nrankdir=LR; node [shape=box,fontname=Helvetica];\n";
     for (int i = 0; i < gr.states.size(); ++i)
     {
-        QString label;
-        label += QString("I%1\\n").arg(i);
+        QMap<QString, int> core;
         for (const auto& it : gr.states[i])
         {
             QString rhs;
@@ -212,7 +209,13 @@ QString LR1Builder::toDot(const LR1Graph& gr)
             }
             if (it.dot == it.right.size())
                 rhs += " •";
-            label += it.left + " →" + rhs + " /" + it.lookahead + "\\n";
+            QString coreKey = it.left + " →" + rhs;
+            core[coreKey]   = core.value(coreKey, 0) + 1;
+        }
+        QString label = QString("I%1\\n").arg(i);
+        for (auto it = core.begin(); it != core.end(); ++it)
+        {
+            label += it.key() + QString(" /%1\\n").arg(it.value());
         }
         dot += QString("s%1 [label=\"%2\"];\n").arg(i).arg(label.replace("\"", "\\\""));
     }

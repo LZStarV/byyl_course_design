@@ -35,8 +35,49 @@ static QString trim(const QString& s)
 static QVector<QString> splitRhs(const QString& rhs)
 {
     QVector<QString> v;
-    auto             parts = rhs.split(' ', Qt::SkipEmptyParts);
-    for (auto p : parts) v.push_back(p.trimmed());
+    QString          s = rhs;
+    int              i = 0;
+    auto isWordChar    = [](QChar c) { return c.isLetterOrNumber() || c == '_' || c == '-'; };
+    auto matchMulti    = [&s, &i](const QString& pat)
+    {
+        if (i + pat.size() <= s.size() && s.mid(i, pat.size()) == pat)
+        {
+            i += pat.size();
+            return true;
+        }
+        return false;
+    };
+    QSet<QString> singles{"(", ")", ";", "<", ">", "=", "+", "-", "*", "/", "%", "^"};
+    while (i < s.size())
+    {
+        QChar c = s[i];
+        if (c.isSpace())
+        {
+            i++;
+            continue;
+        }
+        if (matchMulti(":=") || matchMulti("<=") || matchMulti(">=") || matchMulti("<>"))
+        {
+            v.push_back(s.mid(i - 2, 2));  // last matched 2-ch op
+            continue;
+        }
+        if (singles.contains(QString(c)))
+        {
+            v.push_back(QString(c));
+            i++;
+            continue;
+        }
+        QString w;
+        while (i < s.size() && isWordChar(s[i]))
+        {
+            w += s[i];
+            i++;
+        }
+        if (!w.isEmpty())
+            v.push_back(w);
+        else
+            i++;
+    }
     return v;
 }
 
@@ -63,6 +104,8 @@ static bool detectDirectLeftRecursion(const Grammar& g, QString& who)
 
 static void addSymbols(Grammar& g)
 {
+    QSet<QString> lhs;
+    for (auto it = g.productions.begin(); it != g.productions.end(); ++it) lhs.insert(it.key());
     for (auto it = g.productions.begin(); it != g.productions.end(); ++it)
     {
         g.nonterminals.insert(it.key());
@@ -72,7 +115,7 @@ static void addSymbols(Grammar& g)
             {
                 if (s == "#")
                     continue;
-                if (isNonTerminal(s))
+                if (lhs.contains(s))
                     g.nonterminals.insert(s);
                 else
                     g.terminals.insert(s);
