@@ -46,6 +46,7 @@
 #include "../src/syntax/SyntaxParser.h"
 #include "../src/syntax/DotGenerator.h"
 #include "controllers/SyntaxController/SyntaxController.h"
+#include "controllers/SyntaxController/LR1Controller.h"
 #include "controllers/TestValidationController/TestValidationController.h"
 #include "controllers/AutomataController/AutomataController.h"
 #include "controllers/RegexController/RegexController.h"
@@ -293,6 +294,11 @@ void MainWindow::setupUiCustom()
     {
         syntaxController->bind(exp2w);
     }
+    auto lr1Controller = new LR1Controller(this, engine, &notify);
+    if (auto exp2w = stack->widget(2))
+    {
+        lr1Controller->bind(exp2w);
+    }
     automataController = new AutomataController(this);
     automataController->bind(this);
     // 绑定正则页控制器
@@ -471,6 +477,13 @@ void MainWindow::onRunLexerClicked(bool)
             o << txtLexResult->toPlainText();
             f.close();
         }
+        QFile fs(dir + "/last_source.txt");
+        if (fs.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QTextStream os(&fs);
+            os << src;
+            fs.close();
+        }
         // 在 GUI 测试环境下不做任何 UI 提示，直接返回
         return;
     }
@@ -542,6 +555,13 @@ void MainWindow::onRunLexerClicked(bool)
         QTextStream o(&f);
         o << output;
         f.close();
+    }
+    QFile fs(dir + "/last_source.txt");
+    if (fs.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream os(&fs);
+        os << src;
+        fs.close();
     }
     if (output.contains("ERR"))
         statusBar()->showMessage("存在未识别的词法单元(ERR)，请检查正则与输入");

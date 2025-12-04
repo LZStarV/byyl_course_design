@@ -22,6 +22,8 @@ set(CORE_SOURCES
     src/syntax/SLR.cpp
     src/syntax/LR1.h
     src/syntax/LR1.cpp
+    src/syntax/LR1Parser.h
+    src/syntax/LR1Parser.cpp
     src/syntax/AST.h
     src/syntax/SyntaxParser.cpp
     src/syntax/DotGenerator.cpp
@@ -93,6 +95,10 @@ set(APP_SOURCES
     app/experiments/exp2/tabs/syntax/SyntaxTreeTab.cpp
     app/experiments/exp2/tabs/syntax/SyntaxCodeViewTab.h
     app/experiments/exp2/tabs/syntax/SyntaxCodeViewTab.cpp
+    app/experiments/exp2/tabs/syntax/LR1ProcessTab.h
+    app/experiments/exp2/tabs/syntax/LR1ProcessTab.cpp
+    app/experiments/exp2/tabs/syntax/LR1TreeTab.h
+    app/experiments/exp2/tabs/syntax/LR1TreeTab.cpp
     app/experiments/exp1/tabs/regex/RegexEditorTab.h
     app/experiments/exp1/tabs/regex/RegexEditorTab.cpp
     app/experiments/exp1/tabs/automata/NFAViewTab.h
@@ -107,6 +113,8 @@ set(APP_SOURCES
     app/experiments/exp1/tabs/test/TestValidationTab.cpp
     app/controllers/SyntaxController/SyntaxController.h
     app/controllers/SyntaxController/SyntaxController.cpp
+    app/controllers/SyntaxController/LR1Controller.h
+    app/controllers/SyntaxController/LR1Controller.cpp
     app/controllers/TestValidationController/TestValidationController.h
     app/controllers/TestValidationController/TestValidationController.cpp
     app/controllers/RegexController/RegexController.h
@@ -151,6 +159,7 @@ target_sources(GuiTest PRIVATE
     app/mainwindow.ui
     app/controllers/SyntaxController/SyntaxController.h
     app/controllers/SyntaxController/SyntaxController.cpp
+    app/controllers/SyntaxController/LR1Controller.cpp
     app/controllers/AutomataController/AutomataController.h
     app/controllers/AutomataController/AutomataController.cpp
     app/controllers/SettingsController/SettingsController.cpp
@@ -180,6 +189,8 @@ target_sources(GuiTest PRIVATE
     app/experiments/exp2/tabs/grammar/FirstFollowTab.cpp
     app/experiments/exp2/tabs/syntax/SyntaxTreeTab.cpp
     app/experiments/exp2/tabs/syntax/SyntaxCodeViewTab.cpp
+    app/experiments/exp2/tabs/syntax/LR1ProcessTab.cpp
+    app/experiments/exp2/tabs/syntax/LR1TreeTab.cpp
     app/experiments/exp1/tabs/regex/RegexEditorTab.cpp
     app/experiments/exp1/tabs/automata/NFAViewTab.cpp
     app/experiments/exp1/tabs/automata/DFAViewTab.cpp
@@ -192,6 +203,7 @@ target_sources(GuiTest PRIVATE
     src/syntax/LL1.cpp
     src/syntax/LR0.cpp
     src/syntax/LR1.cpp
+    src/syntax/LR1Parser.cpp
     src/syntax/SLR.cpp
     src/syntax/SyntaxParser.cpp
     src/syntax/DotGenerator.cpp
@@ -212,6 +224,7 @@ target_sources(GuiTest PRIVATE
 )
 target_link_libraries(GuiTest PRIVATE Qt6::Widgets Qt6::Test)
 add_test(NAME 界面测试 COMMAND GuiTest)
+
 
 add_executable(GrammarParserTest tests/syntax/grammar_parser_test.cpp)
 target_sources(GrammarParserTest PRIVATE
@@ -238,6 +251,7 @@ target_sources(LR1Test PRIVATE
 )
 target_link_libraries(LR1Test PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME LR1算法测试 COMMAND LR1Test)
+
 
 add_executable(LR0Test tests/syntax/lr0_test.cpp)
 target_sources(LR0Test PRIVATE
