@@ -52,7 +52,7 @@ ParseResult LR1Parser::parse(const QVector<QString>& tokens,
         QString act = actionFor(t, st, a);
         if (act.contains('|'))
         {
-            auto    parts = act.split('|');
+            auto    parts  = act.split('|');
             QString policy = Config::lr1ConflictPolicy().trimmed().toLower();
             if (policy == "prefer_shift")
             {
@@ -63,7 +63,8 @@ ParseResult LR1Parser::parse(const QVector<QString>& tokens,
                         pick = p;
                         break;
                     }
-                if (pick.isEmpty()) pick = parts[0];
+                if (pick.isEmpty())
+                    pick = parts[0];
                 act = pick;
             }
             else if (policy == "prefer_reduce")
@@ -75,7 +76,8 @@ ParseResult LR1Parser::parse(const QVector<QString>& tokens,
                         pick = p;
                         break;
                     }
-                if (pick.isEmpty()) pick = parts[0];
+                if (pick.isEmpty())
+                    pick = parts[0];
                 act = pick;
             }
             else

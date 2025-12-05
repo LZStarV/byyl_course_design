@@ -54,11 +54,10 @@
   - `graphs_dir`：图导出根目录（默认：`<generated_output_dir>/graphs`，语法图位于其 `syntax/` 子目录）
   - `config_search_paths`：配置文件搜索路径数组（优先于默认相对路径）
 - 词法与生成器：
-  - `macro_names`：`{ "letter": "letter", "digit": "digit" }`（类别宏名）
   - `whitespaces`：空白字符集合（默认：`[" ", "\t", "\n", "\r"]`）
   - `weight_tiers`：权重阈值数组（例：`[{"min_code":220,"weight":3},...]`）
   - `skip`：跳过开关（`brace_comment/line_comment/block_comment/hash_comment/single_quote_string/double_quote_string/template_string`）
-  - `token_header_regex`：Token 头部解析正则（默认：`^_([A-Za-z][A-Za-z0-9_]*?)(\d+)(S)?$`）
+  - Token 头部解析：遵循命名约定 `_NAME123`（`_NAME123S` 表示组），用于提取编码与是否为组；无需额外配置。
   - `token_map`：`{ "use_heuristics": true }`（是否启用名称与组规则的启发式映射）
 - 语法与算法：
   - `epsilon_symbol`（默认：`#`）、`eof_symbol`（默认：`$`）、`aug_suffix`（默认：`'`）

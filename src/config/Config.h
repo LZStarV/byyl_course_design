@@ -26,27 +26,25 @@ class Config
     static int                 weightForCode(int c);
     static QVector<WeightTier> weightTiers();
     /** \brief 词法生成输出目录路径 */
-    static QString generatedOutputDir();
-    static QString syntaxOutputDir();
-    static QString graphsDir();
-    static QString macroLetterName();
-    static QString macroDigitName();
-    static bool    isWhitespace(QChar ch);
+    static QString        generatedOutputDir();
+    static QString        syntaxOutputDir();
+    static QString        graphsDir();
+    static QString        macroLetterName();
+    static QString        macroDigitName();
+    static bool           isWhitespace(QChar ch);
     static QVector<QChar> whitespaces();
-    static bool    tokenMapUseHeuristics();
-    static QString graphvizExecutable();
-    static int     graphvizDefaultDpi();
-    static int     graphvizTimeoutMs();
+    static bool           tokenMapUseHeuristics();
+    static QString        graphvizExecutable();
+    static int            graphvizDefaultDpi();
+    static int            graphvizTimeoutMs();
     // syntax config
-    static QString epsilonSymbol();
-    static QString eofSymbol();
-    static QString augSuffix();
-    static QString lr1ConflictPolicy();
-    static QString nonterminalPattern();
+    static QString          epsilonSymbol();
+    static QString          eofSymbol();
+    static QString          augSuffix();
+    static QString          lr1ConflictPolicy();
+    static QString          nonterminalPattern();
     static QVector<QString> grammarMultiOps();
     static QVector<QString> grammarSingleOps();
-    // lexer token header regex
-    static QString tokenHeaderRegex();
     // i18n for tables
     static QString tableMarkLabel();
     static QString tableStateIdLabel();
@@ -107,7 +105,6 @@ class Config
     static QString             s_nontermPat;
     static QVector<QString>    s_multiOps;
     static QVector<QString>    s_singleOps;
-    static QString             s_tokenHeaderRegex;
     static QString             s_tblMark;
     static QString             s_tblStateId;
     static QString             s_tblStateSet;

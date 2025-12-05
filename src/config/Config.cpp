@@ -26,7 +26,6 @@ QString                     Config::s_lr1Policy;
 QString                     Config::s_nontermPat;
 QVector<QString>            Config::s_multiOps;
 QVector<QString>            Config::s_singleOps;
-QString                     Config::s_tokenHeaderRegex;
 QString                     Config::s_tblMark;
 QString                     Config::s_tblStateId;
 QString                     Config::s_tblStateSet;
@@ -68,33 +67,32 @@ void Config::load()
 {
     if (s_loaded)
         return;
-    s_loaded            = true;
-    s_tiers             = defaultTiers();
-    s_outDir            = QString();
-    s_syntaxDir         = QString();
-    s_graphsDir         = QString();
-    s_macroLetter       = QString("letter");
-    s_macroDigit        = QString("digit");
+    s_loaded      = true;
+    s_tiers       = defaultTiers();
+    s_outDir      = QString();
+    s_syntaxDir   = QString();
+    s_graphsDir   = QString();
+    s_macroLetter = QString("letter");
+    s_macroDigit  = QString("digit");
     s_ws.clear();
     s_tokenMapUseHeuristics = true;
-    s_graphvizExe       = QString("dot");
-    s_graphvizDpi       = 150;
-    s_graphvizTimeout   = 20000;
-    s_epsilon           = QString("#");
-    s_eof               = QString("$");
-    s_augSuffix         = QString("'");
-    s_lr1Policy         = QString("prefer_shift");
+    s_graphvizExe           = QString("dot");
+    s_graphvizDpi           = 150;
+    s_graphvizTimeout       = 20000;
+    s_epsilon               = QString("#");
+    s_eof                   = QString("$");
+    s_augSuffix             = QString("'");
+    s_lr1Policy             = QString("prefer_shift");
     s_nontermPat.clear();
     s_multiOps.clear();
     s_singleOps.clear();
-    s_tokenHeaderRegex  = QString("^_([A-Za-z][A-Za-z0-9_]*?)(\\d+)(S)?$");
-    s_tblMark           = QStringLiteral("标记");
-    s_tblStateId        = QStringLiteral("状态 ID");
-    s_tblStateSet       = QStringLiteral("状态集合");
-    s_tblEpsilonCol     = QStringLiteral("#");
-    s_dotRankdir        = QStringLiteral("LR");
-    s_dotNodeShape      = QStringLiteral("circle");
-    s_dotEpsLabel       = QStringLiteral("ε");
+    s_tblMark          = QStringLiteral("标记");
+    s_tblStateId       = QStringLiteral("状态 ID");
+    s_tblStateSet      = QStringLiteral("状态集合");
+    s_tblEpsilonCol    = QStringLiteral("#");
+    s_dotRankdir       = QStringLiteral("LR");
+    s_dotNodeShape     = QStringLiteral("circle");
+    s_dotEpsLabel      = QStringLiteral("ε");
     s_cfgSearchPaths.clear();
     s_hasOutDirOverride = false;
     s_hasTiersOverride  = false;
@@ -112,11 +110,10 @@ void Config::load()
         s_outDir = QString::fromUtf8(genDirEnv);
 
     // read config file
-    QString appDir   = QCoreApplication::applicationDirPath();
-    QString usePath;
+    QString          appDir = QCoreApplication::applicationDirPath();
+    QString          usePath;
     QVector<QString> candidates;
-    for (const auto& p : s_cfgSearchPaths)
-        candidates.push_back(p);
+    for (const auto& p : s_cfgSearchPaths) candidates.push_back(p);
     candidates.push_back(appDir + "/../../config/lexer.json");
     candidates.push_back(appDir + "/config/lexer.json");
     for (const auto& c : candidates)
@@ -167,8 +164,10 @@ void Config::load()
                     auto mo = obj.value("macro_names").toObject();
                     auto ml = mo.value("letter").toString();
                     auto md = mo.value("digit").toString();
-                    if (!ml.trimmed().isEmpty()) s_macroLetter = ml.trimmed();
-                    if (!md.trimmed().isEmpty()) s_macroDigit  = md.trimmed();
+                    if (!ml.trimmed().isEmpty())
+                        s_macroLetter = ml.trimmed();
+                    if (!md.trimmed().isEmpty())
+                        s_macroDigit = md.trimmed();
                 }
                 if (obj.contains("whitespaces") && obj.value("whitespaces").isArray())
                 {
@@ -197,11 +196,14 @@ void Config::load()
                 {
                     auto go = obj.value("graphviz").toObject();
                     auto ex = go.value("executable").toString();
-                    if (!ex.trimmed().isEmpty()) s_graphvizExe = ex.trimmed();
+                    if (!ex.trimmed().isEmpty())
+                        s_graphvizExe = ex.trimmed();
                     int dpi = go.value("default_dpi").toInt();
-                    if (dpi > 0) s_graphvizDpi = dpi;
-                    int to  = go.value("timeout_ms").toInt();
-                    if (to > 0) s_graphvizTimeout = to;
+                    if (dpi > 0)
+                        s_graphvizDpi = dpi;
+                    int to = go.value("timeout_ms").toInt();
+                    if (to > 0)
+                        s_graphvizTimeout = to;
                 }
                 if (obj.contains("epsilon_symbol"))
                     s_epsilon = obj.value("epsilon_symbol").toString("#");
@@ -213,11 +215,9 @@ void Config::load()
                     s_lr1Policy = obj.value("lr1_conflict_policy").toString("prefer_shift");
                 if (obj.contains("nonterminal_pattern"))
                     s_nontermPat = obj.value("nonterminal_pattern").toString();
-                if (obj.contains("token_header_regex"))
-                    s_tokenHeaderRegex = obj.value("token_header_regex").toString();
                 if (obj.contains("i18n") && obj.value("i18n").isObject())
                 {
-                    auto io = obj.value("i18n").toObject();
+                    auto io         = obj.value("i18n").toObject();
                     s_tblMark       = io.value("table_mark").toString(s_tblMark);
                     s_tblStateId    = io.value("table_state_id").toString(s_tblStateId);
                     s_tblStateSet   = io.value("table_state_set").toString(s_tblStateSet);
@@ -225,12 +225,13 @@ void Config::load()
                 }
                 if (obj.contains("dot") && obj.value("dot").isObject())
                 {
-                    auto d = obj.value("dot").toObject();
+                    auto d         = obj.value("dot").toObject();
                     s_dotRankdir   = d.value("rankdir").toString(s_dotRankdir);
                     s_dotNodeShape = d.value("node_shape").toString(s_dotNodeShape);
                     s_dotEpsLabel  = d.value("epsilon_label").toString(s_dotEpsLabel);
                 }
-                if (obj.contains("config_search_paths") && obj.value("config_search_paths").isArray())
+                if (obj.contains("config_search_paths") &&
+                    obj.value("config_search_paths").isArray())
                 {
                     s_cfgSearchPaths.clear();
                     for (auto v : obj.value("config_search_paths").toArray())
@@ -266,7 +267,8 @@ void Config::load()
     if (s_multiOps.isEmpty())
         s_multiOps = QVector<QString>({"<=", ">=", "<>", ":="});
     if (s_singleOps.isEmpty())
-        s_singleOps = QVector<QString>({"(", ")", ";", "<", ">", "=", "+", "-", "*", "/", "%", "^"});
+        s_singleOps =
+            QVector<QString>({"(", ")", ";", "<", ">", "=", "+", "-", "*", "/", "%", "^"});
 }
 
 void Config::reload()
@@ -399,7 +401,8 @@ bool Config::isWhitespace(QChar ch)
 {
     load();
     for (auto c : s_ws)
-        if (ch == c) return true;
+        if (ch == c)
+            return true;
     return false;
 }
 
@@ -469,11 +472,6 @@ QVector<QString> Config::grammarSingleOps()
     return s_singleOps;
 }
 
-QString Config::tokenHeaderRegex()
-{
-    load();
-    return s_tokenHeaderRegex;
-}
 
 QString Config::tableMarkLabel()
 {

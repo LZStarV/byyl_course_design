@@ -17,10 +17,10 @@ static QString trim(const QString& s)
 static QVector<QString> splitRhs(const QString& rhs)
 {
     QVector<QString> v;
-    QString          s = rhs;
-    int              i = 0;
-    auto isWordChar    = [](QChar c) { return c.isLetterOrNumber() || c == '_' || c == '-'; };
-    auto multiOps = Config::grammarMultiOps();
+    QString          s       = rhs;
+    int              i       = 0;
+    auto          isWordChar = [](QChar c) { return c.isLetterOrNumber() || c == '_' || c == '-'; };
+    auto          multiOps   = Config::grammarMultiOps();
     QSet<QString> singleOpsSet;
     for (const auto& op : Config::grammarSingleOps()) singleOpsSet.insert(op);
     while (i < s.size())

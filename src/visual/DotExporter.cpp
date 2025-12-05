@@ -17,11 +17,10 @@ static QString esc(const QString& s)
 
 static QString header(const QString& name)
 {
-    QString rank = Config::dotRankdir();
+    QString rank  = Config::dotRankdir();
     QString shape = Config::dotNodeShape();
-    return QStringLiteral("digraph ") + name +
-           QStringLiteral(" {\nrankdir=") + rank + QStringLiteral(";\nnode [shape=") + shape +
-           QStringLiteral("];\n");
+    return QStringLiteral("digraph ") + name + QStringLiteral(" {\nrankdir=") + rank +
+           QStringLiteral(";\nnode [shape=") + shape + QStringLiteral("];\n");
 }
 static QString trailer()
 {

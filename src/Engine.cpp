@@ -2,7 +2,7 @@
 #include "config/Config.h"
 #include "syntax/GrammarParser.h"
 static int matchLen(const MinDFA& mdfa, const QString& src, int pos);
-RegexFile Engine::lexFile(const QString& text)
+RegexFile  Engine::lexFile(const QString& text)
 {
     return RegexLexer::lex(text);
 }
@@ -183,7 +183,8 @@ QString Engine::run(const MinDFA& mdfa, const QString& source, int tokenCode)
             }
             continue;
         }
-        if (Config::skipLineComment() && ch == '/' && pos + 1 < source.size() && source[pos + 1] == '/')
+        if (Config::skipLineComment() && ch == '/' && pos + 1 < source.size() &&
+            source[pos + 1] == '/')
         {
             pos += 2;
             while (pos < source.size() && source[pos++] != '\n')
@@ -199,7 +200,8 @@ QString Engine::run(const MinDFA& mdfa, const QString& source, int tokenCode)
             }
             continue;
         }
-        if (Config::skipBlockComment() && ch == '/' && pos + 1 < source.size() && source[pos + 1] == '*')
+        if (Config::skipBlockComment() && ch == '/' && pos + 1 < source.size() &&
+            source[pos + 1] == '*')
         {
             pos += 2;
             while (pos + 1 < source.size())
@@ -396,37 +398,11 @@ static int matchLen(const MinDFA& mdfa, const QString& src, int pos)
             int t = mdfa.states[state].trans.value(a, -1);
             if (t == -1)
                 continue;
-            if (a.compare(Config::macroLetterName(), Qt::CaseInsensitive) == 0)
+            if (a.size() == 1 && a[0] == ch)
             {
-                bool ok = ch.isLetter();
-                if (!ok && mdfa.alpha.allowUnderscoreInLetter && ch == '_')
-                    ok = true;
-                if (!ok && mdfa.alpha.allowDollarInLetter && ch == '$')
-                    ok = true;
-                if (ok)
-                {
-                    state = t;
-                    moved = true;
-                    break;
-                }
-            }
-            else if (a.compare(Config::macroDigitName(), Qt::CaseInsensitive) == 0)
-            {
-                if (ch.isDigit())
-                {
-                    state = t;
-                    moved = true;
-                    break;
-                }
-            }
-            else if (a.size() == 1)
-            {
-                if (ch == a[0])
-                {
-                    state = t;
-                    moved = true;
-                    break;
-                }
+                state = t;
+                moved = true;
+                break;
             }
         }
         if (!moved)

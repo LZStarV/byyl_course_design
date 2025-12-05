@@ -195,16 +195,7 @@ static void collectAlphabet(ASTNode* n, Alphabet& a, const QMap<QString, Rule>& 
             for (auto ch : n->value) a.add(QString(ch));
             break;
         case ASTNode::Ref:
-            if (n->value.compare(Config::macroLetterName(), Qt::CaseInsensitive) == 0)
-            {
-                a.hasLetter = true;
-                a.add(Config::macroLetterName());
-            }
-            else if (n->value.compare(Config::macroDigitName(), Qt::CaseInsensitive) == 0)
-            {
-                a.hasDigit = true;
-                a.add(Config::macroDigitName());
-            }
+            // 引用在构建前将被展开，无需特殊处理
             break;
         default:
             break;
@@ -217,8 +208,29 @@ ParsedFile RegexParser::parse(const RegexFile& file)
     out.macros = file.rules;
     for (auto r : file.tokens)
     {
-        int         i   = 0;
-        auto        ast = parseExpr(r.expr, i, out.macros);
+        int  i   = 0;
+        auto ast = parseExpr(r.expr, i, out.macros);
+        // 展开引用，确保后续构建仅包含字符与结构运算
+        // 简单递归展开：Ref -> 解析宏表达式并替换
+        std::function<ASTNode*(ASTNode*)> expand = [&](ASTNode* n) -> ASTNode*
+        {
+            if (!n)
+                return nullptr;
+            if (n->type == ASTNode::Ref)
+            {
+                auto it = out.macros.find(n->value);
+                if (it != out.macros.end())
+                {
+                    int  j = 0;
+                    auto m = parseExpr(it.value().expr, j, out.macros);
+                    return expand(m);
+                }
+                return nullptr;
+            }
+            for (int k = 0; k < n->children.size(); ++k) n->children[k] = expand(n->children[k]);
+            return n;
+        };
+        ast = expand(ast);
         ParsedToken pt;
         pt.rule = r;
         pt.ast  = ast;
@@ -226,19 +238,7 @@ ParsedFile RegexParser::parse(const RegexFile& file)
         Alphabet a;
         collectAlphabet(ast, a, out.macros);
         for (auto s : a.symbols) out.alpha.add(s);
-        if (a.hasLetter)
-            out.alpha.hasLetter = true;
-        if (a.hasDigit)
-            out.alpha.hasDigit = true;
-    }
-    // 根据宏定义推断 letter 允许的附加字符
-    if (out.macros.contains(Config::macroLetterName()))
-    {
-        auto expr = out.macros.value(Config::macroLetterName()).expr;
-        if (expr.contains('_'))
-            out.alpha.allowUnderscoreInLetter = true;
-        if (expr.contains('$'))
-            out.alpha.allowDollarInLetter = true;
+        // 不再使用类别标记（letter/digit），统一按字符集收集
     }
     return out;
 }

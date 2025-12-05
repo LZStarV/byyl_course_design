@@ -46,28 +46,7 @@ static QPair<int, int> buildFrom(NFA& nfa, ASTNode* ast)
         }
         return p;
     }
-    // 处理预定义引用（letter/digit）：并记录到字母表
-    if (ast->type == ASTNode::Ref)
-    {
-        auto    p = newFrag(nfa);
-        NFAEdge e;
-        e.to      = p.second;
-        e.epsilon = false;
-        if (ast->value.compare("letter", Qt::CaseInsensitive) == 0)
-        {
-            nfa.alpha.hasLetter = true;
-            nfa.alpha.add("letter");
-            e.symbol = "letter";
-        }
-        else if (ast->value.compare("digit", Qt::CaseInsensitive) == 0)
-        {
-            nfa.alpha.hasDigit = true;
-            nfa.alpha.add("digit");
-            e.symbol = "digit";
-        }
-        nfa.states[p.first].edges.push_back(e);
-        return p;
-    }
+    // 引用应在解析阶段被展开，此处不再特殊处理
     // 连接：a 的终止通过 ε 边指向 b 的起始
     if (ast->type == ASTNode::Concat)
     {

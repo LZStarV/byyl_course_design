@@ -167,8 +167,8 @@ LR1Graph LR1Builder::build(const Grammar& g)
                 if (it.dot < it.right.size())
                 {
                     QString X = it.right[it.dot];
-                if (!X.isEmpty() && X != Config::epsilonSymbol())
-                    nextSymbols.insert(X);
+                    if (!X.isEmpty() && X != Config::epsilonSymbol())
+                        nextSymbols.insert(X);
                 }
             }
             for (auto ns = nextSymbols.begin(); ns != nextSymbols.end(); ++ns)
