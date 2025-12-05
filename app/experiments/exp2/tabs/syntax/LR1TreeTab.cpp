@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QTreeWidget>
 
 LR1TreeTab::LR1TreeTab(QWidget* parent) : QWidget(parent)
 {
@@ -21,9 +22,17 @@ LR1TreeTab::LR1TreeTab(QWidget* parent) : QWidget(parent)
     h->addWidget(lblDpi);
     h->addWidget(edtGraphDpi);
     v->addLayout(h);
+    auto hMain = new QHBoxLayout;
     tblProcess = new QTableWidget;
     tblProcess->setObjectName("tblLR1Process");
     tblProcess->setEditTriggers(QAbstractItemView::NoEditTriggers);
     tblProcess->setSelectionBehavior(QAbstractItemView::SelectRows);
-    v->addWidget(tblProcess);
+    hMain->addWidget(tblProcess);
+    auto tree = new QTreeWidget;
+    tree->setObjectName("treeSemanticLR1");
+    tree->setHeaderHidden(true);
+    hMain->addWidget(tree);
+    hMain->setStretch(0, 1);
+    hMain->setStretch(1, 1);
+    v->addLayout(hMain);
 }

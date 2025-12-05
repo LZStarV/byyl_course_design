@@ -8,6 +8,7 @@
 #include "../../../src/config/Config.h"
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QTreeWidget>
 
 LR1Controller::LR1Controller(MainWindow* mw, Engine* engine, NotificationService* notify) :
     mw_(mw), engine_(engine), notify_(notify)
@@ -40,23 +41,51 @@ void LR1Controller::fillProcessTable(QTableWidget*             tbl,
                                      const QVector<ParseStep>& steps)
 {
     tbl->clear();
-    tbl->setColumnCount(cols.size());
+    tbl->setColumnCount(2);
     tbl->setRowCount(steps.size());
-    QStringList headers;
-    for (auto c : cols) headers << c;
-    tbl->setHorizontalHeaderLabels(headers);
+    tbl->setHorizontalHeaderLabels(QStringList({QStringLiteral("步骤"), QStringLiteral("描述")}));
     for (int r = 0; r < steps.size(); ++r)
     {
         const auto& ps = steps[r];
         tbl->setItem(r, 0, new QTableWidgetItem(QString::number(ps.step)));
-        QString stk;
-        for (const auto& p : ps.stack) stk += QString("(%1,%2) ").arg(p.first).arg(p.second);
-        tbl->setItem(r, 1, new QTableWidgetItem(stk.trimmed()));
-        tbl->setItem(r, 2, new QTableWidgetItem(ps.rest.join(" ")));
-        tbl->setItem(r, 3, new QTableWidgetItem(ps.action));
-        tbl->setItem(r, 4, new QTableWidgetItem(ps.production));
+        QString desc;
+        if (ps.action.startsWith("s"))
+            desc = QString("shift 到 s%1，读入 '%2'")
+                       .arg(ps.stack.isEmpty() ? -1 : ps.stack.back().first)
+                       .arg(ps.rest.isEmpty() ? QStringLiteral("$") : ps.rest[0]);
+        else if (ps.action.startsWith("r"))
+            desc = QString("reduce %1").arg(ps.production);
+        else if (ps.action == "acc")
+            desc = QStringLiteral("acc，分析完成");
+        else
+            desc = QString("动作 %1").arg(ps.action);
+        tbl->setItem(r, 1, new QTableWidgetItem(desc));
     }
     tbl->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
+static void addTreeNode(QTreeWidgetItem* parent, const SemanticASTNode* n)
+{
+    if (!n) return;
+    auto item = new QTreeWidgetItem(QStringList(n->tag));
+    if (parent)
+        parent->addChild(item);
+    else
+        ;
+    for (auto c : n->children) addTreeNode(item, c);
+}
+
+void LR1Controller::fillSemanticTree(QTreeWidget* tree, const SemanticASTNode* root)
+{
+    if (!tree) return;
+    tree->clear();
+    auto item = new QTreeWidgetItem(QStringList(root ? root->tag : QString("(empty)")));
+    tree->addTopLevelItem(item);
+    if (root)
+    {
+        for (auto c : root->children) addTreeNode(item, c);
+    }
+    tree->expandAll();
 }
 
 void LR1Controller::bind(QWidget* exp2Page)
@@ -73,6 +102,8 @@ void LR1Controller::bind(QWidget* exp2Page)
                 &LR1Controller::onPickSourceActivated);
     if (auto b = page_->findChild<QPushButton*>("btnRunLR1Process"))
         connect(b, &QPushButton::clicked, this, &LR1Controller::runLR1Process);
+    if (auto b = page_->findChild<QPushButton*>("btnLoadSemanticActions"))
+        connect(b, &QPushButton::clicked, this, &LR1Controller::loadSemanticActions);
     if (auto b = page_->findChild<QPushButton*>("btnPreviewLR1Tree"))
         connect(b, &QPushButton::clicked, this, &LR1Controller::previewTree);
     setupExportButton();
@@ -80,7 +111,7 @@ void LR1Controller::bind(QWidget* exp2Page)
 
 void LR1Controller::onPickSourceActivated(int index)
 {
-    // 索引从0开始，0表示"源程序"，1表示"Token序列"，2表示"当前文法"
+    // 索引从0开始：0=正则表达式，1=Token序列，2=当前文法
     QString filePath = QFileDialog::getOpenFileName(
         mw_, QStringLiteral("选择文件"), "", QStringLiteral("所有文件 (*)"));
 
@@ -101,7 +132,7 @@ void LR1Controller::onPickSourceActivated(int index)
     if (auto txtSourceView = page_->findChild<QPlainTextEdit*>("txtSourceViewLR1"))
     {
         if (index == 0)
-        {  // 源程序
+        {  // 正则表达式
             txtSourceView->setPlainText(content);
         }
         else if (index == 1)
@@ -124,7 +155,7 @@ void LR1Controller::onPickSourceActivated(int index)
 void LR1Controller::loadDefault()
 {
     QString dir     = Config::syntaxOutputDir();
-    QString srcPath = dir + "/last_source.txt";
+    QString srcPath = dir + "/last_regex.txt";
     QString tokPath = dir + "/last_tokens.txt";
     QFile   fs(srcPath), ft(tokPath);
     if (fs.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -142,17 +173,12 @@ void LR1Controller::loadDefault()
             edt->setPlainText(in.readAll());
         ft.close();
     }
-    // 同步文法到只读视图
-    if (auto txtGrammar = page_->findChild<QTextEdit*>("txtInputGrammar"))
-    {
-        if (auto gv = page_->findChild<QPlainTextEdit*>("txtGrammarViewLR1"))
-            gv->setPlainText(txtGrammar->toPlainText());
-    }
+    // 语义动作不参与默认加载
 }
 
 void LR1Controller::pickSource()
 {
-    auto path = QFileDialog::getOpenFileName(mw_, QStringLiteral("选择源程序文件"));
+    auto path = QFileDialog::getOpenFileName(mw_, QStringLiteral("选择正则表达式文件"));
     if (path.isEmpty())
         return;
     QFile f(path);
@@ -166,15 +192,6 @@ void LR1Controller::pickSource()
     f.close();
     if (auto edt = page_->findChild<QPlainTextEdit*>("txtSourceViewLR1"))
         edt->setPlainText(content);
-    QString tokPath = Config::syntaxOutputDir() + "/last_tokens.txt";
-    QFile   ft(tokPath);
-    if (ft.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream in(&ft);
-        if (auto tokv = page_->findChild<QPlainTextEdit*>("txtTokensViewLR1"))
-            tokv->setPlainText(in.readAll());
-        ft.close();
-    }
 }
 
 void LR1Controller::runLR1Process()
@@ -203,7 +220,8 @@ void LR1Controller::runLR1Process()
         notify_->warning("请先提供Token序列");
         return;
     }
-    auto                   tokens = splitTokens(tokensStr);
+    auto                   tokensCodes = splitTokens(tokensStr);
+    auto                   tokens      = tokensCodes;
     QMap<QString, QString> tokMap;
     // 优先：转换阶段生成的映射
     QString genMap = Config::generatedOutputDir() + "/syntax/token_map.json";
@@ -257,12 +275,14 @@ void LR1Controller::runLR1Process()
     }
     if (unknown > 0)
         notify_->warning(QString("存在未映射的Token编码数量: %1").arg(unknown));
-    // 分隔符是否保留由文法自定义，不进行额外过滤
-    auto r = LR1Parser::parse(tokens, g, tbl);
+    // 语义动作策略（外部配置）
+    auto roleMeaning = Config::semanticRoleMeaning();
+    auto rootPolicy  = Config::semanticRootSelectionPolicy();
+    auto childOrder  = Config::semanticChildOrderPolicy();
+    auto r           = LR1Parser::parseWithSemantics(tokens, g, tbl, semanticActions_, roleMeaning, rootPolicy, childOrder);
     if (auto tblw = page_->findChild<QTableWidget*>("tblLR1Process"))
     {
         QVector<QString> cols;
-        cols << "步" << "栈" << "输入" << "动作" << "产生式";
         fillProcessTable(tblw, cols, r.steps);
     }
     if (r.errorPos >= 0)
@@ -278,7 +298,12 @@ void LR1Controller::runLR1Process()
         notify_->error("语法分析失败 " + detail);
         return;
     }
-    lastDot_ = parseTreeToDot(r.root);
+    if (r.astRoot)
+        lastDot_ = semanticAstToDot(r.astRoot);
+    else
+        lastDot_ = parseTreeToDotWithTokens(r.root, tokens);
+    if (auto tree = page_->findChild<QTreeWidget*>("treeSemanticLR1"))
+        fillSemanticTree(tree, r.astRoot);
     notify_->info(QString("LR(1)分析完成，共 %1 步").arg(r.steps.size()));
 }
 
@@ -303,6 +328,12 @@ void LR1Controller::previewTree()
         dotSvc_->previewPng(png, "LR(1) 语法树 预览");
         QFile::remove(png);
     }
+    if (auto tree = page_->findChild<QTreeWidget*>("treeSemanticLR1"))
+    {
+        // 同步文本树视图
+        // 使用最新的语义 AST：需在 runLR1Process 之后通过 parseWithSemantics 的结果传入
+        // 这里从 DOT 无法恢复 AST，仅在 runLR1Process 内部填充
+    }
 }
 
 void LR1Controller::setupExportButton()
@@ -325,4 +356,72 @@ void LR1Controller::setupExportButton()
             return 150;
         });
     btn->setDotSupplier([this] { return this->lastDot_; });
+}
+void LR1Controller::loadSemanticActions()
+{
+    auto path = QFileDialog::getOpenFileName(mw_,
+                                             QStringLiteral("选择语义动作文件"),
+                                             QString(),
+                                             QStringLiteral("Text (*.txt *.sem);;All (*)"));
+    if (path.isEmpty())
+        return;
+    auto lines = readLines(path);
+    if (lines.size() % 2 != 0)
+    {
+        notify_->error(QStringLiteral("语义动作文件行数必须为偶数"));
+        return;
+    }
+    QMap<QString, QVector<QVector<int>>> m;
+    for (int i = 0; i < lines.size(); i += 2)
+    {
+        QString prod = lines[i].trimmed();
+        QString acts = lines[i + 1].trimmed();
+        if (prod.isEmpty())
+            continue;
+        // 产生式行：A -> α1 | α2 | ...
+        int arrow = prod.indexOf("->");
+        if (arrow < 0)
+        {
+            notify_->error(QStringLiteral("产生式格式错误: ") + prod);
+            return;
+        }
+        QString L    = prod.left(arrow).trimmed();
+        QString Rall = prod.mid(arrow + 2).trimmed();
+        auto    rhss = Rall.split('|');
+        auto    actc = acts.split('|');
+        if (rhss.size() != actc.size())
+        {
+            notify_->error(QStringLiteral("候选数与动作数不匹配: ") + L);
+            return;
+        }
+        QVector<QVector<int>> seqs;
+        for (int k = 0; k < rhss.size(); ++k)
+        {
+            auto rhs    = rhss[k].trimmed();
+            auto actstr = actc[k].trimmed();
+            auto syms   = rhs == "#" ? QVector<QString>() : rhs.split(' ', Qt::SkipEmptyParts);
+            auto bits   = actstr.split(' ', Qt::SkipEmptyParts);
+            QVector<int> vs;
+            for (auto b : bits) vs.push_back(b.toInt());
+            if (vs.size() != syms.size())
+            {
+                notify_->error(QStringLiteral("动作位数与候选符号数不匹配: ") + L);
+                return;
+            }
+            seqs.push_back(vs);
+        }
+        m[L] = seqs;
+    }
+    semanticActions_ = m;
+    if (auto v = page_->findChild<QPlainTextEdit*>("txtSemanticViewLR1"))
+    {
+        QString text;
+        for (int i = 0; i < lines.size(); ++i)
+        {
+            text += lines[i];
+            text += '\n';
+        }
+        v->setPlainText(text);
+    }
+    notify_->info(QStringLiteral("语义动作导入成功"));
 }

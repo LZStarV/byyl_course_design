@@ -15,6 +15,7 @@
 #include "../../../src/syntax/LR1Parser.h"
 #include "../../../src/syntax/DotGenerator.h"
 #include "../../components/ExportGraphButton/ExportGraphButton.h"
+class QTreeWidget;
 
 class LR1Controller : public QObject
 {
@@ -31,10 +32,13 @@ class LR1Controller : public QObject
     QWidget*             page_ = nullptr;
     QString              lastSourcePath_;
     QString              lastDot_;
+    // 语义动作：LHS -> 每个候选的角色位序列
+    QMap<QString, QVector<QVector<int>>> semanticActions_;
 
     void                    loadDefault();
     void                    pickSource();
     void                    onPickSourceActivated(int index);
+    void                    loadSemanticActions();
     void                    runLR1Process();
     void                    previewTree();
     void                    setupExportButton();
@@ -42,4 +46,5 @@ class LR1Controller : public QObject
     static void             fillProcessTable(QTableWidget*             tbl,
                                              const QVector<QString>&   cols,
                                              const QVector<ParseStep>& steps);
+    static void             fillSemanticTree(QTreeWidget* tree, const SemanticASTNode* root);
 };

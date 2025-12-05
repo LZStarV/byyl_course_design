@@ -1,0 +1,30 @@
+program -> stmt-sequence
+1
+stmt-sequence -> stmt-sequence ; statement | statement
+1 0 1 | 1
+statement -> if-stmt | repeat-stmt | assign-stmt | read-stmt | write-stmt
+1 | 1 | 1 | 1 | 1
+if-stmt -> if exp then stmt-sequence end | if exp then stmt-sequence else stmt-sequence end
+1 2 0 2 0 | 1 2 0 2 0 2 0
+repeat-stmt -> repeat stmt-sequence until exp
+1 2 0 2
+assign-stmt -> identifier := exp
+2 1 2
+read-stmt -> read identifier
+1 2
+write-stmt -> write exp
+1 2
+exp -> simple-exp comparison-op simple-exp | simple-exp
+2 1 2 | 1
+comparison-op -> < | > | = | <= | <> | >=
+1 | 1 | 1 | 1 | 1 | 1
+simple-exp -> simple-exp addop term | term
+2 1 2 | 1
+addop -> + | -
+1 | 1
+term -> term mulop factor | factor
+2 1 2 | 1
+mulop -> * | / | % | ^
+1 | 1 | 1 | 1
+factor -> ( exp ) | number | identifier
+0 1 0 | 1 | 1

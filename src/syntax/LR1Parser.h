@@ -4,6 +4,7 @@
 #include <QMap>
 #include "Grammar.h"
 #include "LR1.h"
+#include "AST.h"
 
 struct ParseTreeNode
 {
@@ -25,6 +26,7 @@ struct ParseResult
     QVector<ParseStep> steps;
     ParseTreeNode*     root     = nullptr;
     int                errorPos = -1;
+    SemanticASTNode*   astRoot  = nullptr;
 };
 
 class LR1Parser
@@ -33,4 +35,11 @@ class LR1Parser
     static ParseResult parse(const QVector<QString>& tokens,
                              const Grammar&          g,
                              const LR1ActionTable&   t);
+    static ParseResult parseWithSemantics(const QVector<QString>&                     tokens,
+                                          const Grammar&                              g,
+                                          const LR1ActionTable&                       t,
+                                          const QMap<QString, QVector<QVector<int>>>& actions,
+                                          const QMap<int, QString>&                   roleMeaning,
+                                          const QString&                              rootPolicy,
+                                          const QString&                              childOrder);
 };

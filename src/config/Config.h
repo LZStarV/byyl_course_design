@@ -37,6 +37,10 @@ class Config
     static QString        graphvizExecutable();
     static int            graphvizDefaultDpi();
     static int            graphvizTimeoutMs();
+    // semantic actions config (externalized, no hardcoding)
+    static QMap<int, QString> semanticRoleMeaning();
+    static QString            semanticRootSelectionPolicy();
+    static QString            semanticChildOrderPolicy();
     // syntax config
     static QString          epsilonSymbol();
     static QString          eofSymbol();
@@ -113,6 +117,10 @@ class Config
     static QString             s_dotNodeShape;
     static QString             s_dotEpsLabel;
     static QVector<QString>    s_cfgSearchPaths;
+    // semantics
+    static QMap<int, QString>  s_semRoleMeaning;
+    static QString             s_semRootPolicy;
+    static QString             s_semChildOrder;
     static bool                s_hasOutDirOverride;
     static QString             s_outDirOverride;
     static bool                s_hasTiersOverride;

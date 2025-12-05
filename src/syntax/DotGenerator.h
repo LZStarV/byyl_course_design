@@ -5,3 +5,5 @@
 
 QString syntaxAstToDot(SyntaxASTNode* root);
 QString parseTreeToDot(ParseTreeNode* root);
+QString parseTreeToDotWithTokens(ParseTreeNode* root, const QVector<QString>& tokens);
+QString semanticAstToDot(SemanticASTNode* root);

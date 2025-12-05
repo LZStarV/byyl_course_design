@@ -52,6 +52,9 @@ bool                        Config::s_hasSkipDouble   = false;
 bool                        Config::s_skipDouble      = false;
 bool                        Config::s_hasSkipTemplate = false;
 bool                        Config::s_skipTemplate    = false;
+QMap<int, QString>          Config::s_semRoleMeaning;
+QString                     Config::s_semRootPolicy;
+QString                     Config::s_semChildOrder;
 
 static QVector<Config::WeightTier> defaultTiers()
 {
@@ -223,6 +226,23 @@ void Config::load()
                     s_tblStateSet   = io.value("table_state_set").toString(s_tblStateSet);
                     s_tblEpsilonCol = io.value("epsilon_column_label").toString(s_tblEpsilonCol);
                 }
+                if (obj.contains("semantic_actions") && obj.value("semantic_actions").isObject())
+                {
+                    auto so = obj.value("semantic_actions").toObject();
+                    s_semRoleMeaning.clear();
+                    if (so.contains("role_meaning") && so.value("role_meaning").isObject())
+                    {
+                        auto rm = so.value("role_meaning").toObject();
+                        for (auto k : rm.keys())
+                        {
+                            bool ok = false;
+                            int  ki = k.toInt(&ok);
+                            if (ok) s_semRoleMeaning[ki] = rm.value(k).toString();
+                        }
+                    }
+                    s_semRootPolicy  = so.value("root_selection_policy").toString();
+                    s_semChildOrder  = so.value("child_order_policy").toString();
+                }
                 if (obj.contains("dot") && obj.value("dot").isObject())
                 {
                     auto d         = obj.value("dot").toObject();
@@ -269,6 +289,14 @@ void Config::load()
     if (s_singleOps.isEmpty())
         s_singleOps =
             QVector<QString>({"(", ")", ";", "<", ">", "=", "+", "-", "*", "/", "%", "^"});
+    if (s_semRoleMeaning.isEmpty())
+    {
+        s_semRoleMeaning[0] = "discard";
+        s_semRoleMeaning[1] = "root";
+        s_semRoleMeaning[2] = "child";
+    }
+    if (s_semRootPolicy.trimmed().isEmpty()) s_semRootPolicy = "first_1";
+    if (s_semChildOrder.trimmed().isEmpty()) s_semChildOrder = "rhs_order";
 }
 
 void Config::reload()
@@ -894,4 +922,21 @@ bool Config::saveJson(const QString& path)
     f.write(doc.toJson(QJsonDocument::Compact));
     f.close();
     return true;
+}
+QMap<int, QString> Config::semanticRoleMeaning()
+{
+    load();
+    return s_semRoleMeaning;
+}
+
+QString Config::semanticRootSelectionPolicy()
+{
+    load();
+    return s_semRootPolicy;
+}
+
+QString Config::semanticChildOrderPolicy()
+{
+    load();
+    return s_semChildOrder;
 }
