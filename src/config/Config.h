@@ -49,6 +49,10 @@ class Config
     static QString          nonterminalPattern();
     static QVector<QString> grammarMultiOps();
     static QVector<QString> grammarSingleOps();
+    static bool             emitIdentifierLexeme();
+    static QVector<QString> identifierTokenNames();
+    static void             setEmitIdentifierLexeme(bool v);
+    static void             setIdentifierTokenNames(const QVector<QString>& names);
     // i18n for tables
     static QString tableMarkLabel();
     static QString tableStateIdLabel();
@@ -88,6 +92,33 @@ class Config
     static void setSkipTemplate(bool v);
     static void clearSkipOverrides();
     static bool saveJson(const QString& path);
+    // setters for settings dialog
+    static void setSyntaxOutputDir(const QString& dir);
+    static void setGraphsDir(const QString& dir);
+    static void setMacroLetterName(const QString& name);
+    static void setMacroDigitName(const QString& name);
+    static void setWhitespaces(const QVector<QChar>& ws);
+    static void setTokenMapUseHeuristics(bool v);
+    static void setGraphvizExecutable(const QString& exe);
+    static void setGraphvizDefaultDpi(int dpi);
+    static void setGraphvizTimeoutMs(int ms);
+    static void setEpsilonSymbol(const QString& s);
+    static void setEofSymbol(const QString& s);
+    static void setAugSuffix(const QString& s);
+    static void setLr1ConflictPolicy(const QString& p);
+    static void setNonterminalPattern(const QString& pat);
+    static void setGrammarMultiOps(const QVector<QString>& ops);
+    static void setGrammarSingleOps(const QVector<QString>& ops);
+    static void setTableMarkLabel(const QString& s);
+    static void setTableStateIdLabel(const QString& s);
+    static void setTableStateSetLabel(const QString& s);
+    static void setEpsilonColumnLabel(const QString& s);
+    static void setDotRankdir(const QString& s);
+    static void setDotNodeShape(const QString& s);
+    static void setDotEpsilonLabel(const QString& s);
+    static void setConfigSearchPaths(const QVector<QString>& paths);
+    static void setSemanticRootSelectionPolicy(const QString& p);
+    static void setSemanticChildOrderPolicy(const QString& p);
 
    private:
     static bool                s_loaded;
@@ -117,6 +148,8 @@ class Config
     static QString             s_dotNodeShape;
     static QString             s_dotEpsLabel;
     static QVector<QString>    s_cfgSearchPaths;
+    static bool                s_emitIdentifierLexeme;
+    static QVector<QString>    s_identifierNames;
     // semantics
     static QMap<int, QString>  s_semRoleMeaning;
     static QString             s_semRootPolicy;

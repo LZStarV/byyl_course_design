@@ -419,7 +419,25 @@ void MainWindow::onGenCodeClicked(bool)
     }
     QVector<int> codes;
     auto         mdfas = engine->buildAllMinDFA(*parsedPtr, codes);
-    auto         s     = CodeGenerator::generateCombined(mdfas, codes, parsedPtr->alpha);
+    QSet<int>    idCodes;
+    {
+        auto             names = Config::identifierTokenNames();
+        QVector<QString> lowers;
+        for (auto s : names) lowers.push_back(s.trimmed().toLower());
+        for (const auto& pt : parsedPtr->tokens)
+        {
+            QString n = pt.rule.name.trimmed().toLower();
+            for (const auto& k : lowers)
+            {
+                if (!k.isEmpty() && n.contains(k))
+                {
+                    idCodes.insert(pt.rule.code);
+                    break;
+                }
+            }
+        }
+    }
+    auto s = CodeGenerator::generateCombined(mdfas, codes, parsedPtr->alpha, idCodes);
     txtGeneratedCode->setPlainText(s);
     QString base     = ensureGenDir();
     QString ts       = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
@@ -480,8 +498,26 @@ void MainWindow::onRunLexerClicked(bool)
         if (src.trimmed().isEmpty())
             src = QStringLiteral("abc123 def456");
         QVector<int> codes;
-        auto         mdfas  = engine->buildAllMinDFA(*parsedPtr, codes);
-        auto         output = engine->runMultiple(mdfas, codes, src);
+        auto         mdfas = engine->buildAllMinDFA(*parsedPtr, codes);
+        QSet<int>    idCodes;
+        {
+            auto             names = Config::identifierTokenNames();
+            QVector<QString> lowers;
+            for (auto s : names) lowers.push_back(s.trimmed().toLower());
+            for (const auto& pt : parsedPtr->tokens)
+            {
+                QString n = pt.rule.name.trimmed().toLower();
+                for (const auto& k : lowers)
+                {
+                    if (!k.isEmpty() && n.contains(k))
+                    {
+                        idCodes.insert(pt.rule.code);
+                        break;
+                    }
+                }
+            }
+        }
+        auto output = engine->runMultiple(mdfas, codes, src, idCodes);
         txtLexResult->setPlainText(output.isEmpty() ? QStringLiteral("100 100") : output);
         QString dir = Config::generatedOutputDir() + "/syntax";
         QDir    d(dir);
@@ -523,12 +559,30 @@ void MainWindow::onRunLexerClicked(bool)
         !QFileInfo::exists(currentCodePath))
     {
         QVector<int> codes;
-        auto         mdfas    = engine->buildAllMinDFA(*parsedPtr, codes);
-        auto         s        = CodeGenerator::generateCombined(mdfas, codes, parsedPtr->alpha);
-        QString      base     = ensureGenDir();
-        QString      ts       = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
-        QString      savePath = base + "/lex_" + ts + "_" + hashNow.mid(0, 12) + ".cpp";
-        QFile        f(savePath);
+        auto         mdfas = engine->buildAllMinDFA(*parsedPtr, codes);
+        QSet<int>    idCodes3;
+        {
+            auto             names = Config::identifierTokenNames();
+            QVector<QString> lowers;
+            for (auto s : names) lowers.push_back(s.trimmed().toLower());
+            for (const auto& pt : parsedPtr->tokens)
+            {
+                QString n = pt.rule.name.trimmed().toLower();
+                for (const auto& k : lowers)
+                {
+                    if (!k.isEmpty() && n.contains(k))
+                    {
+                        idCodes3.insert(pt.rule.code);
+                        break;
+                    }
+                }
+            }
+        }
+        auto    s    = CodeGenerator::generateCombined(mdfas, codes, parsedPtr->alpha, idCodes3);
+        QString base = ensureGenDir();
+        QString ts   = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
+        QString savePath = base + "/lex_" + ts + "_" + hashNow.mid(0, 12) + ".cpp";
+        QFile   f(savePath);
         if (f.open(QIODevice::WriteOnly | QIODevice::Text))
         {
             QTextStream w(&f);
@@ -571,8 +625,26 @@ void MainWindow::onRunLexerClicked(bool)
         txtSourceTiny->setPlainText(src);
     }
     QVector<int> codes;
-    auto         mdfas  = engine->buildAllMinDFA(*parsedPtr, codes);
-    auto         output = engine->runMultiple(mdfas, codes, src);
+    auto         mdfas = engine->buildAllMinDFA(*parsedPtr, codes);
+    QSet<int>    idCodes;
+    {
+        auto             names = Config::identifierTokenNames();
+        QVector<QString> lowers;
+        for (auto s : names) lowers.push_back(s.trimmed().toLower());
+        for (const auto& pt : parsedPtr->tokens)
+        {
+            QString n = pt.rule.name.trimmed().toLower();
+            for (const auto& k : lowers)
+            {
+                if (!k.isEmpty() && n.contains(k))
+                {
+                    idCodes.insert(pt.rule.code);
+                    break;
+                }
+            }
+        }
+    }
+    auto output = engine->runMultiple(mdfas, codes, src, idCodes);
     txtLexResult->setPlainText(output);
     // 自动保存到内部
     QString dir = Config::generatedOutputDir() + "/syntax";
@@ -706,7 +778,25 @@ void MainWindow::onCompileRunClicked(bool)
     QString      hash  = computeRegexHash(txtInputRegex->toPlainText()).mid(0, 12);
     QString      outCpp =
         currentCodePath.isEmpty() ? (base + "/lex_" + ts + "_" + hash + ".cpp") : currentCodePath;
-    auto  srcCombined = CodeGenerator::generateCombined(mdfas, codes, parsedPtr->alpha);
+    QSet<int> idCodes4;
+    {
+        auto             names = Config::identifierTokenNames();
+        QVector<QString> lowers;
+        for (auto s : names) lowers.push_back(s.trimmed().toLower());
+        for (const auto& pt : parsedPtr->tokens)
+        {
+            QString n = pt.rule.name.trimmed().toLower();
+            for (const auto& k : lowers)
+            {
+                if (!k.isEmpty() && n.contains(k))
+                {
+                    idCodes4.insert(pt.rule.code);
+                    break;
+                }
+            }
+        }
+    }
+    auto  srcCombined = CodeGenerator::generateCombined(mdfas, codes, parsedPtr->alpha, idCodes4);
     QFile f(outCpp);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -773,6 +863,7 @@ void MainWindow::onCompileRunClicked(bool)
         env.insert("LEXER_SKIP_SQ_STRING", Config::skipSingleQuoteString() ? "1" : "0");
         env.insert("LEXER_SKIP_DQ_STRING", Config::skipDoubleQuoteString() ? "1" : "0");
         env.insert("LEXER_SKIP_TPL_STRING", Config::skipTemplateString() ? "1" : "0");
+        env.insert("LEXER_EMIT_IDENTIFIER_LEXEME", Config::emitIdentifierLexeme() ? "1" : "0");
         env.insert("BYYL_GEN_DIR", Config::generatedOutputDir());
         run.setProcessEnvironment(env);
     }

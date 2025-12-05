@@ -416,7 +416,8 @@ static int matchLen(const MinDFA& mdfa, const QString& src, int pos)
 
 QString Engine::runMultiple(const QVector<MinDFA>& mdfas,
                             const QVector<int>&    codes,
-                            const QString&         source)
+                            const QString&         source,
+                            const QSet<int>&       identifierCodes)
 {
     QString out;
     int     pos = 0;
@@ -556,7 +557,12 @@ QString Engine::runMultiple(const QVector<MinDFA>& mdfas,
         }
         if (bestLen > 0)
         {
-            out += QString::number(codes[bestIdx]) + " ";
+            int code = codes[bestIdx];
+            out += QString::number(code) + " ";
+            if (Config::emitIdentifierLexeme() && identifierCodes.contains(code))
+            {
+                out += source.mid(pos, bestLen) + " ";
+            }
             pos += bestLen;
         }
         else

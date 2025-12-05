@@ -1,6 +1,7 @@
 #pragma once
 #include "../model/Automata.h"
 #include <QString>
+#include <QSet>
 /**
  * \brief 代码生成器
  *
@@ -26,5 +27,6 @@ class CodeGenerator
      */
     static QString generateCombined(const QVector<MinDFA>& mdfas,
                                     const QVector<int>&    codes,
-                                    const Alphabet&        alpha);
+                                    const Alphabet&        alpha,
+                                    const QSet<int>&       identifierCodes);
 };

@@ -66,7 +66,8 @@ void LR1Controller::fillProcessTable(QTableWidget*             tbl,
 
 static void addTreeNode(QTreeWidgetItem* parent, const SemanticASTNode* n)
 {
-    if (!n) return;
+    if (!n)
+        return;
     auto item = new QTreeWidgetItem(QStringList(n->tag));
     if (parent)
         parent->addChild(item);
@@ -77,7 +78,8 @@ static void addTreeNode(QTreeWidgetItem* parent, const SemanticASTNode* n)
 
 void LR1Controller::fillSemanticTree(QTreeWidget* tree, const SemanticASTNode* root)
 {
-    if (!tree) return;
+    if (!tree)
+        return;
     tree->clear();
     auto item = new QTreeWidgetItem(QStringList(root ? root->tag : QString("(empty)")));
     tree->addTopLevelItem(item);
@@ -221,7 +223,7 @@ void LR1Controller::runLR1Process()
         return;
     }
     auto                   tokensCodes = splitTokens(tokensStr);
-    auto                   tokens      = tokensCodes;
+    QVector<QString>       tokens;
     QMap<QString, QString> tokMap;
     // 优先：转换阶段生成的映射
     QString genMap = Config::generatedOutputDir() + "/syntax/token_map.json";
@@ -265,13 +267,24 @@ void LR1Controller::runLR1Process()
             }
         }
     }
-    int unknown = 0;
-    for (auto& x : tokens)
+    int           unknown = 0;
+    QSet<QString> idNames;
+    for (auto s : Config::identifierTokenNames()) idNames.insert(s.trimmed().toLower());
+    for (int i = 0; i < tokensCodes.size(); ++i)
     {
-        if (tokMap.contains(x))
-            x = tokMap.value(x);
-        else if (x != "$")
+        QString raw    = tokensCodes[i];
+        QString mapped = tokMap.contains(raw) ? tokMap.value(raw) : raw;
+        QString mlow   = mapped.trimmed().toLower();
+        if (mapped != "$" && !tokMap.contains(raw))
             unknown++;
+        if (idNames.contains(mlow))
+        {
+            tokens.push_back(mapped);
+            if (i + 1 < tokensCodes.size())
+                i++;
+            continue;
+        }
+        tokens.push_back(mapped);
     }
     if (unknown > 0)
         notify_->warning(QString("存在未映射的Token编码数量: %1").arg(unknown));
@@ -279,7 +292,8 @@ void LR1Controller::runLR1Process()
     auto roleMeaning = Config::semanticRoleMeaning();
     auto rootPolicy  = Config::semanticRootSelectionPolicy();
     auto childOrder  = Config::semanticChildOrderPolicy();
-    auto r           = LR1Parser::parseWithSemantics(tokens, g, tbl, semanticActions_, roleMeaning, rootPolicy, childOrder);
+    auto r           = LR1Parser::parseWithSemantics(
+        tokens, g, tbl, semanticActions_, roleMeaning, rootPolicy, childOrder);
     if (auto tblw = page_->findChild<QTableWidget*>("tblLR1Process"))
     {
         QVector<QString> cols;

@@ -56,7 +56,8 @@ class Engine
     /** \brief 运行组合词法，返回编码序列 */
     QString                               runMultiple(const QVector<MinDFA>& mdfas,
                                                       const QVector<int>&    codes,
-                                                      const QString&         source);
+                                                      const QString&         source,
+                                                      const QSet<int>&       identifierCodes);
     Grammar                               parseGrammarText(const QString& text, QString& error);
     LL1Info                               computeLL1(const Grammar& g);
     QMap<QString, QVector<QString>>       firstFollowAsRows(const LL1Info& info);

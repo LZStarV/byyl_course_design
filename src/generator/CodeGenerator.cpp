@@ -126,7 +126,8 @@ static QString genStepI(const MinDFA& mdfa, int idx)
 }
 QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas,
                                         const QVector<int>&    codes,
-                                        const Alphabet&        alpha)
+                                        const Alphabet&        alpha,
+                                        const QSet<int>&       identifierCodes)
 {
     QString out;
     out += "#include <cctype>\n";
@@ -184,6 +185,26 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas,
             out += ",";
     }
     out += "};\n\n";
+    {
+        QList<int> ids = QList<int>(identifierCodes.begin(), identifierCodes.end());
+        std::sort(ids.begin(), ids.end());
+        out += "static int IDENT_CODES[" + QString::number(ids.size()) + "]={";
+        for (int i = 0; i < ids.size(); ++i)
+        {
+            out += QString::number(ids[i]);
+            if (i + 1 < ids.size())
+                out += ",";
+        }
+        out += "};\n";
+        out +=
+            "static inline bool isIdentifierCode(int c){ for(size_t "
+            "i=0;i<sizeof(IDENT_CODES)/sizeof(int);++i){ if(IDENT_CODES[i]==c) return true;} "
+            "return false;}\n";
+        out +=
+            "static inline bool emitIdLex(){ const char* "
+            "e=getenv(\"LEXER_EMIT_IDENTIFIER_LEXEME\"); if(!e) return true; string v(e); for(auto "
+            "&ch:v) ch=tolower(ch); return (v==\"1\"||v==\"true\"||v==\"yes\"); }\n\n";
+    }
 
     out += "// 权重函数：用于在匹配长度相同的情况下进行优先级决策\n";
     out += "static inline int codeWeight(int c)\n";
@@ -385,7 +406,11 @@ QString CodeGenerator::generateCombined(const QVector<MinDFA>& mdfas,
     out += "        if (bestLen > 0)\n";
     out += "        {\n";
     out += "            if (!out.empty()) out += ' ';\n";
-    out += "            out += to_string(codeList[bestIdx]);\n";
+    out += "            int code = codeList[bestIdx];\n";
+    out += "            out += to_string(code);\n";
+    out +=
+        "            if (emitIdLex() && isIdentifierCode(code)) { out += ' '; out += "
+        "src.substr(pos,bestLen); }\n";
     out += "            pos += bestLen;\n";
     out += "        }\n";
     out += "        else\n";

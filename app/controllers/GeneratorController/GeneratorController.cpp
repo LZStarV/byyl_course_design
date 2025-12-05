@@ -90,9 +90,27 @@ void GeneratorController::generateCode()
         return;
     }
     QVector<int> codes;
-    auto         mdfas    = engine_->buildAllMinDFA(*mw_->getParsed(), codes);
-    auto         s        = CodeGenerator::generateCombined(mdfas, codes, mw_->getParsed()->alpha);
-    auto         codeView = codeTab_->findChild<QPlainTextEdit*>("txtGeneratedCode");
+    auto         mdfas = engine_->buildAllMinDFA(*mw_->getParsed(), codes);
+    QSet<int>    idCodes;
+    {
+        auto             names = Config::identifierTokenNames();
+        QVector<QString> lowers;
+        for (auto s : names) lowers.push_back(s.trimmed().toLower());
+        for (const auto& pt : mw_->getParsed()->tokens)
+        {
+            QString n = pt.rule.name.trimmed().toLower();
+            for (const auto& k : lowers)
+            {
+                if (!k.isEmpty() && n.contains(k))
+                {
+                    idCodes.insert(pt.rule.code);
+                    break;
+                }
+            }
+        }
+    }
+    auto s        = CodeGenerator::generateCombined(mdfas, codes, mw_->getParsed()->alpha, idCodes);
+    auto codeView = codeTab_->findChild<QPlainTextEdit*>("txtGeneratedCode");
     if (codeView)
         codeView->setPlainText(s);
     QString base    = mw_->ensureGenDirPublic();

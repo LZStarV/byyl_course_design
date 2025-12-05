@@ -1,5 +1,6 @@
 #include <QtTest/QtTest>
 #include "../../src/Engine.h"
+#include "../../src/config/Config.h"
 #include "../../src/syntax/GrammarParser.h"
 #include "../../src/syntax/LR1.h"
 #include "../../src/syntax/LR1Parser.h"
@@ -21,16 +22,51 @@ class TinyLR1FlowTest : public QObject
         auto         pf = engine.parseFile(rf);
         QVector<int> codes;
         auto         mdfas = engine.buildAllMinDFA(pf, codes);
+        QSet<int>    idCodes;
+        {
+            auto             names = Config::identifierTokenNames();
+            QVector<QString> lowers;
+            for (auto s : names) lowers.push_back(s.trimmed().toLower());
+            for (const auto& pt : pf.tokens)
+            {
+                QString n = pt.rule.name.trimmed().toLower();
+                for (const auto& k : lowers)
+                {
+                    if (!k.isEmpty() && n.contains(k))
+                    {
+                        idCodes.insert(pt.rule.code);
+                        break;
+                    }
+                }
+            }
+        }
 
         QFile fs("../tests/test_data/sample/tiny/tiny1.tny");
         QVERIFY(fs.open(QIODevice::ReadOnly | QIODevice::Text));
         QString src = QTextStream(&fs).readAll();
         fs.close();
-        auto tokenStr = engine.runMultiple(mdfas, codes, src);
+        auto tokenStr = engine.runMultiple(mdfas, codes, src, idCodes);
         qWarning() << "[tiny] tokens(raw)" << tokenStr;
         auto             map = TokenMapBuilder::build(regexText, pf);
         QVector<QString> tokens;
-        for (auto x : tokenStr.split(' ', Qt::SkipEmptyParts)) tokens.push_back(map.value(x, x));
+        {
+            auto          raw = tokenStr.split(' ', Qt::SkipEmptyParts);
+            QSet<QString> idNames;
+            for (auto s : Config::identifierTokenNames()) idNames.insert(s.trimmed().toLower());
+            for (int i = 0; i < raw.size(); ++i)
+            {
+                QString mapped = map.value(raw[i], raw[i]);
+                QString mlow   = mapped.trimmed().toLower();
+                if (idNames.contains(mlow))
+                {
+                    tokens.push_back(mapped);
+                    if (i + 1 < raw.size())
+                        i++;
+                    continue;
+                }
+                tokens.push_back(mapped);
+            }
+        }
         QString mapped;
         for (int i = 0; i < tokens.size() && i < 40; ++i)
         {

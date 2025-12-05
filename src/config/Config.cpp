@@ -34,6 +34,8 @@ QString                     Config::s_dotRankdir;
 QString                     Config::s_dotNodeShape;
 QString                     Config::s_dotEpsLabel;
 QVector<QString>            Config::s_cfgSearchPaths;
+bool                        Config::s_emitIdentifierLexeme = true;
+QVector<QString>            Config::s_identifierNames;
 bool                        Config::s_hasOutDirOverride = false;
 QString                     Config::s_outDirOverride;
 bool                        Config::s_hasTiersOverride = false;
@@ -89,23 +91,25 @@ void Config::load()
     s_nontermPat.clear();
     s_multiOps.clear();
     s_singleOps.clear();
-    s_tblMark          = QStringLiteral("标记");
-    s_tblStateId       = QStringLiteral("状态 ID");
-    s_tblStateSet      = QStringLiteral("状态集合");
-    s_tblEpsilonCol    = QStringLiteral("#");
-    s_dotRankdir       = QStringLiteral("LR");
-    s_dotNodeShape     = QStringLiteral("circle");
-    s_dotEpsLabel      = QStringLiteral("ε");
+    s_tblMark       = QStringLiteral("标记");
+    s_tblStateId    = QStringLiteral("状态 ID");
+    s_tblStateSet   = QStringLiteral("状态集合");
+    s_tblEpsilonCol = QStringLiteral("#");
+    s_dotRankdir    = QStringLiteral("LR");
+    s_dotNodeShape  = QStringLiteral("circle");
+    s_dotEpsLabel   = QStringLiteral("ε");
     s_cfgSearchPaths.clear();
-    s_hasOutDirOverride = false;
-    s_hasTiersOverride  = false;
-    s_hasSkipBrace      = false;
-    s_hasSkipLine       = false;
-    s_hasSkipBlock      = false;
-    s_hasSkipHash       = false;
-    s_hasSkipSingle     = false;
-    s_hasSkipDouble     = false;
-    s_hasSkipTemplate   = false;
+    s_emitIdentifierLexeme = true;
+    s_identifierNames      = QVector<QString>({QStringLiteral("identifier")});
+    s_hasOutDirOverride    = false;
+    s_hasTiersOverride     = false;
+    s_hasSkipBrace         = false;
+    s_hasSkipLine          = false;
+    s_hasSkipBlock         = false;
+    s_hasSkipHash          = false;
+    s_hasSkipSingle        = false;
+    s_hasSkipDouble        = false;
+    s_hasSkipTemplate      = false;
 
     // env override for output dir
     QByteArray genDirEnv = qgetenv("BYYL_GEN_DIR");
@@ -216,6 +220,21 @@ void Config::load()
                     s_augSuffix = obj.value("aug_suffix").toString("'");
                 if (obj.contains("lr1_conflict_policy"))
                     s_lr1Policy = obj.value("lr1_conflict_policy").toString("prefer_shift");
+                if (obj.contains("emit_identifier_lexeme"))
+                    s_emitIdentifierLexeme = obj.value("emit_identifier_lexeme").toBool(true);
+                if (obj.contains("identifier_token_names") &&
+                    obj.value("identifier_token_names").isArray())
+                {
+                    s_identifierNames.clear();
+                    for (auto v : obj.value("identifier_token_names").toArray())
+                    {
+                        auto s = v.toString().trimmed();
+                        if (!s.isEmpty())
+                            s_identifierNames.push_back(s);
+                    }
+                    if (s_identifierNames.isEmpty())
+                        s_identifierNames.push_back(QStringLiteral("identifier"));
+                }
                 if (obj.contains("nonterminal_pattern"))
                     s_nontermPat = obj.value("nonterminal_pattern").toString();
                 if (obj.contains("i18n") && obj.value("i18n").isObject())
@@ -237,11 +256,12 @@ void Config::load()
                         {
                             bool ok = false;
                             int  ki = k.toInt(&ok);
-                            if (ok) s_semRoleMeaning[ki] = rm.value(k).toString();
+                            if (ok)
+                                s_semRoleMeaning[ki] = rm.value(k).toString();
                         }
                     }
-                    s_semRootPolicy  = so.value("root_selection_policy").toString();
-                    s_semChildOrder  = so.value("child_order_policy").toString();
+                    s_semRootPolicy = so.value("root_selection_policy").toString();
+                    s_semChildOrder = so.value("child_order_policy").toString();
                 }
                 if (obj.contains("dot") && obj.value("dot").isObject())
                 {
@@ -295,8 +315,10 @@ void Config::load()
         s_semRoleMeaning[1] = "root";
         s_semRoleMeaning[2] = "child";
     }
-    if (s_semRootPolicy.trimmed().isEmpty()) s_semRootPolicy = "first_1";
-    if (s_semChildOrder.trimmed().isEmpty()) s_semChildOrder = "rhs_order";
+    if (s_semRootPolicy.trimmed().isEmpty())
+        s_semRootPolicy = "first_1";
+    if (s_semChildOrder.trimmed().isEmpty())
+        s_semChildOrder = "rhs_order";
 }
 
 void Config::reload()
@@ -499,7 +521,6 @@ QVector<QString> Config::grammarSingleOps()
     load();
     return s_singleOps;
 }
-
 
 QString Config::tableMarkLabel()
 {
@@ -904,6 +925,8 @@ bool Config::saveJson(const QString& path)
         tiersArr.append(o);
     }
     obj.insert("weight_tiers", tiersArr);
+    if (!s_syntaxDir.isEmpty()) obj.insert("syntax_output_dir", s_syntaxDir);
+    if (!s_graphsDir.isEmpty()) obj.insert("graphs_dir", s_graphsDir);
     obj.insert("skip_brace_comment", s_hasSkipBrace ? s_skipBrace : skipBraceComment());
     obj.insert("skip_line_comment", s_hasSkipLine ? s_skipLine : skipLineComment());
     obj.insert("skip_block_comment", s_hasSkipBlock ? s_skipBlock : skipBlockComment());
@@ -913,6 +936,91 @@ bool Config::saveJson(const QString& path)
     obj.insert("skip_double_quote_string",
                s_hasSkipDouble ? s_skipDouble : skipDoubleQuoteString());
     obj.insert("skip_template_string", s_hasSkipTemplate ? s_skipTemplate : skipTemplateString());
+    obj.insert("emit_identifier_lexeme", s_emitIdentifierLexeme);
+    {
+        QJsonArray arr;
+        for (const auto& s : s_identifierNames) arr.append(s);
+        obj.insert("identifier_token_names", arr);
+    }
+    // whitespaces
+    {
+        QJsonArray arr;
+        for (auto c : s_ws)
+        {
+            if (c == '\t') arr.append("\\t");
+            else if (c == '\n') arr.append("\\n");
+            else if (c == '\r') arr.append("\\r");
+            else arr.append(QString(c));
+        }
+        obj.insert("whitespaces", arr);
+    }
+    // macro names
+    {
+        QJsonObject mo;
+        mo.insert("letter", s_macroLetter);
+        mo.insert("digit", s_macroDigit);
+        obj.insert("macro_names", mo);
+    }
+    // token_map
+    {
+        QJsonObject to;
+        to.insert("use_heuristics", s_tokenMapUseHeuristics);
+        obj.insert("token_map", to);
+    }
+    // graphviz
+    {
+        QJsonObject go;
+        go.insert("executable", s_graphvizExe);
+        go.insert("default_dpi", s_graphvizDpi);
+        go.insert("timeout_ms", s_graphvizTimeout);
+        obj.insert("graphviz", go);
+    }
+    // syntax configs
+    obj.insert("epsilon_symbol", s_epsilon);
+    obj.insert("eof_symbol", s_eof);
+    obj.insert("aug_suffix", s_augSuffix);
+    obj.insert("lr1_conflict_policy", s_lr1Policy);
+    if (!s_nontermPat.trimmed().isEmpty()) obj.insert("nonterminal_pattern", s_nontermPat);
+    {
+        QJsonObject gt;
+        QJsonArray  mo;
+        for (const auto& s : s_multiOps) mo.append(s);
+        QJsonArray so;
+        for (const auto& s : s_singleOps) so.append(s);
+        gt.insert("multi_ops", mo);
+        gt.insert("single_ops", so);
+        obj.insert("grammar_tokens", gt);
+    }
+    // i18n table labels
+    {
+        QJsonObject io;
+        io.insert("table_mark", s_tblMark);
+        io.insert("table_state_id", s_tblStateId);
+        io.insert("table_state_set", s_tblStateSet);
+        io.insert("epsilon_column_label", s_tblEpsilonCol);
+        obj.insert("i18n", io);
+    }
+    // dot style
+    {
+        QJsonObject d;
+        d.insert("rankdir", s_dotRankdir);
+        d.insert("node_shape", s_dotNodeShape);
+        d.insert("epsilon_label", s_dotEpsLabel);
+        obj.insert("dot", d);
+    }
+    // config search paths
+    {
+        QJsonArray arr;
+        for (const auto& p : s_cfgSearchPaths) arr.append(p);
+        obj.insert("config_search_paths", arr);
+    }
+    // semantic policies
+    {
+        QJsonObject so;
+        so.insert("root_selection_policy", s_semRootPolicy);
+        so.insert("child_order_policy", s_semChildOrder);
+        obj.insert("semantic_actions", so);
+    }
     QJsonDocument doc(obj);
     QFile         f(path);
     if (!QDir(QFileInfo(path).absolutePath()).exists())
@@ -940,3 +1048,162 @@ QString Config::semanticChildOrderPolicy()
     load();
     return s_semChildOrder;
 }
+void Config::setSyntaxOutputDir(const QString& dir)
+{
+    load();
+    s_syntaxDir = dir.trimmed();
+}
+void Config::setGraphsDir(const QString& dir)
+{
+    load();
+    s_graphsDir = dir.trimmed();
+}
+void Config::setMacroLetterName(const QString& name)
+{
+    load();
+    s_macroLetter = name.trimmed();
+}
+void Config::setMacroDigitName(const QString& name)
+{
+    load();
+    s_macroDigit = name.trimmed();
+}
+void Config::setWhitespaces(const QVector<QChar>& ws)
+{
+    load();
+    s_ws = ws;
+}
+void Config::setTokenMapUseHeuristics(bool v)
+{
+    load();
+    s_tokenMapUseHeuristics = v;
+}
+void Config::setGraphvizExecutable(const QString& exe)
+{
+    load();
+    s_graphvizExe = exe.trimmed();
+}
+void Config::setGraphvizDefaultDpi(int dpi)
+{
+    load();
+    if (dpi > 0) s_graphvizDpi = dpi;
+}
+void Config::setGraphvizTimeoutMs(int ms)
+{
+    load();
+    if (ms > 0) s_graphvizTimeout = ms;
+}
+void Config::setEpsilonSymbol(const QString& s)
+{
+    load();
+    s_epsilon = s;
+}
+void Config::setEofSymbol(const QString& s)
+{
+    load();
+    s_eof = s;
+}
+void Config::setAugSuffix(const QString& s)
+{
+    load();
+    s_augSuffix = s;
+}
+void Config::setLr1ConflictPolicy(const QString& p)
+{
+    load();
+    s_lr1Policy = p.trimmed();
+}
+void Config::setNonterminalPattern(const QString& pat)
+{
+    load();
+    s_nontermPat = pat;
+}
+void Config::setGrammarMultiOps(const QVector<QString>& ops)
+{
+    load();
+    s_multiOps = ops;
+}
+void Config::setGrammarSingleOps(const QVector<QString>& ops)
+{
+    load();
+    s_singleOps = ops;
+}
+void Config::setTableMarkLabel(const QString& s)
+{
+    load();
+    s_tblMark = s;
+}
+void Config::setTableStateIdLabel(const QString& s)
+{
+    load();
+    s_tblStateId = s;
+}
+void Config::setTableStateSetLabel(const QString& s)
+{
+    load();
+    s_tblStateSet = s;
+}
+void Config::setEpsilonColumnLabel(const QString& s)
+{
+    load();
+    s_tblEpsilonCol = s;
+}
+void Config::setDotRankdir(const QString& s)
+{
+    load();
+    s_dotRankdir = s;
+}
+void Config::setDotNodeShape(const QString& s)
+{
+    load();
+    s_dotNodeShape = s;
+}
+void Config::setDotEpsilonLabel(const QString& s)
+{
+    load();
+    s_dotEpsLabel = s;
+}
+void Config::setConfigSearchPaths(const QVector<QString>& paths)
+{
+    load();
+    s_cfgSearchPaths = paths;
+}
+void Config::setSemanticRootSelectionPolicy(const QString& p)
+{
+    load();
+    s_semRootPolicy = p.trimmed();
+}
+void Config::setSemanticChildOrderPolicy(const QString& p)
+{
+    load();
+    s_semChildOrder = p.trimmed();
+}
+bool Config::emitIdentifierLexeme()
+{
+    load();
+    return s_emitIdentifierLexeme;
+}
+
+QVector<QString> Config::identifierTokenNames()
+{
+    load();
+    return s_identifierNames;
+}
+void Config::setEmitIdentifierLexeme(bool v)
+{
+    load();
+    s_emitIdentifierLexeme = v;
+}
+void Config::setIdentifierTokenNames(const QVector<QString>& names)
+{
+    load();
+    s_identifierNames.clear();
+    for (auto s : names)
+    {
+        auto t = s.trimmed();
+        if (!t.isEmpty()) s_identifierNames.push_back(t);
+    }
+    if (s_identifierNames.isEmpty()) s_identifierNames.push_back(QStringLiteral("identifier"));
+}
+
+ 

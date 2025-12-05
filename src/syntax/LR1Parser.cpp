@@ -159,12 +159,12 @@ static SemanticASTNode* makeSemNode(const QString& tag)
     return n;
 }
 
-static SemanticASTNode* buildSemantic(const QString&                           L,
-                                      const QVector<SemanticASTNode*>&         semKids,
-                                      const QVector<int>&                      roles,
-                                      const QMap<int, QString>&                roleMeaning,
-                                      const QString&                           rootPolicy,
-                                      const QString&                           childOrder)
+static SemanticASTNode* buildSemantic(const QString&                   L,
+                                      const QVector<SemanticASTNode*>& semKids,
+                                      const QVector<int>&              roles,
+                                      const QMap<int, QString>&        roleMeaning,
+                                      const QString&                   rootPolicy,
+                                      const QString&                   childOrder)
 {
     int rootIdx = -1;
     for (int i = 0; i < roles.size(); ++i)
@@ -172,13 +172,16 @@ static SemanticASTNode* buildSemantic(const QString&                           L
         auto m = roleMeaning.value(roles[i]);
         if (m == "root")
         {
-            if (rootIdx < 0) rootIdx = i;
-            else if (rootPolicy == "last_1") rootIdx = i;
+            if (rootIdx < 0)
+                rootIdx = i;
+            else if (rootPolicy == "last_1")
+                rootIdx = i;
         }
     }
     QVector<int> childIdx;
     for (int i = 0; i < roles.size(); ++i)
-        if (roleMeaning.value(roles[i]) == "child") childIdx.push_back(i);
+        if (roleMeaning.value(roles[i]) == "child")
+            childIdx.push_back(i);
     SemanticASTNode* root = nullptr;
     if (rootIdx >= 0)
     {
@@ -193,14 +196,16 @@ static SemanticASTNode* buildSemantic(const QString&                           L
     {
         for (int idx : childIdx)
         {
-            if (idx < semKids.size() && semKids[idx]) root->children.push_back(semKids[idx]);
+            if (idx < semKids.size() && semKids[idx])
+                root->children.push_back(semKids[idx]);
         }
     }
     else
     {
         for (int idx : childIdx)
         {
-            if (idx < semKids.size() && semKids[idx]) root->children.push_back(semKids[idx]);
+            if (idx < semKids.size() && semKids[idx])
+                root->children.push_back(semKids[idx]);
         }
     }
     return root;
@@ -363,7 +368,8 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<QString>&               
                         }
                     }
                 }
-                if (pick >= 0 && pick < vec.size()) roles = vec[pick];
+                if (pick >= 0 && pick < vec.size())
+                    roles = vec[pick];
             }
             auto sem = buildSemantic(L, semKids, roles, roleMeaning, rootPolicy, childOrder);
             semStk.push_back(sem);

@@ -73,7 +73,7 @@ class CliRegexTest : public QObject
         }
         QVERIFY(mdfas.size() == codes.size());
         auto src_ok  = QStringLiteral("abc123 456 def789");
-        auto out_ok  = eng.runMultiple(mdfas, codes, src_ok);
+        auto out_ok  = eng.runMultiple(mdfas, codes, src_ok, QSet<int>());
         auto toks_ok = out_ok.split(' ', Qt::SkipEmptyParts);
         int  err_ok  = 0;
         for (const auto& s : toks_ok)
@@ -87,7 +87,7 @@ class CliRegexTest : public QObject
                             << "\n";
         QVERIFY(err_ok == 0);
         auto src_mix  = QStringLiteral("if return == var abc123");
-        auto out_mix  = eng.runMultiple(mdfas, codes, src_mix);
+        auto out_mix  = eng.runMultiple(mdfas, codes, src_mix, QSet<int>());
         auto toks_mix = out_mix.split(' ', Qt::SkipEmptyParts);
         int  err_mix  = 0;
         for (const auto& s : toks_mix)
@@ -101,7 +101,7 @@ class CliRegexTest : public QObject
                             << "\n";
         QVERIFY(err_mix == 0);
         auto src_all  = QStringLiteral("abc123 def456\nif return == var abc123");
-        auto out_all  = eng.runMultiple(mdfas, codes, src_all);
+        auto out_all  = eng.runMultiple(mdfas, codes, src_all, QSet<int>());
         auto toks_all = out_all.split(' ', Qt::SkipEmptyParts);
         int  err_all  = 0;
         for (const auto& s : toks_all)
@@ -145,7 +145,7 @@ class CliRegexTest : public QObject
         {
             src = QStringLiteral("{ comment }\nREAD x;\nwrite 123\nif x < 10 then read y end\n");
         }
-        auto out  = eng.runMultiple(mdfas, codes, src);
+        auto out  = eng.runMultiple(mdfas, codes, src, QSet<int>());
         auto toks = out.split(' ', Qt::SkipEmptyParts);
         int  err  = 0;
         for (const auto& s : toks)
@@ -188,7 +188,7 @@ class CliRegexTest : public QObject
             src = QStringLiteral(
                 "public class Main1{ public static void main(String[] args){ int x=123; "
                 "System.out.println(x); } }");
-        auto out = eng.runMultiple(mdfas, codes, src);
+        auto out = eng.runMultiple(mdfas, codes, src, QSet<int>());
         QTextStream(stdout) << "【cpp 输出】" << out << "\n";
         auto toks = out.split(' ', Qt::SkipEmptyParts);
         int  err  = 0;
@@ -236,7 +236,7 @@ class CliRegexTest : public QObject
         qputenv("LEXER_SKIP_SQ_STRING", QByteArray("1"));
         qputenv("LEXER_SKIP_DQ_STRING", QByteArray("1"));
         qputenv("LEXER_SKIP_TPL_STRING", QByteArray("1"));
-        auto out = eng.runMultiple(mdfas, codes, src);
+        auto out = eng.runMultiple(mdfas, codes, src, QSet<int>());
         QTextStream(stdout) << "【rust 输出】" << out << "\n";
         auto toks = out.split(' ', Qt::SkipEmptyParts);
         int  err  = 0;
@@ -281,7 +281,7 @@ class CliRegexTest : public QObject
         qputenv("LEXER_SKIP_SQ_STRING", QByteArray("1"));
         qputenv("LEXER_SKIP_DQ_STRING", QByteArray("1"));
         qputenv("LEXER_SKIP_TPL_STRING", QByteArray("1"));
-        auto out = eng.runMultiple(mdfas, codes, src);
+        auto out = eng.runMultiple(mdfas, codes, src, QSet<int>());
         QTextStream(stdout) << "【rust 输出】" << out << "\n";
         auto toks = out.split(' ', Qt::SkipEmptyParts);
         int  err  = 0;
@@ -322,7 +322,7 @@ class CliRegexTest : public QObject
             src = QStringLiteral("let x = 123;");
         else
             src = QStringLiteral("let x = 123;");
-        auto out  = eng.runMultiple(mdfas, codes, src);
+        auto out  = eng.runMultiple(mdfas, codes, src, QSet<int>());
         auto toks = out.split(' ', Qt::SkipEmptyParts);
         int  err  = 0;
         for (const auto& s : toks)

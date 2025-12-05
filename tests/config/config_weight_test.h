@@ -17,12 +17,12 @@ class ConfigWeightTest : public QObject
         auto         parsed = eng.parseFile(rf);
         QVector<int> codes;
         auto         mdfas        = eng.buildAllMinDFA(parsed, codes);
-        auto         out_default  = eng.runMultiple(mdfas, codes, QStringLiteral("a"));
+        auto         out_default  = eng.runMultiple(mdfas, codes, QStringLiteral("a"), QSet<int>());
         auto         toks_default = out_default.split(' ', Qt::SkipEmptyParts);
         QVERIFY(!toks_default.isEmpty());
         QCOMPARE(toks_default[0], QString::number(220));
         qputenv("LEXER_WEIGHTS", QByteArray("100:5,220:1,0:0"));
-        auto out_env  = eng.runMultiple(mdfas, codes, QStringLiteral("a"));
+        auto out_env  = eng.runMultiple(mdfas, codes, QStringLiteral("a"), QSet<int>());
         auto toks_env = out_env.split(' ', Qt::SkipEmptyParts);
         QVERIFY(!toks_env.isEmpty());
         QCOMPARE(toks_env[0], QString::number(100));
