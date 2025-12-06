@@ -10,11 +10,11 @@ class SyntaxParserTest : public QObject
     void parse_tokens_basic()
     {
         QString err;
-        auto    g    = GrammarParser::parseString("s -> a s | #\n", err);
+        auto    g = GrammarParser::parseString("s -> a s | #\n", err);
         QVERIFY(err.isEmpty());
-        auto info = LL1::compute(g);
+        auto             info = LL1::compute(g);
         QVector<QString> toks = {QStringLiteral("a"), QStringLiteral("a")};
-        auto res = parseTokens(toks, g, info);
+        auto             res  = parseTokens(toks, g, info);
         QVERIFY(res.errorPos < 0);
         QVERIFY(res.root != nullptr);
         QVERIFY(res.root->symbol == QStringLiteral("s"));
@@ -22,10 +22,12 @@ class SyntaxParserTest : public QObject
     }
     void parse_epsilon_branch()
     {
-        QString err; auto g = GrammarParser::parseString("S -> #\n", err); QVERIFY(err.isEmpty());
-        auto info = LL1::compute(g);
-        QVector<QString> toks; // empty input
-        auto res = parseTokens(toks, g, info);
+        QString err;
+        auto    g = GrammarParser::parseString("S -> #\n", err);
+        QVERIFY(err.isEmpty());
+        auto             info = LL1::compute(g);
+        QVector<QString> toks;  // empty input
+        auto             res = parseTokens(toks, g, info);
         QVERIFY(res.errorPos < 0);
         QVERIFY(res.root != nullptr);
         QVERIFY(res.root->symbol == QStringLiteral("S"));

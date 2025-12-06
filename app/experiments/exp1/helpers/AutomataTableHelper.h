@@ -12,7 +12,7 @@ class AutomataTableHelper
     static void                       pruneEmptyColumns(QTableWidget* tbl);
     static QMap<QString, QSet<QChar>> buildMacroSets(const QMap<QString, Rule>& macros);
     static QMap<QString, QString>     buildMacroExprs(const QMap<QString, Rule>& macros);
-    static void             aggregateByMacros(Tables& t,
-                                             const QMap<QString, QSet<QChar>>& macroSets,
-                                             const QMap<QString, QString>&     macroExprs);
+    static void                       aggregateByMacros(Tables&                           t,
+                                                        const QMap<QString, QSet<QChar>>& macroSets,
+                                                        const QMap<QString, QString>&     macroExprs);
 };

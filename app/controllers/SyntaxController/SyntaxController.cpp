@@ -335,16 +335,20 @@ void SyntaxController::previewLR0()
     }
     auto    gr  = LR0Builder::build(grammar_);
     QString dot = LR0Builder::toDot(gr);
-    QString png;
     int     dpi = Config::graphvizDefaultDpi();
-    if (!SyntaxController::renderDotFromContentLocal(dot, png, dpi))
+    if (auto e = page_->findChild<QLineEdit*>("edtGraphDpiLR0");
+        e && !e->text().trimmed().isEmpty())
+        dpi = e->text().trimmed().toInt();
+    if (!dotSvc_)
+        return;
+    QString png;
+    if (!dotSvc_->renderToTempPng(dot, png, dpi))
     {
         notify_->error("渲染失败");
         return;
     }
-    mw_->previewImage(png, "LR(0) 项集 DFA 预览");
+    dotSvc_->previewPng(png, "LR(0) 项集 DFA 预览");
     QFile::remove(png);
-    notify_->info("LR(0) DFA 已更新");
 }
 
 void SyntaxController::exportLR0Dot()

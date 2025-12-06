@@ -65,7 +65,7 @@ static QVector<LR1Item> closureLL1(const Grammar& g, const LL1Info& info, const 
             if (it.dot < it.right.size())
             {
                 QString B = it.right[it.dot];
-                if (!isTerminal(g.terminals, B) && B != "#")
+                if (!isTerminal(g.terminals, B) && B != Config::epsilonSymbol())
                 {
                     // β = right[dot+1..]
                     QVector<QString> beta;
@@ -131,7 +131,7 @@ LR1Graph LR1Builder::build(const Grammar& g)
     if (!aug.startSymbol.isEmpty())
     {
         // 增广文法 S' -> S
-        QString Sprime = g.startSymbol + "'";
+        QString Sprime = g.startSymbol + Config::augSuffix();
         if (!aug.productions.contains(Sprime))
         {
             aug.productions[Sprime].push_back({Sprime, QVector<QString>{g.startSymbol}, -1});
@@ -144,11 +144,11 @@ LR1Graph LR1Builder::build(const Grammar& g)
         return LR1Graph{};
     }
     LL1Info          info = LL1::compute(aug);
-    QVector<LR1Item> I0 =
-        closureLL1(aug,
-                   info,
-                   QVector<LR1Item>{LR1Item{
-                       aug.startSymbol, aug.productions[aug.startSymbol][0].right, 0, "$"}});
+    QVector<LR1Item> I0   = closureLL1(
+        aug,
+        info,
+        QVector<LR1Item>{LR1Item{
+            aug.startSymbol, aug.productions[aug.startSymbol][0].right, 0, Config::eofSymbol()}});
     LR1Graph gr;
     gr.states.push_back(I0);
     QMap<QString, int> stateIndex;

@@ -628,56 +628,238 @@ QMap<QString, QMap<QString, QString>> Engine::parsingTableAsRows(const Grammar& 
 }
 static QSet<QChar> expandRangesLocal(const QString& ranges)
 {
-    QSet<QChar> set; int i=0; int n=ranges.size();
-    auto skip=[&](){ while(i<n && (ranges[i]==' '||ranges[i]=='\t')) i++; };
+    QSet<QChar> set;
+    int         i    = 0;
+    int         n    = ranges.size();
+    auto        skip = [&]()
+    {
+        while (i < n && (ranges[i] == ' ' || ranges[i] == '\t')) i++;
+    };
     skip();
-    while(i<n){ skip(); if(i>=n) break; QChar a=ranges[i++]; if(i<n && ranges[i]=='-'){ i++; if(i<n){ QChar b=ranges[i++]; ushort ua=a.unicode(), ub=b.unicode(); if(ua<=ub){ for(ushort u=ua; u<=ub; ++u) set.insert(QChar(u)); } else { for(ushort u=ub; u<=ua; ++u) set.insert(QChar(u)); } } } else { set.insert(a);} skip(); if(i<n && (ranges[i]==','||ranges[i]==';')) i++; skip(); }
+    while (i < n)
+    {
+        skip();
+        if (i >= n)
+            break;
+        QChar a = ranges[i++];
+        if (i < n && ranges[i] == '-')
+        {
+            i++;
+            if (i < n)
+            {
+                QChar  b  = ranges[i++];
+                ushort ua = a.unicode(), ub = b.unicode();
+                if (ua <= ub)
+                {
+                    for (ushort u = ua; u <= ub; ++u) set.insert(QChar(u));
+                }
+                else
+                {
+                    for (ushort u = ub; u <= ua; ++u) set.insert(QChar(u));
+                }
+            }
+        }
+        else
+        {
+            set.insert(a);
+        }
+        skip();
+        if (i < n && (ranges[i] == ',' || ranges[i] == ';'))
+            i++;
+        skip();
+    }
     return set;
 }
-static QMap<QString,QSet<QChar>> macroSetsFromRules(const QMap<QString, Rule>& macros)
+static QMap<QString, QSet<QChar>> macroSetsFromRules(const QMap<QString, Rule>& macros)
 {
-    QMap<QString,QSet<QChar>> m; auto keys=macros.keys();
-    for(const auto& k: keys){ const auto& r=macros.value(k); QSet<QChar> set; const QString& expr=r.expr; int i=0,n=expr.size();
-        while(i<n){ while(i<n && (expr[i]==' '||expr[i]=='\t'||expr[i]=='\n'||expr[i]=='\r')) i++; if(i>=n) break; if(expr[i]=='['){ int j=i+1; QString ranges; while(j<n && expr[j]!=']'){ ranges.append(expr[j]); j++; } if(j<n && expr[j]==']'){ set.unite(expandRangesLocal(ranges)); i=j+1; } else break; }
-        else if(expr[i]=='('){ int j=i+1, depth=1; QString inner; while(j<n && depth>0){ if(expr[j]=='(') depth++; else if(expr[j]==')') depth--; if(depth>0) inner.append(expr[j]); j++; } set.unite(expandRangesLocal(inner)); i=j; }
-        else if(expr[i]=='\\'){ if(i+1<n){ set.insert(expr[i+1]); i+=2; } else break; }
-        else { set.insert(expr[i]); i++; } }
-        if(!set.isEmpty()) m.insert(r.name, set);
+    QMap<QString, QSet<QChar>> m;
+    auto                       keys = macros.keys();
+    for (const auto& k : keys)
+    {
+        const auto&    r = macros.value(k);
+        QSet<QChar>    set;
+        const QString& expr = r.expr;
+        int            i = 0, n = expr.size();
+        while (i < n)
+        {
+            while (i < n &&
+                   (expr[i] == ' ' || expr[i] == '\t' || expr[i] == '\n' || expr[i] == '\r'))
+                i++;
+            if (i >= n)
+                break;
+            if (expr[i] == '[')
+            {
+                int     j = i + 1;
+                QString ranges;
+                while (j < n && expr[j] != ']')
+                {
+                    ranges.append(expr[j]);
+                    j++;
+                }
+                if (j < n && expr[j] == ']')
+                {
+                    set.unite(expandRangesLocal(ranges));
+                    i = j + 1;
+                }
+                else
+                    break;
+            }
+            else if (expr[i] == '(')
+            {
+                int     j = i + 1, depth = 1;
+                QString inner;
+                while (j < n && depth > 0)
+                {
+                    if (expr[j] == '(')
+                        depth++;
+                    else if (expr[j] == ')')
+                        depth--;
+                    if (depth > 0)
+                        inner.append(expr[j]);
+                    j++;
+                }
+                set.unite(expandRangesLocal(inner));
+                i = j;
+            }
+            else if (expr[i] == '\\')
+            {
+                if (i + 1 < n)
+                {
+                    set.insert(expr[i + 1]);
+                    i += 2;
+                }
+                else
+                    break;
+            }
+            else
+            {
+                set.insert(expr[i]);
+                i++;
+            }
+        }
+        if (!set.isEmpty())
+            m.insert(r.name, set);
     }
     return m;
 }
-static QMap<QString,QString> macroExprsFromRules(const QMap<QString, Rule>& macros)
+static QMap<QString, QString> macroExprsFromRules(const QMap<QString, Rule>& macros)
 {
-    QMap<QString,QString> m; for(auto it=macros.begin(); it!=macros.end(); ++it){ m.insert(it->name, it->expr);} return m;
+    QMap<QString, QString> m;
+    for (auto it = macros.begin(); it != macros.end(); ++it)
+    {
+        m.insert(it->name, it->expr);
+    }
+    return m;
 }
-static void aggregateTableByMacros(Tables& t,
-                                   const QMap<QString,QSet<QChar>>& msets,
-                                   const QMap<QString,QString>& mexpr)
+static void aggregateTableByMacros(Tables&                           t,
+                                   const QMap<QString, QSet<QChar>>& msets,
+                                   const QMap<QString, QString>&     mexpr)
 {
-    if(msets.isEmpty()) return; int colCount=t.columns.size(); if(colCount<3) return;
-    bool hasEps = (colCount>0 && t.columns.last()==QStringLiteral("#"));
-    int symStart=2; int symEnd=hasEps?(colCount-1):colCount;
-    QMap<QChar,int> charIdx; for(int ci=symStart; ci<symEnd; ++ci){ const QString& c=t.columns[ci]; if(c.size()==1) charIdx.insert(c[0], ci); }
-    QSet<int> removeIdx; QVector<QString> newCols; newCols<<t.columns[0]<<t.columns[1]; QVector<int> keepIdx;
-    auto mkeys=msets.keys(); std::sort(mkeys.begin(), mkeys.end()); QMap<QString,QVector<int>> macroHit;
-    for(const auto& name: mkeys){ const auto& set=msets.value(name); QVector<int> idxs; for(auto ch: set){ if(charIdx.contains(ch)) idxs.push_back(charIdx.value(ch)); }
-        if(!idxs.isEmpty()){ std::sort(idxs.begin(), idxs.end()); macroHit.insert(name, idxs); for(int id: idxs) removeIdx.insert(id); QString label=name; if(mexpr.contains(name)) label+=QStringLiteral(" (")+mexpr.value(name)+QStringLiteral(")"); newCols.push_back(label);} }
-    for(int ci=symStart; ci<symEnd; ++ci){ if(!removeIdx.contains(ci)){ newCols.push_back(t.columns[ci]); keepIdx.push_back(ci);} }
-    if(hasEps) newCols.push_back(QStringLiteral("#"));
-    auto mergeTargets=[&](const QStringList& parts){ QSet<QString> uniq; for(const auto& p: parts){ for(const auto& seg: p.split(',', Qt::SkipEmptyParts)) uniq.insert(seg.trimmed()); } QList<QString> v=QList<QString>(uniq.begin(), uniq.end()); std::sort(v.begin(), v.end()); return v.isEmpty()?QString():v.join(','); };
-    QVector<QVector<QString>> newRows; for(const auto& row: t.rows){ QVector<QString> nr; nr<<row[0]<<row[1]; for(const auto& name: mkeys){ if(!macroHit.contains(name)) continue; QStringList parts; for(int id: macroHit.value(name)) parts<<row[id]; nr.push_back(mergeTargets(parts)); }
-        for(int id: keepIdx) nr.push_back(row[id]); if(hasEps) nr.push_back(row[symEnd]); newRows.push_back(nr); }
-    t.columns=newCols; t.rows=newRows;
+    if (msets.isEmpty())
+        return;
+    int colCount = t.columns.size();
+    if (colCount < 3)
+        return;
+    bool             hasEps   = (colCount > 0 && t.columns.last() == QStringLiteral("#"));
+    int              symStart = 2;
+    int              symEnd   = hasEps ? (colCount - 1) : colCount;
+    QMap<QChar, int> charIdx;
+    for (int ci = symStart; ci < symEnd; ++ci)
+    {
+        const QString& c = t.columns[ci];
+        if (c.size() == 1)
+            charIdx.insert(c[0], ci);
+    }
+    QSet<int>        removeIdx;
+    QVector<QString> newCols;
+    newCols << t.columns[0] << t.columns[1];
+    QVector<int> keepIdx;
+    auto         mkeys = msets.keys();
+    std::sort(mkeys.begin(), mkeys.end());
+    QMap<QString, QVector<int>> macroHit;
+    for (const auto& name : mkeys)
+    {
+        const auto&  set = msets.value(name);
+        QVector<int> idxs;
+        for (auto ch : set)
+        {
+            if (charIdx.contains(ch))
+                idxs.push_back(charIdx.value(ch));
+        }
+        if (!idxs.isEmpty())
+        {
+            std::sort(idxs.begin(), idxs.end());
+            macroHit.insert(name, idxs);
+            for (int id : idxs) removeIdx.insert(id);
+            QString label = name;
+            if (mexpr.contains(name))
+                label += QStringLiteral(" (") + mexpr.value(name) + QStringLiteral(")");
+            newCols.push_back(label);
+        }
+    }
+    for (int ci = symStart; ci < symEnd; ++ci)
+    {
+        if (!removeIdx.contains(ci))
+        {
+            newCols.push_back(t.columns[ci]);
+            keepIdx.push_back(ci);
+        }
+    }
+    if (hasEps)
+        newCols.push_back(QStringLiteral("#"));
+    auto mergeTargets = [&](const QStringList& parts)
+    {
+        QSet<QString> uniq;
+        for (const auto& p : parts)
+        {
+            for (const auto& seg : p.split(',', Qt::SkipEmptyParts)) uniq.insert(seg.trimmed());
+        }
+        QList<QString> v = QList<QString>(uniq.begin(), uniq.end());
+        std::sort(v.begin(), v.end());
+        return v.isEmpty() ? QString() : v.join(',');
+    };
+    QVector<QVector<QString>> newRows;
+    for (const auto& row : t.rows)
+    {
+        QVector<QString> nr;
+        nr << row[0] << row[1];
+        for (const auto& name : mkeys)
+        {
+            if (!macroHit.contains(name))
+                continue;
+            QStringList parts;
+            for (int id : macroHit.value(name)) parts << row[id];
+            nr.push_back(mergeTargets(parts));
+        }
+        for (int id : keepIdx) nr.push_back(row[id]);
+        if (hasEps)
+            nr.push_back(row[symEnd]);
+        newRows.push_back(nr);
+    }
+    t.columns = newCols;
+    t.rows    = newRows;
 }
 Tables Engine::nfaTableWithMacros(const NFA& nfa, const QMap<QString, Rule>& macros)
 {
-    Tables t = tableFromNFA(nfa); auto msets=macroSetsFromRules(macros); auto mexpr=macroExprsFromRules(macros); aggregateTableByMacros(t, msets, mexpr); return t;
+    Tables t     = tableFromNFA(nfa);
+    auto   msets = macroSetsFromRules(macros);
+    auto   mexpr = macroExprsFromRules(macros);
+    aggregateTableByMacros(t, msets, mexpr);
+    return t;
 }
 Tables Engine::dfaTableWithMacros(const DFA& dfa, const QMap<QString, Rule>& macros)
 {
-    Tables t = tableFromDFA(dfa); auto msets=macroSetsFromRules(macros); auto mexpr=macroExprsFromRules(macros); aggregateTableByMacros(t, msets, mexpr); return t;
+    Tables t     = tableFromDFA(dfa);
+    auto   msets = macroSetsFromRules(macros);
+    auto   mexpr = macroExprsFromRules(macros);
+    aggregateTableByMacros(t, msets, mexpr);
+    return t;
 }
 Tables Engine::minTableWithMacros(const MinDFA& dfa, const QMap<QString, Rule>& macros)
 {
-    Tables t = tableFromMin(dfa); auto msets=macroSetsFromRules(macros); auto mexpr=macroExprsFromRules(macros); aggregateTableByMacros(t, msets, mexpr); return t;
+    Tables t     = tableFromMin(dfa);
+    auto   msets = macroSetsFromRules(macros);
+    auto   mexpr = macroExprsFromRules(macros);
+    aggregateTableByMacros(t, msets, mexpr);
+    return t;
 }

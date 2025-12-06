@@ -215,7 +215,7 @@ static QString mergeTargets(const QStringList& parts)
     return v.isEmpty() ? QString() : v.join(',');
 }
 
-void AutomataTableHelper::aggregateByMacros(Tables& t,
+void AutomataTableHelper::aggregateByMacros(Tables&                           t,
                                             const QMap<QString, QSet<QChar>>& macroSets,
                                             const QMap<QString, QString>&     macroExprs)
 {
@@ -257,7 +257,8 @@ void AutomataTableHelper::aggregateByMacros(Tables& t,
             macroHitCols.insert(name, idxs);
             for (int id : idxs) removeIdx.insert(id);
             QString label = name;
-            if (macroExprs.contains(name)) label += QStringLiteral(" (") + macroExprs.value(name) + QStringLiteral(")");
+            if (macroExprs.contains(name))
+                label += QStringLiteral(" (") + macroExprs.value(name) + QStringLiteral(")");
             newCols.push_back(label);
         }
     }

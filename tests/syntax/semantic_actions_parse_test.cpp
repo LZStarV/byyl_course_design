@@ -31,10 +31,12 @@ static QMap<QString, QVector<QVector<int>>> parseActions(const QVector<QString>&
     return m;
 }
 
-class SemanticActionsParseTest : public QObject {
+class SemanticActionsParseTest : public QObject
+{
     Q_OBJECT
-  private slots:
-    void basic() {
+   private slots:
+    void basic()
+    {
         QVector<QString> lines = {
             QStringLiteral("read-stmt -> read identifier"),
             QStringLiteral("1 2"),

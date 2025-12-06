@@ -85,7 +85,7 @@ class CodegenTest : public QObject
             QString(
                 "); } else { if(!out.empty()) out+=' '; out+=std::string(\"ERR\"); } } "
                 "std::cout<<out; return 0; }\n");
-        QDir    tmp(QDir::tempPath() + "/byyl_codegen_test");
+        QDir tmp(QDir::tempPath() + "/byyl_codegen_test");
         tmp.mkpath(".");
         QString outPath = tmp.absoluteFilePath("gen_lex.cpp");
         QFile   of(outPath);
@@ -93,9 +93,8 @@ class CodegenTest : public QObject
         of.write(src.toUtf8());
         of.close();
         QProcess proc;
-        QString binPath = tmp.absoluteFilePath("gen_lex_bin");
-        proc.start("clang++",
-                   QStringList() << "-std=c++17" << outPath << "-o" << binPath);
+        QString  binPath = tmp.absoluteFilePath("gen_lex_bin");
+        proc.start("clang++", QStringList() << "-std=c++17" << outPath << "-o" << binPath);
         if (!proc.waitForStarted(3000))
         {
             QSKIP("clang++ 不存在或无法启动，跳过代码生成编译用例");

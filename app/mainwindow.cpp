@@ -596,36 +596,13 @@ void MainWindow::onRunLexerClicked(bool)
         currentCodePath  = savePath;
         currentBinPath   = base + "/bin/" + QFileInfo(savePath).completeBaseName();
     }
-    // 准备输入：优先选中的样例文件，其次文本框内容，最后使用内置示例
+    // 准备输入：仅使用文本框内容；为空则提示并退出
     QString src = txtSourceTiny->toPlainText();
     if (src.trimmed().isEmpty())
     {
-        QString p1 =
-            QCoreApplication::applicationDirPath() + "/../../tests/test_data/sample/tiny/tiny1.tny";
-        QFile f1(p1);
-        if (f1.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            QTextStream in(&f1);
-            src = in.readAll();
-            f1.close();
-        }
-        else
-        {
-            QString p2 =
-                QCoreApplication::applicationDirPath() + "/tests/test_data/sample/tiny/tiny1.tny";
-            QFile f2(p2);
-            if (f2.open(QIODevice::ReadOnly | QIODevice::Text))
-            {
-                QTextStream in(&f2);
-                src = in.readAll();
-                f2.close();
-            }
-        }
-        if (src.trimmed().isEmpty())
-        {
-            src = QStringLiteral("read x;\n");
-        }
-        txtSourceTiny->setPlainText(src);
+        statusBar()->showMessage("请先输入源程序或选择样例文件");
+        ToastManager::instance().showWarning("请先输入源程序或选择样例文件");
+        return;
     }
     QVector<int> codes;
     auto         mdfas = engine->buildAllMinDFA(*parsedPtr, codes);
@@ -1777,4 +1754,3 @@ void MainWindow::onPreviewSyntaxTreeClicked(bool)
     if (syntaxController)
         syntaxController->previewTree();
 }
-    

@@ -1,13 +1,16 @@
 #include "LR0TableDialog.h"
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 
 LR0TableDialog::LR0TableDialog(const LR0Graph& gr, QWidget* parent) : QDialog(parent)
 {
     setWindowTitle(QStringLiteral("LR(0) DFA 表"));
-    auto v    = new QVBoxLayout(this);
-    auto lbl1 = new QLabel(QStringLiteral("状态项集"));
-    v->addWidget(lbl1);
+    auto h     = new QHBoxLayout(this);
+    auto left  = new QVBoxLayout;
+    auto right = new QVBoxLayout;
+    auto lbl1  = new QLabel(QStringLiteral("状态项集"));
+    left->addWidget(lbl1);
     auto tblStates = new QTableWidget;
     tblStates->setColumnCount(2);
     tblStates->setHorizontalHeaderLabels(QStringList() << "状态" << "项");
@@ -35,9 +38,9 @@ LR0TableDialog::LR0TableDialog(const LR0Graph& gr, QWidget* parent) : QDialog(pa
         }
     }
     tblStates->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    v->addWidget(tblStates);
+    left->addWidget(tblStates);
     auto lbl2 = new QLabel(QStringLiteral("迁移边"));
-    v->addWidget(lbl2);
+    right->addWidget(lbl2);
     auto tblEdges = new QTableWidget;
     tblEdges->setColumnCount(3);
     tblEdges->setHorizontalHeaderLabels(QStringList() << "源状态" << "符号" << "目标状态");
@@ -57,6 +60,8 @@ LR0TableDialog::LR0TableDialog(const LR0Graph& gr, QWidget* parent) : QDialog(pa
         }
     }
     tblEdges->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    v->addWidget(tblEdges);
+    right->addWidget(tblEdges);
+    h->addLayout(left);
+    h->addLayout(right);
     resize(900, 700);
 }

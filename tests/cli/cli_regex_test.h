@@ -20,7 +20,10 @@ class CliRegexTest : public QObject
         }
         return QString();
     }
-    QString readAllAny(const QString& rel) { return testio_readAllAny(rel); }
+    QString readAllAny(const QString& rel)
+    {
+        return testio_readAllAny(rel);
+    }
    private slots:
     void test_js_regex_pipeline()
     {
@@ -225,7 +228,7 @@ class CliRegexTest : public QObject
             {"LEXER_SKIP_DQ_STRING", "1"},
             {"LEXER_SKIP_TPL_STRING", "1"},
         });
-        auto out = eng.runMultiple(mdfas, codes, src, QSet<int>());
+        auto     out = eng.runMultiple(mdfas, codes, src, QSet<int>());
         QTextStream(stdout) << "【cpp 输出】" << out << "\n";
         auto toks = out.split(' ', Qt::SkipEmptyParts);
         int  err  = 0;
@@ -272,7 +275,7 @@ class CliRegexTest : public QObject
             {"LEXER_SKIP_DQ_STRING", "1"},
             {"LEXER_SKIP_TPL_STRING", "1"},
         });
-        auto out = eng.runMultiple(mdfas, codes, src, QSet<int>());
+        auto     out = eng.runMultiple(mdfas, codes, src, QSet<int>());
         QTextStream(stdout) << "【go 输出】" << out << "\n";
         auto toks = out.split(' ', Qt::SkipEmptyParts);
         int  err  = 0;

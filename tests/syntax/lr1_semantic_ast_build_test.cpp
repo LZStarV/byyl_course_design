@@ -4,15 +4,18 @@
 #include "../../src/syntax/LR1Parser.h"
 #include "../../src/config/Config.h"
 
-class LR1SemanticAstBuildTest : public QObject {
+class LR1SemanticAstBuildTest : public QObject
+{
     Q_OBJECT
-  private slots:
-    void tiny_example() {
+   private slots:
+    void tiny_example()
+    {
         QString gram =
             "program -> stmt-sequence\n"
             "stmt-sequence -> stmt-sequence ; statement | statement\n"
             "statement -> if-stmt | repeat-stmt | assign-stmt | read-stmt | write-stmt\n"
-            "if-stmt -> if exp then stmt-sequence end | if exp then stmt-sequence else stmt-sequence end\n"
+            "if-stmt -> if exp then stmt-sequence end | if exp then stmt-sequence else "
+            "stmt-sequence end\n"
             "repeat-stmt -> repeat stmt-sequence until exp\n"
             "assign-stmt -> identifier := exp\n"
             "read-stmt -> read identifier\n"
@@ -27,12 +30,13 @@ class LR1SemanticAstBuildTest : public QObject {
         QString err;
         auto    g = GrammarParser::parse(gram, err);
         QVERIFY(err.isEmpty());
-        auto gr  = LR1Builder::build(g);
-        auto tbl = LR1Builder::computeActionTable(g, gr);
-        QVector<QString> tokens = {QStringLiteral("read"), QStringLiteral("identifier"), QStringLiteral(";")};
+        auto             gr     = LR1Builder::build(g);
+        auto             tbl    = LR1Builder::computeActionTable(g, gr);
+        QVector<QString> tokens = {
+            QStringLiteral("read"), QStringLiteral("identifier"), QStringLiteral(";")};
         QMap<QString, QVector<QVector<int>>> acts;
         acts[QStringLiteral("read-stmt")] = {QVector<int>({1, 2})};
-        auto res = LR1Parser::parseWithSemantics(tokens,
+        auto res                          = LR1Parser::parseWithSemantics(tokens,
                                                  g,
                                                  tbl,
                                                  acts,
@@ -44,27 +48,48 @@ class LR1SemanticAstBuildTest : public QObject {
         QCOMPARE(res.astRoot->tag, QStringLiteral("read"));
         QVERIFY(!res.astRoot->children.isEmpty());
     }
-    void assign_stmt_positive() {
+    void assign_stmt_positive()
+    {
         QString gram =
             "assign-stmt -> identifier := exp\n"
             "exp -> identifier | number\n";
-        QString err; auto g = GrammarParser::parse(gram, err); QVERIFY(err.isEmpty());
-        auto gr = LR1Builder::build(g); auto tbl = LR1Builder::computeActionTable(g, gr);
-        QVector<QString> tokens = {QStringLiteral("identifier"), QStringLiteral(":="), QStringLiteral("number")};
-        QMap<QString, QVector<QVector<int>>> acts; acts[QStringLiteral("assign-stmt")] = {QVector<int>({1,2,3})};
-        auto res = LR1Parser::parseWithSemantics(tokens, g, tbl, acts,
-                       Config::semanticRoleMeaning(), Config::semanticRootSelectionPolicy(), Config::semanticChildOrderPolicy());
-        QCOMPARE(res.errorPos, -1); QVERIFY(res.astRoot != nullptr);
+        QString err;
+        auto    g = GrammarParser::parse(gram, err);
+        QVERIFY(err.isEmpty());
+        auto             gr     = LR1Builder::build(g);
+        auto             tbl    = LR1Builder::computeActionTable(g, gr);
+        QVector<QString> tokens = {
+            QStringLiteral("identifier"), QStringLiteral(":="), QStringLiteral("number")};
+        QMap<QString, QVector<QVector<int>>> acts;
+        acts[QStringLiteral("assign-stmt")] = {QVector<int>({1, 2, 3})};
+        auto res                            = LR1Parser::parseWithSemantics(tokens,
+                                                 g,
+                                                 tbl,
+                                                 acts,
+                                                 Config::semanticRoleMeaning(),
+                                                 Config::semanticRootSelectionPolicy(),
+                                                 Config::semanticChildOrderPolicy());
+        QCOMPARE(res.errorPos, -1);
+        QVERIFY(res.astRoot != nullptr);
     }
-    void missing_semicolon_negative() {
-        QString gram =
-            "stmt -> read identifier ;\n";
-        QString err; auto g = GrammarParser::parse(gram, err); QVERIFY(err.isEmpty());
-        auto gr = LR1Builder::build(g); auto tbl = LR1Builder::computeActionTable(g, gr);
+    void missing_semicolon_negative()
+    {
+        QString gram = "stmt -> read identifier ;\n";
+        QString err;
+        auto    g = GrammarParser::parse(gram, err);
+        QVERIFY(err.isEmpty());
+        auto             gr     = LR1Builder::build(g);
+        auto             tbl    = LR1Builder::computeActionTable(g, gr);
         QVector<QString> tokens = {QStringLiteral("read"), QStringLiteral("identifier")};
-        QMap<QString, QVector<QVector<int>>> acts; acts[QStringLiteral("stmt")] = {QVector<int>({1,2,3})};
-        auto res = LR1Parser::parseWithSemantics(tokens, g, tbl, acts,
-                       Config::semanticRoleMeaning(), Config::semanticRootSelectionPolicy(), Config::semanticChildOrderPolicy());
+        QMap<QString, QVector<QVector<int>>> acts;
+        acts[QStringLiteral("stmt")] = {QVector<int>({1, 2, 3})};
+        auto res                     = LR1Parser::parseWithSemantics(tokens,
+                                                 g,
+                                                 tbl,
+                                                 acts,
+                                                 Config::semanticRoleMeaning(),
+                                                 Config::semanticRootSelectionPolicy(),
+                                                 Config::semanticChildOrderPolicy());
         QVERIFY(res.errorPos >= 0);
     }
 };

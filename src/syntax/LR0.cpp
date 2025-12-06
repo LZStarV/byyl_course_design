@@ -125,6 +125,7 @@ LR0Graph LR0Builder::build(const Grammar& g)
                     added    = true;
                 }
                 gr.edges[i][X] = existing;
+                edges[i][X]    = existing;
             }
         }
     }
