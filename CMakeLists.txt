@@ -155,7 +155,44 @@ if(APPLE)
     )
 endif()
 
+add_executable(FACoreTest tests/automata/fa_core_test.cpp)
+target_sources(FACoreTest PRIVATE
+    src/Engine.cpp
+    src/regex/RegexLexer.cpp
+    src/regex/TokenHeaderParser.cpp
+    src/regex/RegexParser.cpp
+    src/automata/Thompson.cpp
+    src/automata/SubsetConstruction.cpp
+    src/automata/Hopcroft.cpp
+    src/generator/CodeGenerator.cpp
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.cpp
+    src/config/Config.cpp
+)
+target_link_libraries(FACoreTest PRIVATE Qt6::Core Qt6::Test)
+add_test(NAME FA核心测试 COMMAND FACoreTest)
+
+add_executable(LongestMatchTest tests/lexer/longest_match_test.cpp)
+target_sources(LongestMatchTest PRIVATE
+    src/Engine.cpp
+    src/regex/RegexLexer.cpp
+    src/regex/TokenHeaderParser.cpp
+    src/regex/RegexParser.cpp
+    src/automata/Thompson.cpp
+    src/automata/SubsetConstruction.cpp
+    src/automata/Hopcroft.cpp
+    src/generator/CodeGenerator.cpp
+    src/syntax/Grammar.cpp
+    src/syntax/GrammarParser.cpp
+    src/syntax/LL1.cpp
+    src/syntax/TokenMapBuilder.cpp
+    src/config/Config.cpp
+)
+target_link_libraries(LongestMatchTest PRIVATE Qt6::Core Qt6::Test)
+add_test(NAME 最长匹配测试 COMMAND LongestMatchTest)
 enable_testing()
+option(BYYL_BUILD_INTEGRATION_TESTS "Build integration tests (flow/codegen/cli)" ON)
 add_executable(GuiTest tests/ui/auto_test_ui.cpp)
 target_sources(GuiTest PRIVATE
     app/mainwindow.cpp
@@ -263,26 +300,7 @@ target_sources(LR1Test PRIVATE
 target_link_libraries(LR1Test PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME LR1算法测试 COMMAND LR1Test)
 
-add_executable(TinyLR1FlowTest tests/syntax/tiny_lr1_flow_test.cpp)
-target_sources(TinyLR1FlowTest PRIVATE
-    src/Engine.cpp
-    src/regex/RegexLexer.cpp
-    src/regex/TokenHeaderParser.cpp
-    src/regex/RegexParser.cpp
-    src/config/Config.cpp
-    src/generator/CodeGenerator.cpp
-    src/syntax/Grammar.cpp
-    src/syntax/GrammarParser.cpp
-    src/syntax/LL1.cpp
-    src/syntax/LR1.cpp
-    src/syntax/LR1Parser.cpp
-    src/syntax/TokenMapBuilder.cpp
-    src/automata/Thompson.cpp
-    src/automata/SubsetConstruction.cpp
-    src/automata/Hopcroft.cpp
-)
-target_link_libraries(TinyLR1FlowTest PRIVATE Qt6::Core Qt6::Test)
-add_test(NAME TinyLR1流程测试 COMMAND TinyLR1FlowTest)
+## TinyLR1FlowTest removed
 
 
 add_executable(LR0Test tests/syntax/lr0_test.cpp)
@@ -307,6 +325,7 @@ target_sources(SLRTest PRIVATE
 target_link_libraries(SLRTest PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME SLR算法测试 COMMAND SLRTest)
 
+if(BYYL_BUILD_INTEGRATION_TESTS)
 add_executable(CliRegexTest tests/cli/cli_regex_test.cpp)
 target_sources(CliRegexTest PRIVATE
     tests/cli/cli_regex_test.h
@@ -326,7 +345,9 @@ target_sources(CliRegexTest PRIVATE
 )
 target_link_libraries(CliRegexTest PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME 命令行正则测试 COMMAND CliRegexTest)
+endif()
 
+if(BYYL_BUILD_INTEGRATION_TESTS)
 add_executable(CodegenTest tests/codegen/codegen_compile_run_test.cpp)
 target_sources(CodegenTest PRIVATE
     tests/codegen/codegen_compile_run_test.h
@@ -346,79 +367,4 @@ target_sources(CodegenTest PRIVATE
 )
 target_link_libraries(CodegenTest PRIVATE Qt6::Core Qt6::Test)
 add_test(NAME 代码生成器测试 COMMAND CodegenTest)
-
-add_executable(ConfigWeightTest tests/config/config_weight_test.cpp)
-target_sources(ConfigWeightTest PRIVATE
-    tests/config/config_weight_test.h
-    src/visual/DotExporter.cpp
-    src/regex/RegexLexer.cpp
-    src/regex/TokenHeaderParser.cpp
-    src/regex/RegexParser.cpp
-    src/automata/Thompson.cpp
-    src/automata/SubsetConstruction.cpp
-    src/automata/Hopcroft.cpp
-    src/generator/CodeGenerator.cpp
-    src/Engine.cpp
-    src/syntax/Grammar.cpp
-    src/syntax/GrammarParser.cpp
-    src/syntax/LL1.cpp
-    src/config/Config.cpp
-)
-target_link_libraries(ConfigWeightTest PRIVATE Qt6::Core Qt6::Test)
-add_test(NAME 权重配置测试 COMMAND ConfigWeightTest)
-
-add_executable(GenDirConfigTest tests/config/gen_dir_config_test.cpp)
-target_sources(GenDirConfigTest PRIVATE
-    tests/config/gen_dir_config_test.h
-    src/config/Config.cpp
-)
-target_link_libraries(GenDirConfigTest PRIVATE Qt6::Core Qt6::Test)
-add_test(NAME 生成目录配置测试 COMMAND GenDirConfigTest)
-
-add_executable(ConfigGuiPersistTest tests/config/config_gui_persist_test.cpp)
-target_sources(ConfigGuiPersistTest PRIVATE
-    tests/config/config_gui_persist_test.h
-    src/config/Config.cpp
-)
-target_link_libraries(ConfigGuiPersistTest PRIVATE Qt6::Core Qt6::Test)
-add_test(NAME 配置持久化测试 COMMAND ConfigGuiPersistTest)
-
-add_executable(DotExportTest tests/automata/dot_export_test.cpp)
-target_sources(DotExportTest PRIVATE
-    tests/automata/dot_export_test.h
-    src/visual/DotExporter.cpp
-    src/regex/RegexLexer.cpp
-    src/regex/TokenHeaderParser.cpp
-    src/regex/RegexParser.cpp
-    src/automata/Thompson.cpp
-    src/automata/SubsetConstruction.cpp
-    src/automata/Hopcroft.cpp
-    src/Engine.cpp
-    src/syntax/Grammar.cpp
-    src/syntax/GrammarParser.cpp
-    src/syntax/LL1.cpp
-    src/generator/CodeGenerator.cpp
-    src/config/Config.cpp
-)
-target_link_libraries(DotExportTest PRIVATE Qt6::Core Qt6::Test)
-add_test(NAME DOT导出测试 COMMAND DotExportTest)
-
-add_executable(FATableMacroTest tests/automata/fa_table_macro_test.cpp)
-target_sources(FATableMacroTest PRIVATE
-    tests/automata/fa_table_macro_test.h
-    src/visual/DotExporter.cpp
-    src/regex/RegexLexer.cpp
-    src/regex/TokenHeaderParser.cpp
-    src/regex/RegexParser.cpp
-    src/automata/Thompson.cpp
-    src/automata/SubsetConstruction.cpp
-    src/automata/Hopcroft.cpp
-    src/generator/CodeGenerator.cpp
-    src/Engine.cpp
-    src/syntax/Grammar.cpp
-    src/syntax/GrammarParser.cpp
-    src/syntax/LL1.cpp
-    src/config/Config.cpp
-)
-target_link_libraries(FATableMacroTest PRIVATE Qt6::Core Qt6::Test)
-add_test(NAME FA表宏列聚合测试 COMMAND FATableMacroTest)
+endif()

@@ -1,18 +1,18 @@
 # byyl 词法/语法分析器（Qt+CMake）
 
 - 环境：Qt 6.9.3，CMake 4.2.0，Ninja 1.13.2（macOS / Windows）
-- 构建产物目录：`dist`（统一使用 CMake / Ninja）
+- 构建产物目录：`build`（统一使用 CMake / Ninja）
 
 ## 快速开始
-- 配置：`qt-cmake -S . -B dist -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+- 配置：`qt-cmake -S . -B build -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
 - 编译（二选一）：
-  - `cmake --build dist -j`
-  - `ninja -C dist`（等效的简洁写法）
+  - `cmake --build build -j`
+  - `ninja -C build`（等效的简洁写法）
 - 运行：
-  - macOS：`open dist/byyl.app` 或 `dist/byyl.app/Contents/MacOS/byyl`
-  - Windows：`dist\\byyl.exe`
-- 测试：`ctest --test-dir dist -V`
-- 全量格式化命令：`find . -type f \( -name "*.h" -o -name "*.cpp" \) -not -path "./dist/*" -not -path "./build/*" -print0 | xargs -0 -n 50 clang-format -i -style=file`
+  - macOS：`open build/byyl.app` 或 `build/byyl.app/Contents/MacOS/byyl`
+  - Windows：`build\\byyl.exe`
+- 测试：`ctest --test-dir build -V`
+- 全量格式化命令：`find . -type f \( -name "*.h" -o -name "*.cpp" \) -not -path "./build/*" -not -path "./build/*" -print0 | xargs -0 -n 50 clang-format -i -style=file`
 
 ## 功能
 - 实验一（词法）：

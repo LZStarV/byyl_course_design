@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include <QtTest/QtTest>
 #include "../../src/config/Config.h"
 #include "../../src/syntax/LR1Parser.h"
 #include "../../src/syntax/GrammarParser.h"
@@ -31,19 +31,25 @@ static QMap<QString, QVector<QVector<int>>> parseActions(const QVector<QString>&
     return m;
 }
 
-TEST(SemanticActionsParse, Basic)
-{
-    QVector<QString> lines = {
-        "read-stmt -> read identifier",
-        "1 2",
-        "assign-stmt -> identifier := exp",
-        "2 1 2",
-    };
-    auto m = parseActions(lines);
-    ASSERT_TRUE(m.contains("read-stmt"));
-    ASSERT_TRUE(m.contains("assign-stmt"));
-    ASSERT_EQ(m.value("read-stmt").size(), 1);
-    ASSERT_EQ(m.value("read-stmt")[0].size(), 2);
-    ASSERT_EQ(m.value("read-stmt")[0][0], 1);
-    ASSERT_EQ(m.value("read-stmt")[0][1], 2);
-}
+class SemanticActionsParseTest : public QObject {
+    Q_OBJECT
+  private slots:
+    void basic() {
+        QVector<QString> lines = {
+            QStringLiteral("read-stmt -> read identifier"),
+            QStringLiteral("1 2"),
+            QStringLiteral("assign-stmt -> identifier := exp"),
+            QStringLiteral("2 1 2"),
+        };
+        auto m = parseActions(lines);
+        QVERIFY(m.contains(QStringLiteral("read-stmt")));
+        QVERIFY(m.contains(QStringLiteral("assign-stmt")));
+        QCOMPARE(m.value(QStringLiteral("read-stmt")).size(), 1);
+        QCOMPARE(m.value(QStringLiteral("read-stmt"))[0].size(), 2);
+        QCOMPARE(m.value(QStringLiteral("read-stmt"))[0][0], 1);
+        QCOMPARE(m.value(QStringLiteral("read-stmt"))[0][1], 2);
+    }
+};
+
+QTEST_MAIN(SemanticActionsParseTest)
+#include "semantic_actions_parse_test.moc"

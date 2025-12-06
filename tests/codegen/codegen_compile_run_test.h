@@ -85,27 +85,36 @@ class CodegenTest : public QObject
             QString(
                 "); } else { if(!out.empty()) out+=' '; out+=std::string(\"ERR\"); } } "
                 "std::cout<<out; return 0; }\n");
-        QString outPath = QDir::currentPath() + "/gen_lex.cpp";
+        QDir    tmp(QDir::tempPath() + "/byyl_codegen_test");
+        tmp.mkpath(".");
+        QString outPath = tmp.absoluteFilePath("gen_lex.cpp");
         QFile   of(outPath);
         of.open(QIODevice::WriteOnly | QIODevice::Text);
         of.write(src.toUtf8());
         of.close();
         QProcess proc;
+        QString binPath = tmp.absoluteFilePath("gen_lex_bin");
         proc.start("clang++",
-                   QStringList() << "-std=c++17" << outPath << "-o"
-                                 << QDir::currentPath() + "/gen_lex_bin");
+                   QStringList() << "-std=c++17" << outPath << "-o" << binPath);
+        if (!proc.waitForStarted(3000))
+        {
+            QSKIP("clang++ 不存在或无法启动，跳过代码生成编译用例");
+            return;
+        }
         proc.waitForFinished();
         QTextStream(stdout) << "【生成器编译退出码】" << proc.exitCode() << "\n";
         QTextStream(stdout) << "【编译器错误输出】"
                             << QString::fromUtf8(proc.readAllStandardError()) << "\n";
         QVERIFY(proc.exitStatus() == QProcess::NormalExit);
         QProcess run;
-        run.start(QDir::currentPath() + "/gen_lex_bin");
+        run.start(binPath);
         run.write("abc123 def456\n");
         run.closeWriteChannel();
         run.waitForFinished();
         auto output = run.readAllStandardOutput();
         QTextStream(stdout) << "【生成器运行输出】" << QString::fromUtf8(output) << "\n";
         QVERIFY(!output.isEmpty());
+        QFile::remove(outPath);
+        QFile::remove(binPath);
     }
 };

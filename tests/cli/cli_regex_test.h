@@ -4,6 +4,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include "../../src/Engine.h"
+#include "../common/TestIO.h"
+#include "../common/EnvGuard.h"
 class CliRegexTest : public QObject
 {
     Q_OBJECT
@@ -18,27 +20,12 @@ class CliRegexTest : public QObject
         }
         return QString();
     }
-    QString readAllAny(const QString& rel)
-    {
-        QString p1 = QCoreApplication::applicationDirPath() + "/../../" + rel;
-        auto    t  = readAllTry(p1);
-        if (!t.isEmpty())
-            return t;
-        QString p2 = QCoreApplication::applicationDirPath() + "/" + rel;
-        t          = readAllTry(p2);
-        if (!t.isEmpty())
-            return t;
-        QString p3 = rel;
-        t          = readAllTry(p3);
-        if (!t.isEmpty())
-            return t;
-        return QString();
-    }
+    QString readAllAny(const QString& rel) { return testio_readAllAny(rel); }
    private slots:
     void test_js_regex_pipeline()
     {
         Engine eng;
-        auto   text = readAllAny("tests/test_data/regex/javascript.regex");
+        auto   text = testio_readAllAny("tests/test_data/regex/javascript.regex");
         if (text.isEmpty())
         {
             text = QStringLiteral("letter = [A-Za-z_]\n") + QStringLiteral("digit = [0-9]\n") +
@@ -54,9 +41,9 @@ class CliRegexTest : public QObject
         QTextStream(stdout) << "【文件长度】" << text.size() << "\n";
         auto rf = eng.lexFile(text);
         QTextStream(stdout) << "【词法规则数(lex)】" << rf.tokens.size() << "\n";
-        QTextStream(stdout) << "【java lex tokens】" << rf.tokens.size() << "\n";
+        QTextStream(stdout) << "【javascript lex tokens】" << rf.tokens.size() << "\n";
         auto pf = eng.parseFile(rf);
-        QTextStream(stdout) << "【java parse tokens】" << pf.tokens.size() << "\n";
+        QTextStream(stdout) << "【javascript parse tokens】" << pf.tokens.size() << "\n";
         QTextStream(stdout) << "【可解析的Token数(parse)】" << pf.tokens.size() << "\n";
         QTextStream(stdout) << "【Token名称与编码】";
         for (const auto& t : pf.tokens)
@@ -118,7 +105,7 @@ class CliRegexTest : public QObject
     void test_tiny_regex_pipeline()
     {
         Engine eng;
-        auto   text = readAllAny("tests/test_data/regex/tiny.regex");
+        auto   text = testio_readAllAny("tests/test_data/regex/tiny.regex");
         if (text.isEmpty())
         {
             text = QStringLiteral(
@@ -133,14 +120,14 @@ class CliRegexTest : public QObject
                 "| :=\n");
         }
         auto rf = eng.lexFile(text);
-        QTextStream(stdout) << "【cpp lex tokens】" << rf.tokens.size() << "\n";
+        QTextStream(stdout) << "【tiny lex tokens】" << rf.tokens.size() << "\n";
         auto pf = eng.parseFile(rf);
-        QTextStream(stdout) << "【cpp parse tokens】" << pf.tokens.size() << "\n";
+        QTextStream(stdout) << "【tiny parse tokens】" << pf.tokens.size() << "\n";
         QVERIFY(pf.tokens.size() > 0);
         QVector<int> codes;
         auto         mdfas = eng.buildAllMinDFA(pf, codes);
         QVERIFY(mdfas.size() == codes.size());
-        auto src = readAllAny("tests/test_data/sample/tiny/tiny1.tny");
+        auto src = testio_readAllAny("tests/test_data/sample/tiny/tiny1.tny");
         if (src.isEmpty())
         {
             src = QStringLiteral("{ comment }\nREAD x;\nwrite 123\nif x < 10 then read y end\n");
@@ -230,14 +217,16 @@ class CliRegexTest : public QObject
         if (src.isEmpty())
             src = QStringLiteral(
                 "#include <iostream>\nint main(){int x=123; std::cout<<x<<std::endl; return 0;}");
-        qputenv("LEXER_SKIP_HASH_COMMENT", QByteArray("0"));
-        qputenv("LEXER_SKIP_LINE_COMMENT", QByteArray("1"));
-        qputenv("LEXER_SKIP_BLOCK_COMMENT", QByteArray("1"));
-        qputenv("LEXER_SKIP_SQ_STRING", QByteArray("1"));
-        qputenv("LEXER_SKIP_DQ_STRING", QByteArray("1"));
-        qputenv("LEXER_SKIP_TPL_STRING", QByteArray("1"));
+        EnvGuard guard({
+            {"LEXER_SKIP_HASH_COMMENT", "0"},
+            {"LEXER_SKIP_LINE_COMMENT", "1"},
+            {"LEXER_SKIP_BLOCK_COMMENT", "1"},
+            {"LEXER_SKIP_SQ_STRING", "1"},
+            {"LEXER_SKIP_DQ_STRING", "1"},
+            {"LEXER_SKIP_TPL_STRING", "1"},
+        });
         auto out = eng.runMultiple(mdfas, codes, src, QSet<int>());
-        QTextStream(stdout) << "【rust 输出】" << out << "\n";
+        QTextStream(stdout) << "【cpp 输出】" << out << "\n";
         auto toks = out.split(' ', Qt::SkipEmptyParts);
         int  err  = 0;
         for (const auto& s : toks)
@@ -245,15 +234,15 @@ class CliRegexTest : public QObject
             if (s == "ERR")
                 err++;
         }
-        QTextStream(stdout) << "【rust tokens】";
+        QTextStream(stdout) << "【cpp tokens】";
         for (const auto& s : toks) QTextStream(stdout) << s << ' ';
-        QTextStream(stdout) << "\n【rust ERR数量】" << err << "\n";
+        QTextStream(stdout) << "\n【cpp ERR数量】" << err << "\n";
         QVERIFY(err <= 2);
     }
     void test_go_regex_pipeline()
     {
         Engine eng;
-        auto   text = readAllAny("tests/test_data/regex/go.regex");
+        auto   text = testio_readAllAny("tests/test_data/regex/go.regex");
         auto   rf   = eng.lexFile(text);
         if (rf.tokens.isEmpty())
         {
@@ -274,15 +263,17 @@ class CliRegexTest : public QObject
         QVector<int> codes;
         auto         mdfas = eng.buildAllMinDFA(pf, codes);
         QVERIFY(mdfas.size() == codes.size());
-        auto src = readAllAny("tests/test_data/sample/go/go1.go");
+        auto src = testio_readAllAny("tests/test_data/sample/go/go1.go");
         if (src.isEmpty())
             src = QStringLiteral(
                 "package main\nimport \"fmt\"\nfunc main(){var x int=123; fmt.Println(x)}");
-        qputenv("LEXER_SKIP_SQ_STRING", QByteArray("1"));
-        qputenv("LEXER_SKIP_DQ_STRING", QByteArray("1"));
-        qputenv("LEXER_SKIP_TPL_STRING", QByteArray("1"));
+        EnvGuard guard2({
+            {"LEXER_SKIP_SQ_STRING", "1"},
+            {"LEXER_SKIP_DQ_STRING", "1"},
+            {"LEXER_SKIP_TPL_STRING", "1"},
+        });
         auto out = eng.runMultiple(mdfas, codes, src, QSet<int>());
-        QTextStream(stdout) << "【rust 输出】" << out << "\n";
+        QTextStream(stdout) << "【go 输出】" << out << "\n";
         auto toks = out.split(' ', Qt::SkipEmptyParts);
         int  err  = 0;
         for (const auto& s : toks)
@@ -295,7 +286,7 @@ class CliRegexTest : public QObject
     void test_rust_regex_pipeline()
     {
         Engine eng;
-        auto   text = readAllAny("tests/test_data/regex/rust.regex");
+        auto   text = testio_readAllAny("tests/test_data/regex/rust.regex");
         auto   rf   = eng.lexFile(text);
         if (rf.tokens.isEmpty())
         {
@@ -317,7 +308,7 @@ class CliRegexTest : public QObject
         QVector<int> codes;
         auto         mdfas = eng.buildAllMinDFA(pf, codes);
         QVERIFY(mdfas.size() == codes.size());
-        auto src = readAllAny("tests/test_data/sample/rs/rs1.rs");
+        auto src = testio_readAllAny("tests/test_data/sample/rs/rs1.rs");
         if (src.isEmpty())
             src = QStringLiteral("let x = 123;");
         else
