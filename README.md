@@ -22,8 +22,12 @@
 - 运行：
   - macOS：`open build/byyl.app` 或 `build/byyl.app/Contents/MacOS/byyl`
   - Windows：`build\\byyl.exe`
-- 测试：`ctest --test-dir build -V`
-- 全量格式化命令：`find . -type f \( -name "*.h" -o -name "*.cpp" \) -not -path "./build/*" -not -path "./generated/*" -print0 | xargs -0 -n 50 clang-format -i -style=file`
+- 测试：
+  - 全量测试：`ctest --test-dir build -V`
+  - 仅运行某个测试：`ctest --test-dir build -V -R 'FA核心测试'`
+  - 仅运行多个测试：`ctest --test-dir build -V -R 'FA核心测试|LL1算法测试'`
+- 全量格式化：`find . -type f \( -name "*.h" -o -name "*.cpp" \) -not -path "./build/*" -not -path "./generated/*" -print0 | xargs -0 -n 50 clang-format -i -style=file`
+
 
 ## 功能
 - 实验一（词法）：

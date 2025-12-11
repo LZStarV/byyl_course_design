@@ -844,14 +844,15 @@ ParseResult LR1Parser::parseWithSemantics(const QVector<QString>&               
             }
             semStk.push_back(makeSemNode(tag));
             // 语义过程记录：移进叶子（可能替换为词素）
-            pushStep(res.semanticSteps,
-                     step,
-                     stack,
-                     input,
-                     QString("移进符号[%1]%2，语义栈压入终结符节点")
-                         .arg(a)
-                         .arg(!shownLex.isEmpty() ? QString("（lexeme=%1）").arg(shownLex) : QString()),
-                     QString());
+            pushStep(
+                res.semanticSteps,
+                step,
+                stack,
+                input,
+                QString("移进符号[%1]%2，语义栈压入终结符节点")
+                    .arg(a)
+                    .arg(!shownLex.isEmpty() ? QString("（lexeme=%1）").arg(shownLex) : QString()),
+                QString());
             pushStep(res.steps, step++, stack, input, act, QString());
             input.pop_front();
             continue;

@@ -28,13 +28,18 @@ class LongestMatchTest : public QObject
    private slots:
     void longest_match_keywords_vs_identifier()
     {
-        Engine       eng;
+        Engine eng;
+        qInfo() << "输入规则:" << rules().trimmed();
+        qInfo() << "关键步骤:" << "lexFile -> parseFile -> buildAllMinDFA -> runMultiple";
         auto         rf = eng.lexFile(rules());
         auto         pf = eng.parseFile(rf);
         QVector<int> codes;
         auto         mdfs = eng.buildAllMinDFA(pf, codes);
-        auto         out  = eng.runMultiple(mdfs, codes, QStringLiteral("if abc"), QSet<int>());
-        auto         toks = out.split(' ', Qt::SkipEmptyParts);
+        auto         src  = QStringLiteral("if abc");
+        auto         out  = eng.runMultiple(mdfs, codes, src, QSet<int>());
+        qInfo() << "源文本:" << src;
+        qInfo() << "输出编码序列:" << out;
+        auto toks = out.split(' ', Qt::SkipEmptyParts);
         QVERIFY(!toks.isEmpty());
         // 第一个 token 应为关键字编码200系列之一，而不是标识符100
         QVERIFY(toks[0] != QString::number(100));

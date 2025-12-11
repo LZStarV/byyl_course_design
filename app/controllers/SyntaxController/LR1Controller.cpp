@@ -441,7 +441,8 @@ void LR1Controller::runLR1Process()
         QVector<QString> errs;
         int              needCount = 0;
         for (const auto& tname : tokens)
-            if (idNames.contains(tname.trimmed().toLower())) needCount++;
+            if (idNames.contains(tname.trimmed().toLower()))
+                needCount++;
         if (lexemeStream.size() != needCount)
         {
             lexErr = true;
@@ -460,9 +461,11 @@ void LR1Controller::runLR1Process()
         if (lexErr)
         {
             QString dir = Config::syntaxOutputDir();
-            if (dir.trimmed().isEmpty()) dir = Config::generatedOutputDir() + "/syntax";
+            if (dir.trimmed().isEmpty())
+                dir = Config::generatedOutputDir() + "/syntax";
             QDir d(dir);
-            if (!d.exists()) d.mkpath(".");
+            if (!d.exists())
+                d.mkpath(".");
             QFile lf(dir + "/lr1_last_error.log");
             if (lf.open(QIODevice::WriteOnly | QIODevice::Text))
             {

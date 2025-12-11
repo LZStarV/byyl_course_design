@@ -23,6 +23,9 @@
   - `ctest --test-dir build --output-on-failure`
 - 运行指定测试：
   - `ctest --test-dir build -R FA核心测试 --output-on-failure`
+  - 支持多测试正则筛选：`ctest --test-dir build -V -R 'FA核心测试|LL1算法测试' --output-on-failure`
+  - 直接运行测试二进制：`build/FACoreTest`
+  - 先构建再运行某测试：`cmake --build build --target FACoreTest -j && build/FACoreTest`
 - 关闭集成测试（仅跑快速单元）：
   - `cmake -S . -B build -DBYYL_BUILD_INTEGRATION_TESTS=OFF && cmake --build build && ctest --test-dir build`
 
