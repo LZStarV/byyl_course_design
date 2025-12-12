@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="20.2.12" editor="drawio">
+  <diagram id="Exp2-01" name="BNF_Parse_Flow">
+    <mxGraphModel dx="1050" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="n_start" value="开始：&#xa;输入文法文本" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="100" width="220" height="70" as="geometry"/></mxCell>
+        <mxCell id="n_read" value="读取文本：&#xa;逐行处理&#xa;跳过空行/注释行" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="200" width="260" height="90" as="geometry"/></mxCell>
+        <mxCell id="n_has_arrow" value="判定：&#xa;是否包含 '->' ?" style="shape=rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="320" width="240" height="100" as="geometry"/></mxCell>
+        <mxCell id="n_error" value="错误输出：&#xa;记录错误行号&#xa;忽略该行" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="420" y="320" width="240" height="90" as="geometry"/></mxCell>
+
+        <mxCell id="n_parse" value="行解析：&#xa;A -> α | β ...&#xa;首个左部设为开始符" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="520" y="180" width="300" height="100" as="geometry"/></mxCell>
+        <mxCell id="n_split" value="右部切分：&#xa;多字符运算符优先&#xa;单字符分隔符&#xa;词法单词拼接" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="860" y="180" width="280" height="120" as="geometry"/></mxCell>
+        <mxCell id="n_class" value="符号归类：&#xa;左部→非终结符&#xa;右部非左部且≠#→终结符" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="520" y="330" width="300" height="100" as="geometry"/></mxCell>
+        <mxCell id="n_lr" value="左递归检测（可选）：&#xa;扫描候选首符&#xa;留空扩展" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="860" y="330" width="280" height="100" as="geometry"/></mxCell>
+        <mxCell id="n_out" value="输出：&#xa;Grammar 对象&#xa;开始符/产生式/集合摘要" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="900" y="520" width="300" height="100" as="geometry"/></mxCell>
+
+        <mxCell id="e_s_r" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_start" target="n_read"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_r_has" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_read" target="n_has_arrow"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_has_parse" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="n_has_arrow" target="n_parse"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="lbl_has_parse_yes" value="是" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_has_parse"><mxGeometry x="-0.5" y="-1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry></mxCell>
+        <mxCell id="e_has_err" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_has_arrow" target="n_error"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="lbl_has_err_no" value="否" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_has_err"><mxGeometry x="-0.5" y="-1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry></mxCell>
+
+        <mxCell id="e_parse_split" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_parse" target="n_split"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_split_class" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_split" target="n_class"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_class_lr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_class" target="n_lr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_lr_out" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_lr" target="n_out"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+

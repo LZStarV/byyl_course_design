@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="20.2.12" editor="drawio">
+  <diagram id="Exp2-08" name="ParseTree_SemanticAST_Build">
+    <mxGraphModel dx="1050" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="n_start" value="开始：&#xa;准备语法/语义栈&#xa;词素序列（可选）" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="100" width="320" height="100" as="geometry"/></mxCell>
+        <mxCell id="n_leaf" value="移进叶子：&#xa;ParseTreeNode 叶子入栈&#xa;SemanticASTNode 入语义栈&#xa;标识符类可打包 token(lexeme)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="520" y="100" width="420" height="130" as="geometry"/></mxCell>
+        <mxCell id="n_reduce" value="归约建子树：&#xa;弹出 |α| 并逆序恢复&#xa;以 A 为根附加孩子&#xa;goto 查询并压栈状态" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="980" y="100" width="420" height="130" as="geometry"/></mxCell>
+
+        <mxCell id="n_roles" value="角色策略：&#xa;roles/roleMeaning 标注根/孩子/并列兄弟&#xa;rootPolicy 选择根位&#xa;childOrder 控制孩子顺序" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="520" y="260" width="420" height="130" as="geometry"/></mxCell>
+        <mxCell id="n_wrap" value="顶层包装：&#xa;接受后以开始符包裹语义树&#xa;统一根节点标签" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="980" y="260" width="380" height="110" as="geometry"/></mxCell>
+        <mxCell id="n_preview" value="预览/导出：&#xa;生成 DOT 文本&#xa;渲染 PNG 或导出文件" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="900" y="420" width="360" height="100" as="geometry"/></mxCell>
+
+        <mxCell id="e_s_leaf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_start" target="n_leaf"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_leaf_reduce" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_leaf" target="n_reduce"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_reduce_roles" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_reduce" target="n_roles"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_roles_wrap" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_roles" target="n_wrap"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_wrap_preview" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_wrap" target="n_preview"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+

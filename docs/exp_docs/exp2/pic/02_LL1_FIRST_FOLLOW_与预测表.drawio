@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="20.2.12" editor="drawio">
+  <diagram id="Exp2-02" name="LL1_FIRST_FOLLOW_Table">
+    <mxGraphModel dx="1050" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="n_start" value="开始：&#xa;输入 Grammar" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="100" width="240" height="70" as="geometry"/></mxCell>
+        <mxCell id="n_finit" value="FIRST 初始化：&#xa;非终结符置空&#xa;终结符置 {a}" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="460" y="100" width="280" height="100" as="geometry"/></mxCell>
+        <mxCell id="n_floop" value="判定：&#xa;FIRST 是否变化？" style="shape=rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="780" y="100" width="220" height="90" as="geometry"/></mxCell>
+        <mxCell id="n_fiter" value="FIRST 迭代：&#xa;遍历产生式 A→α&#xa;并入 FIRST(α) 至 FIRST(A)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="540" y="220" width="320" height="110" as="geometry"/></mxCell>
+
+        <mxCell id="n_folinit" value="FOLLOW 初始化：&#xa;开始符含 $&#xa;其他置空" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="360" width="260" height="90" as="geometry"/></mxCell>
+        <mxCell id="n_folloop" value="判定：&#xa;FOLLOW 是否变化？" style="shape=rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="440" y="360" width="220" height="90" as="geometry"/></mxCell>
+        <mxCell id="n_foliter" value="FOLLOW 迭代：&#xa;A→α B β&#xa;FIRST(β)\{#} → FOLLOW(B)&#xa;β 为空或含 # → FOLLOW(A) 并入 FOLLOW(B)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="700" y="340" width="380" height="140" as="geometry"/></mxCell>
+
+        <mxCell id="n_table" value="预测表生成：&#xa;TABLE[A][a]=k（a∈FIRST(α)\{#}）&#xa;ε∈FIRST(α) → b∈FOLLOW(A) 填表" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="540" width="420" height="120" as="geometry"/></mxCell>
+        <mxCell id="n_conf" value="冲突记录：&#xa;同一表项多产式&#xa;记录冲突位置" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="600" y="560" width="300" height="100" as="geometry"/></mxCell>
+        <mxCell id="n_out" value="输出：&#xa;FIRST/FOLLOW 集合摘要&#xa;预测表摘要" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="960" y="560" width="300" height="100" as="geometry"/></mxCell>
+
+        <mxCell id="e_s_fi" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_start" target="n_finit"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_fi_fl" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_finit" target="n_floop"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_fl_iter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="n_floop" target="n_fiter"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="lbl_fl_iter_yes" value="是" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_fl_iter"><mxGeometry x="-0.5" y="-1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry></mxCell>
+
+        <mxCell id="e_fiter_floop" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_fiter" target="n_floop"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="890" y="260"/></Array></mxGeometry></mxCell>
+        <mxCell id="e_fl_folinit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_floop" target="n_folinit"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="lbl_fl_folinit_no" value="否" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_fl_folinit"><mxGeometry x="-0.5" y="-1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry></mxCell>
+
+        <mxCell id="e_folinit_folloop" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_folinit" target="n_folloop"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_folloop_foliter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="n_folloop" target="n_foliter"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="lbl_folloop_foliter_yes" value="是" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_folloop_foliter"><mxGeometry x="-0.5" y="-1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry></mxCell>
+
+        <mxCell id="e_foliter_folloop" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_foliter" target="n_folloop"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="550" y="400"/></Array></mxGeometry></mxCell>
+        <mxCell id="e_folloop_table" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_folloop" target="n_table"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="lbl_folloop_table_no" value="否" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_folloop_table"><mxGeometry x="-0.5" y="-1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry></mxCell>
+
+        <mxCell id="e_table_conf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_table" target="n_conf"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_conf_out" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_conf" target="n_out"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+

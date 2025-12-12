@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" version="20.2.12" editor="drawio">
+  <diagram id="Exp2-04" name="SLR1_Check_Flow">
+    <mxGraphModel dx="1050" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="n_start" value="开始：&#xa;输入 Grammar 与 FOLLOW" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="100" width="300" height="70" as="geometry"/></mxCell>
+        <mxCell id="n_lr0" value="构造支持集：&#xa;LR(0) states/edges&#xa;用于移进判定" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="500" y="100" width="320" height="100" as="geometry"/></mxCell>
+        <mxCell id="n_shift" value="聚合移进：&#xa;点后为终结符 a 且存在边&#xa;动作 sN 加入 (state,a)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="900" y="100" width="320" height="110" as="geometry"/></mxCell>
+        <mxCell id="n_reduce" value="聚合规约：&#xa;末项 A→α&#xa;对 b∈FOLLOW(A) 加入 r A -> α 至 (state,b)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="900" y="240" width="360" height="120" as="geometry"/></mxCell>
+
+        <mxCell id="n_conf" value="判定：&#xa;(state,terminal) 动作集合 size ≥ 2 ?" style="shape=rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="300" width="360" height="100" as="geometry"/></mxCell>
+        <mxCell id="n_class" value="分类冲突：&#xa;移进+规约 → shift/reduce&#xa;多规约 → reduce/reduce&#xa;detail=排序后拼接" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="560" y="320" width="380" height="120" as="geometry"/></mxCell>
+        <mxCell id="n_out" value="输出：&#xa;无冲突 → SLR(1)&#xa;有冲突 → 列表与类型说明" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="560" y="480" width="360" height="100" as="geometry"/></mxCell>
+
+        <mxCell id="e_s_lr0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_start" target="n_lr0"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_lr0_shift" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_lr0" target="n_shift"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_shift_reduce" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_shift" target="n_reduce"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e_reduce_conf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_reduce" target="n_conf"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <mxCell id="e_conf_class_yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="n_conf" target="n_class"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="lbl_conf_class_yes" value="是" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_conf_class_yes"><mxGeometry x="-0.5" y="-1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry></mxCell>
+        <mxCell id="e_conf_out_no" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_conf" target="n_out"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="lbl_conf_out_no" value="否" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_conf_out_no"><mxGeometry x="-0.5" y="-1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry></mxCell>
+        <mxCell id="e_class_out" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="n_class" target="n_out"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+
