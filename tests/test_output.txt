@@ -1,0 +1,247 @@
+byyl % ctest --test-dir build -V
+UpdateCTestConfiguration  from :/Users/bytedance/project/byyl/build/DartConfiguration.tcl
+Test project /Users/bytedance/project/byyl/build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+      Start  1: FA核心测试
+
+1: Test command: /Users/bytedance/project/byyl/build/FACoreTest
+1: Working Directory: /Users/bytedance/project/byyl/build
+1: Test timeout computed to be: 10000000
+1: ********* Start testing of FACoreTest *********
+1: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+1: PASS   : FACoreTest::initTestCase()
+1: QINFO  : FACoreTest::nfa_thompson_structure_union() 输入规则: "_tok100 = a | b"
+1: QINFO  : FACoreTest::nfa_thompson_structure_union() 关键步骤: lexFile -> parseFile -> buildNFA
+1: QINFO  : FACoreTest::nfa_thompson_structure_union() 输出: states= 6 , edges= 6 , epsilonEdges= 4 , acceptCount= 1
+1: PASS   : FACoreTest::nfa_thompson_structure_union()
+1: QINFO  : FACoreTest::dfa_subset_determinism_union() 输入规则: "_tok100 = a | b"
+1: QINFO  : FACoreTest::dfa_subset_determinism_union() 关键步骤: lexFile -> parseFile -> buildNFA -> buildDFA
+1: QINFO  : FACoreTest::dfa_subset_determinism_union() 输出: states= 3 , transitions= 2 , symbolsNormal= true
+1: PASS   : FACoreTest::dfa_subset_determinism_union()
+1: QINFO  : FACoreTest::mindfa_minimization_star() 输入规则: "_tok101 = (a|b)*"
+1: QINFO  : FACoreTest::mindfa_minimization_star() 关键步骤: buildNFA -> buildDFA -> buildMinDFA
+1: QINFO  : FACoreTest::mindfa_minimization_star() 输出: minStates= 1 , start= 1
+1: PASS   : FACoreTest::mindfa_minimization_star()
+1: PASS   : FACoreTest::accept_concat_with_codegen()
+1: PASS   : FACoreTest::cleanupTestCase()
+1: Totals: 6 passed, 0 failed, 0 skipped, 0 blacklisted, 2ms
+1: ********* Finished testing of FACoreTest *********
+ 1/12 Test  #1: FA核心测试 ...................   Passed    0.03 sec
+test 2
+      Start  2: 最长匹配测试
+
+2: Test command: /Users/bytedance/project/byyl/build/LongestMatchTest
+2: Working Directory: /Users/bytedance/project/byyl/build
+2: Test timeout computed to be: 10000000
+2: ********* Start testing of LongestMatchTest *********
+2: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+2: PASS   : LongestMatchTest::initTestCase()
+2: QINFO  : LongestMatchTest::longest_match_keywords_vs_identifier() 输入规则: "letter=[A-Za-z_]\ndigit=[0-9]\n_identifier100=letter(letter|digit)*\n_keywords200S= if | else | read | write | then | end"
+2: QINFO  : LongestMatchTest::longest_match_keywords_vs_identifier() 关键步骤: lexFile -> parseFile -> buildAllMinDFA -> runMultiple
+2: QINFO  : LongestMatchTest::longest_match_keywords_vs_identifier() 源文本: "if abc"
+2: QINFO  : LongestMatchTest::longest_match_keywords_vs_identifier() 输出编码序列: "200 100"
+2: PASS   : LongestMatchTest::longest_match_keywords_vs_identifier()
+2: PASS   : LongestMatchTest::cleanupTestCase()
+2: Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 15ms
+2: ********* Finished testing of LongestMatchTest *********
+ 2/12 Test  #2: 最长匹配测试 ...............   Passed    0.04 sec
+test 3
+      Start  3: 界面测试
+
+3: Test command: /Users/bytedance/project/byyl/build/GuiTest
+3: Working Directory: /Users/bytedance/project/byyl/build
+3: Test timeout computed to be: 10000000
+3: ********* Start testing of TestGui *********
+3: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+3: PASS   : TestGui::initTestCase()
+3: QWARN  : TestGui::testConversionFlow() QObject::disconnect: wildcard call disconnects from destroyed signal of QPushButton::btnRunLexer
+3: 【界面测试】控件已加载：正则编辑、转换按钮、NFA表
+3: PASS   : TestGui::testConversionFlow()
+3: QWARN  : TestGui::testLabels() QObject::disconnect: wildcard call disconnects from destroyed signal of QPushButton::btnRunLexer
+3: 【测试与验证】左侧为源程序输入，右侧为Token编码输出
+3: PASS   : TestGui::testLabels()
+3: QWARN  : TestGui::testRunLexerPanel() QObject::disconnect: wildcard call disconnects from destroyed signal of QPushButton::btnRunLexer
+3: PASS   : TestGui::testRunLexerPanel()
+3: PASS   : TestGui::cleanupTestCase()
+3: Totals: 5 passed, 0 failed, 0 skipped, 0 blacklisted, 195ms
+3: ********* Finished testing of TestGui *********
+ 3/12 Test  #3: 界面测试 .....................   Passed    0.35 sec
+test 4
+      Start  4: 文法解析测试
+
+4: Test command: /Users/bytedance/project/byyl/build/GrammarParserTest
+4: Working Directory: /Users/bytedance/project/byyl/build
+4: Test timeout computed to be: 10000000
+4: ********* Start testing of GrammarParserTest *********
+4: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+4: PASS   : GrammarParserTest::initTestCase()
+4: PASS   : GrammarParserTest::parse_simple_grammar()
+4: PASS   : GrammarParserTest::cleanupTestCase()
+4: Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 1ms
+4: ********* Finished testing of GrammarParserTest *********
+ 4/12 Test  #4: 文法解析测试 ...............   Passed    0.02 sec
+test 5
+      Start  5: LL1算法测试
+
+5: Test command: /Users/bytedance/project/byyl/build/LL1Test
+5: Working Directory: /Users/bytedance/project/byyl/build
+5: Test timeout computed to be: 10000000
+5: ********* Start testing of LL1Test *********
+5: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+5: PASS   : LL1Test::initTestCase()
+5: PASS   : LL1Test::compute_first_follow()
+5: PASS   : LL1Test::cleanupTestCase()
+5: Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 1ms
+5: ********* Finished testing of LL1Test *********
+ 5/12 Test  #5: LL1算法测试 ..................   Passed    0.02 sec
+test 6
+      Start  6: LR1算法测试
+
+6: Test command: /Users/bytedance/project/byyl/build/LR1Test
+6: Working Directory: /Users/bytedance/project/byyl/build
+6: Test timeout computed to be: 10000000
+6: ********* Start testing of LR1Test *********
+6: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+6: PASS   : LR1Test::initTestCase()
+6: PASS   : LR1Test::build_lr1_graph_basic()
+6: PASS   : LR1Test::cleanupTestCase()
+6: Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 1ms
+6: ********* Finished testing of LR1Test *********
+ 6/12 Test  #6: LR1算法测试 ..................   Passed    0.02 sec
+test 7
+      Start  7: 语义树示例测试
+
+7: Test command: /Users/bytedance/project/byyl/build/LR1SemanticTreeExampleTest
+7: Working Directory: /Users/bytedance/project/byyl/build
+7: Test timeout computed to be: 10000000
+7: ********* Start testing of LR1SemanticTreeExampleTest *********
+7: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+7: PASS   : LR1SemanticTreeExampleTest::initTestCase()
+7: PASS   : LR1SemanticTreeExampleTest::example_tree_shape()
+7: PASS   : LR1SemanticTreeExampleTest::cleanupTestCase()
+7: Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 1548ms
+7: ********* Finished testing of LR1SemanticTreeExampleTest *********
+ 7/12 Test  #7: 语义树示例测试 ............   Passed    1.57 sec
+test 8
+      Start  8: 语义树完整结构测试
+
+8: Test command: /Users/bytedance/project/byyl/build/LR1SemanticTreeFullTest
+8: Working Directory: /Users/bytedance/project/byyl/build
+8: Test timeout computed to be: 10000000
+8: ********* Start testing of LR1SemanticTreeFullTest *********
+8: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+8: PASS   : LR1SemanticTreeFullTest::initTestCase()
+8: PASS   : LR1SemanticTreeFullTest::full_tree_contains_expected_nodes()
+8: PASS   : LR1SemanticTreeFullTest::cleanupTestCase()
+8: Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 1563ms
+8: ********* Finished testing of LR1SemanticTreeFullTest *********
+ 8/12 Test  #8: 语义树完整结构测试 ......   Passed    1.59 sec
+test 9
+      Start  9: LR0算法测试
+
+9: Test command: /Users/bytedance/project/byyl/build/LR0Test
+9: Working Directory: /Users/bytedance/project/byyl/build
+9: Test timeout computed to be: 10000000
+9: ********* Start testing of LR0Test *********
+9: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+9: PASS   : LR0Test::initTestCase()
+9: PASS   : LR0Test::build_lr0_graph_basic()
+9: PASS   : LR0Test::cleanupTestCase()
+9: Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 1ms
+9: ********* Finished testing of LR0Test *********
+ 9/12 Test  #9: LR0算法测试 ..................   Passed    0.02 sec
+test 10
+      Start 10: SLR算法测试
+
+10: Test command: /Users/bytedance/project/byyl/build/SLRTest
+10: Working Directory: /Users/bytedance/project/byyl/build
+10: Test timeout computed to be: 10000000
+10: ********* Start testing of SLRTest *********
+10: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+10: PASS   : SLRTest::initTestCase()
+10: PASS   : SLRTest::slr_ok_basic()
+10: PASS   : SLRTest::slr_conflict_placeholder()
+10: PASS   : SLRTest::cleanupTestCase()
+10: Totals: 4 passed, 0 failed, 0 skipped, 0 blacklisted, 1ms
+10: ********* Finished testing of SLRTest *********
+10/12 Test #10: SLR算法测试 ..................   Passed    0.02 sec
+test 11
+      Start 11: 命令行正则测试
+
+11: Test command: /Users/bytedance/project/byyl/build/CliRegexTest
+11: Working Directory: /Users/bytedance/project/byyl/build
+11: Test timeout computed to be: 10000000
+11: ********* Start testing of CliRegexTest *********
+11: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+11: PASS   : CliRegexTest::initTestCase()
+11: 【文件长度】344
+11: 【词法规则数(lex)】4
+11: 【javascript lex tokens】4
+11: 【javascript parse tokens】4
+11: 【可解析的Token数(parse)】4
+11: 【Token名称与编码】_identifier100:100
+11: _number101:101
+11: _keywords200S:200
+11: _operators220S:220
+11: 【编码列表(前10个)】100,101,200,201,202,203,204,205,206,207
+11: 【用例1输入】abc123 456 def789
+11: 【用例1输出】100 101 100
+11: 【用例1Token数量】3，【ERR数量】0
+11: 【用例2输入】if return == var abc123
+11: 【用例2输出】200 202 225 214 100
+11: 【用例2Token数量】5，【ERR数量】0
+11: 【用例3输入】abc123 def456
+11: if return == var abc123
+11: 【用例3输出】100 100 200 202 225 214 100
+11: 【用例3Token数量】7，【ERR数量】0
+11: PASS   : CliRegexTest::test_js_regex_pipeline()
+11: 【tiny lex tokens】4
+11: 【tiny parse tokens】4
+11: PASS   : CliRegexTest::test_tiny_regex_pipeline()
+11: 【go lex tokens】4
+11: 【go parse tokens】4
+11: 【cpp 输出】205 200 100 238 205 208 233 100 234 100 236 237 100 235 238 228 100 231 101 241 100 242 100 242 100 234 100 235 241 239 239
+11: 【rust ERR数量】0
+11: PASS   : CliRegexTest::test_java_regex_pipeline()
+11: 【rust lex tokens】4
+11: 【rust parse tokens】4
+11: 【cpp 输出】ERR 100 227 100 229 200 100 234 235 238 200 100 231 101 241 100 232 232 100 227 227 100 227 227 100 232 232 100 241 215 101 241 239
+11: 【cpp tokens】ERR 100 227 100 229 200 100 234 235 238 200 100 231 101 241 100 232 232 100 227 227 100 227 227 100 232 232 100 241 215 101 241 239 
+11: 【cpp ERR数量】1
+11: PASS   : CliRegexTest::test_cpp_regex_pipeline()
+11: 【go 输出】200 100 201 202 100 232 233 236 203 100 100 231 101 239 100 240 100 232 100 233 237
+11: PASS   : CliRegexTest::test_go_regex_pipeline()
+11: PASS   : CliRegexTest::test_rust_regex_pipeline()
+11: PASS   : CliRegexTest::cleanupTestCase()
+11: Totals: 8 passed, 0 failed, 0 skipped, 0 blacklisted, 891ms
+11: ********* Finished testing of CliRegexTest *********
+11/12 Test #11: 命令行正则测试 ............   Passed    0.91 sec
+test 12
+      Start 12: 代码生成器测试
+
+12: Test command: /Users/bytedance/project/byyl/build/CodegenTest
+12: Working Directory: /Users/bytedance/project/byyl/build
+12: Test timeout computed to be: 10000000
+12: ********* Start testing of CodegenTest *********
+12: Config: Using QtTest library 6.9.3, Qt 6.9.3 (arm64-little_endian-lp64 shared (dynamic) release build; by Apple LLVM 17.0.0 (clang-1700.0.13.3)), macos 15.7.2
+12: PASS   : CodegenTest::initTestCase()
+12: 【生成器编译退出码】0
+12: 【编译器错误输出】
+12: 【输入】abc123 def456
+12: 【关键步骤】跳过空白/注释 → 逐字符步进（Step） → 不可移停止 → 接受判定（AcceptState） → 编码输出
+12: 【生成器运行输出】ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR ERR
+12: PASS   : CodegenTest::test_generate_compile_run()
+12: PASS   : CodegenTest::cleanupTestCase()
+12: Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 1288ms
+12: ********* Finished testing of CodegenTest *********
+12/12 Test #12: 代码生成器测试 ............   Passed    1.31 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Total Test time (real) =   5.92 sec

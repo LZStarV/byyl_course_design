@@ -9,6 +9,8 @@
 
 依赖安装（示例）
 
+> 推荐使用 macOS 使用以下命令行进行构建与运行；Windows 下推荐使用 Qt Creator 打开项目（选中 CMake 项目文件）。
+
 - macOS：`brew install qt graphviz ninja`
 - Windows：安装 Qt(含 MSVC)、Graphviz，并确保 `dot` 在 PATH
 

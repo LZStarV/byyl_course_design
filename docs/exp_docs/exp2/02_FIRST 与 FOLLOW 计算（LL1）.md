@@ -159,7 +159,14 @@ LL1Info LL1::compute(const Grammar& g)
 
 ## 单元测试
 - 输入：
-  - 表达式文法（`E/E'/T/T'/F`）
+  - 文法定义（LL(1) 表达式）：
+    ```
+    E  -> T E'
+    E' -> + T E' | #
+    T  -> F T'
+    T' -> * F T' | #
+    F  -> ( E ) | id
+    ```
 - 预期结果：
   - `FIRST(F)={(,id}`，`FIRST(T')={*,#}`；`FOLLOW(E)={(,),$}`；
   - 预测表关键项符合期望（如 `TABLE[E'][+]` 指向 `E'→+ T E'`）。
