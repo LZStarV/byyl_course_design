@@ -3,13 +3,16 @@
 ## 数据结构总览
 
 对象或变量名称 | 数据结构 | 存储结构用途
-| - | - | -
-LR0Item | 结构体 | 存储左部、右部与点位的项
-状态集合 I | 集合 | 若干 LR0Item 构成的 DFA 状态
-edges | 映射 | 符号到目标状态的迁移记录
-S' | 非终结符 | 增广开始符使初始项集可接受判定
-symbols | 集合 | 状态中点后可移进的符号集合
-added | 布尔 | 构造过程中是否新增状态的标记
+- | - | -
+LR0Item.left/right/dot | 结构体字段 | 项的左部/右部序列/点位
+LR0Graph.states | QVector<QVector<LR0Item>> | 项集族（每个状态的项集合）
+LR0Graph.edges | QMap<int, QMap<QString,int>> | 状态迁移边（i×符号→目标 j）
+symbols | QSet<QString> | 状态中点后可移进的符号集合
+equalSet(a,b) | 函数 | 判断两项集合是否相等（去重用）
+closure(const QVector<LR0Item>&) | 子过程 | LR(0) 闭包（对点后非终结符展开）
+gotoSet(const QVector<LR0Item>&, const QString&) | 子过程 | 对符号 X 右移点得到集合
+Config::augSuffix() | 常量 | 增广后缀（形成 S'）
+added | bool | 构造过程中是否新增状态的标记
 
 ## 算法实现过程
 1. 增广文法：在原开始符外包一条 `S'→S` 的产生式，便于构造初始项集与接受判定。

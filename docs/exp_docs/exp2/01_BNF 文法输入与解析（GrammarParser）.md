@@ -3,13 +3,22 @@
 ## 数据结构总览
 
 对象或变量名称 | 数据结构 | 存储结构用途
-| - | - | -
-Production | 结构体 | 存储产生式的左部、右部符号序列与来源行号
-Grammar | 类/映射 | 存储终结符、非终结符集合、开始符、产生式映射
-`#`/`$` | 特殊符号 | 分别表示空串与输入结束（用于集合/前瞻）
-lineNo | 整数 | 当前解析行号，记录错误定位
-startSymbol | 字符串 | 首个出现的左部，作为文法开始符
-tokens | 序列 | 右部切分后的符号序列
+- | - | -
+Production.left/right/line | 结构体字段 | 左部、右部符号序列、来源行号
+Grammar.terminals | QSet<QString> | 终结符集合
+Grammar.nonterminals | QSet<QString> | 非终结符集合
+Grammar.startSymbol | QString | 文法开始符
+Grammar.productions | QMap<QString, QVector<Production>> | 产生式映射（左部→候选列表）
+lineNo | int | 当前解析行号（错误定位）
+left | QString | 当前行的产生式左部
+tokens | QVector<QString> | 右部切分后的符号序列
+epsilon（`#`） | 特殊符号 | 空串标记（不计入非终结符）
+mops | QVector<QString> | 多字符运算符集合（如 `<=, >=, ==, !=, :=, ++, --`）
+ops | QSet<QChar> | 单字符分隔符集合（如 `(){}[];,<>=+-*/%^`）
+isWordChar(c) | 函数 | 判断是否为词法单词字符（字母/数字/`_`/`-`）
+splitRhs(const QString&) | 子过程 | 右部切分：多字符优先→单字符分隔→词法单词
+parseLine(const QString&, int, Grammar&, QString&) | 子过程 | 行解析：`A -> α | β ...`，首个左部设为开始符
+parseText/parseString/parseFile | 子过程 | 文本/字符串/文件入口（聚合行解析与归类）
 
 ## 算法实现过程
 1. 文本读取与行过滤：按行处理文法文本；空行与仅由 `#` 构成的行忽略；`//` 开头的行为注释行忽略。

@@ -3,14 +3,16 @@
 ## 数据结构总览
 
 对象或变量名称 | 数据结构 | 存储结构用途
-| - | - | -
-FIRST(X) | 集合 | 符号 X 的首符集合；终结符 a 的 FIRST(a)={a}
-FOLLOW(A) | 集合 | 非终结符 A 的后继终结符集合；开始符含 `$`
-TABLE | 映射 | 预测表，TABLE[A][a]=产生式索引 k
-`#`/`$` | 特殊符号 | 分别表示空串与输入结束
-changed | 布尔 | FIRST/FOLLOW 迭代是否变化的标记
-seq | 序列 | 产生式右部符号序列
-k | 整数 | 产生式在 A 的候选中的索引
+- | - | -
+LL1Info.first | QMap<QString, QSet<QString>> | FIRST 集合映射（符号→集合）
+LL1Info.follow | QMap<QString, QSet<QString>> | FOLLOW 集合映射（非终结符→集合）
+LL1Info.table | QMap<QString, QMap<QString,int>> | LL(1) 预测表（A×a→产生式索引）
+LL1Info.conflicts | QVector<QString> | 表项冲突记录（文本说明）
+firstSeq(const QVector<QString>&) | 子过程 | 计算序列的 FIRST，保留 `#` 语义
+Grammar.nonterminals/terminals | QSet<QString> | 非终结符/终结符集合（初始化用）
+Config::epsilonSymbol()/eofSymbol() | 常量 | `#`（epsilon）与 `$`（EOF）符号
+changed | bool | FIRST/FOLLOW 迭代是否发生变化
+seq/k | QVector<QString>/int | 右部序列与产生式索引（填表用）
 
 ## 算法实现过程
 1. FIRST 初始化：为每个终结符 `a` 设置 `FIRST(a)={a}`；为每个非终结符建立空集。

@@ -4,13 +4,15 @@
 
 对象或变量名称 | 数据结构 | 存储结构用途
 | - | - | -
-LR1Item | 结构体 | 存储左部、右部、点位与前瞻终结符的项
-状态集合 I | 集合 | 一组 LR1Item，表示 DFA 的一个状态
-edges | 映射 | 记录“符号→目标状态”的迁移关系
-`#`/`$` | 特殊符号 | 分别表示空串与输入结束（前瞻使用）
-nextSymbols | 集合 | 当前状态中点位后可移进的符号集合
-key | 字符串 | 项集序列化键，用于去重与索引
-changed | 布尔 | 构造过程中是否有新状态加入的标记
+LR1Item.left/right/dot/lookahead | 结构体字段 | 项的左部/右部序列/点位/前瞻终结符
+LR1Graph.states | QVector<QVector<LR1Item>> | 含向前看的项集族
+LR1Graph.edges | QMap<int, QMap<QString,int>> | 状态迁移边（i×符号→目标 j）
+firstSeqLL1(seq, la) | 子过程 | 计算 FIRST(β+a) 的集合
+closureLL1(items) | 子过程 | LR(1) 闭包（基于 FIRST(β+a) 展开）
+goToLL1(items, X) | 子过程 | 对符号 X 右移点并再闭包
+serializeSet(items) | 函数 | 项集序列化为稳定字符串键（去重用）
+Config::eofSymbol()/augSuffix() | 常量 | `$`（EOF）与增广后缀
+nextSymbols/key/changed | 变量 | 点后符号集/序列化键/是否新增状态标记
 
 ## 算法实现过程
 1. 增广文法：在开始符外包一条 `S'→S` 的产生式，并以 `$` 作为初始前瞻终结符。

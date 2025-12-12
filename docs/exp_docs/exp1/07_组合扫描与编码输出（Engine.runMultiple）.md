@@ -5,16 +5,16 @@
 表 1 数据结构总览
 
 对象或变量名称 | 数据结构 | 存储结构用途
-- | - | -
-mdfas | 向量 | 最小化 DFA 集合（组合扫描的候选）
-codes | 向量 | 与 mdfas 一一对应的编码列表
-source | 文本 | 源文本（待扫描）
-identifierCodes | 集合 | 需要追加词素的编码集合
-out | 文本 | 输出编码序列（空格分隔；必要时追加词素）
-pos | 整数 | 当前扫描位置
-bestLen/bestIdx/bestW | 整数 | 最长匹配长度 / 选择索引 / 权重
-matchLen | 函数 | 计算指定 DFA 从位置的最长可接受前缀长度
-emitIdentifierLexeme | 布尔 | 是否开启“追加词素”开关
+| - | - | -
+mdfas | QVector<MinDFA> | 最小化 DFA 集合（组合扫描候选）
+codes | QVector<int> | 与 mdfas 一一对应的编码列表
+source | QString | 源文本（待扫描）
+identifierCodes | QSet<int> | 需要追加词素的编码集合
+out | QString | 输出编码序列（空格分隔；必要时追加词素）
+pos | int | 当前扫描位置
+bestLen/bestIdx/bestW | int | 最长匹配长度 / 选择索引 / 权重
+matchLen(const MinDFA&, const QString&, int) | 函数 | 计算指定 DFA 从位置的最长可接受前缀长度
+Config::emitIdentifierLexeme() | 布尔 | 是否开启“追加词素”开关
 跳过策略开关 | 布尔 | 空白/注释/字符串（单/双/模板）是否跳过
 
 ## 算法实现过程

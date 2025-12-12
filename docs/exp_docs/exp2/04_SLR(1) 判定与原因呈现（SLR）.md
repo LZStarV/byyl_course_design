@@ -3,11 +3,14 @@
 ## 数据结构总览
 
 对象或变量名称 | 数据结构 | 存储结构用途
-| - | - | -
-isSLR1 | 布尔 | 是否为 SLR(1) 文法的结论标记
-conflicts | 列表 | 冲突条目集合（含状态、终结符、类型、明细）
-actionsSet | 映射 | `(state, terminal) → 动作集合` 的聚合结构
-动作字符串 | 字符串 | `sN`（移进到状态 N）、`r A -> α`（规约产生式）
+- | - | -
+SLRCheckResult.isSLR1 | bool | 是否为 SLR(1) 的结论标记
+SLRCheckResult.conflicts | QVector<SLRConflict> | 冲突条目集合
+SLRConflict.state/terminal/type/detail | 结构体字段 | 状态编号/终结符/类型/明细字符串
+actionsSet | QMap<int, QMap<QString, QSet<QString>>> | `(state, terminal) → 动作集合` 聚合结构
+act 字符串 | QString | `sN`（移进）/`r A -> α`（规约）动作文本
+LR0Graph.states/edges | 结构 | LR(0) 项集与迁移边（移进依据）
+LL1Info.follow | 映射 | FOLLOW 集（规约分发依据）
 
 ## 算法实现过程
 1. LR(0) 支持集：先构造 LR(0) 项集 DFA，用于确定移进的目标状态。
